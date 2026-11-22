@@ -1,6 +1,6 @@
 export default ({ command }) => ({
-  // GitHub Pages 部署于 /taohuayuan/ 子路径；开发服务器保持根路径
-  base: command === 'build' ? '/taohuayuan/' : '/',
+  // GitHub Pages 走 /taohuayuan/ 子路径；Vercel 走根域名（其构建环境自带 VERCEL=1）；开发保持根路径
+  base: process.env.VERCEL ? '/' : command === 'build' ? '/taohuayuan/' : '/',
   build: {
     chunkSizeWarningLimit: 550,
     rollupOptions: {
