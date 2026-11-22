@@ -4,7 +4,7 @@
 // 3) 出圈与契约卫生（全局统一 dt=0 冻结门、主循环零 getStats() 热路径、桃源小笺 ? 与入画巡游 L、触屏漫游控制、index.html/vite.config 规范）
 
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import * as THREE from 'three';
 
 import { createHeightFunction, createRiverDistance, createMountains } from '../src/world/terrain.js';
@@ -277,7 +277,24 @@ try {
   assert.ok(loopSrc.includes('sound.setLostMood'), 'main.js syncs Act 3 lost mood to sparse poetic music');
 
   const htmlSrc = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  assert.ok(htmlSrc.includes('type="image/svg+xml"'), 'index.html provides inline SVG cinnabar-seal favicon');
+  assert.ok(
+    htmlSrc.includes('rel="icon"') && htmlSrc.includes('type="image/svg+xml"') && htmlSrc.includes('favicon.svg'),
+    'index.html links SVG illustration favicon'
+  );
+  assert.ok(
+    htmlSrc.includes('rel="apple-touch-icon"') && htmlSrc.includes('apple-touch-icon.png'),
+    'index.html links 180x180 apple-touch-icon'
+  );
+  const faviconSvg = readFileSync(new URL('../public/favicon.svg', import.meta.url), 'utf8');
+  assert.ok(
+    /<(?:linear|radial)Gradient\b/.test(faviconSvg),
+    'public/favicon.svg uses rich multi-stop illustration gradients'
+  );
+  assert.equal(/<text\b/i.test(faviconSvg), false, 'public/favicon.svg contains zero <text> elements');
+  assert.ok(
+    statSync(new URL('../public/apple-touch-icon.png', import.meta.url)).size > 0,
+    'public/apple-touch-icon.png exists and is non-empty'
+  );
   assert.ok(htmlSrc.includes('property="og:title"') && htmlSrc.includes('name="theme-color"'), 'index.html includes OG & theme-color metadata');
   for (const keyHint of ['O 丹青', 'N 雅音', 'P 御风', 'L 入画', '? 小笺']) {
     assert.ok(htmlSrc.includes(keyHint), `index.html #hint lists ${keyHint}`);

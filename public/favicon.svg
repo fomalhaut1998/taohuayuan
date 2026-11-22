@@ -1,0 +1,249 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <clipPath id="fav-clip">
+      <rect x="1.5" y="1.5" width="61" height="61" rx="15" />
+    </clipPath>
+
+    <linearGradient id="fav-sky" x1="12%" y1="0%" x2="88%" y2="100%">
+      <stop offset="0%" stop-color="#79CBE2" />
+      <stop offset="36%" stop-color="#BCE9E7" />
+      <stop offset="70%" stop-color="#EAF5E7" />
+      <stop offset="100%" stop-color="#FFF0D6" />
+    </linearGradient>
+
+    <radialGradient id="fav-sun-halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFDF0" stop-opacity="0.96" />
+      <stop offset="44%" stop-color="#FFEAA8" stop-opacity="0.54" />
+      <stop offset="100%" stop-color="#FFEAA8" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="fav-sun-disc" cx="42%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="68%" stop-color="#FFF9DC" />
+      <stop offset="100%" stop-color="#FFE6A3" />
+    </radialGradient>
+
+    <linearGradient id="fav-cloud" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9" />
+      <stop offset="72%" stop-color="#F8FBF6" stop-opacity="0.72" />
+      <stop offset="100%" stop-color="#E7F3EE" stop-opacity="0.22" />
+    </linearGradient>
+
+    <linearGradient id="fav-mtn-far" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6CB8B6" />
+      <stop offset="56%" stop-color="#A3DAD0" />
+      <stop offset="100%" stop-color="#E2F3EA" />
+    </linearGradient>
+
+    <linearGradient id="fav-hill-l" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#87CE96" />
+      <stop offset="52%" stop-color="#58A381" />
+      <stop offset="100%" stop-color="#397E6B" />
+    </linearGradient>
+
+    <linearGradient id="fav-hill-r" x1="18%" y1="0%" x2="82%" y2="100%">
+      <stop offset="0%" stop-color="#78C09B" />
+      <stop offset="52%" stop-color="#4A9580" />
+      <stop offset="100%" stop-color="#2E6D62" />
+    </linearGradient>
+
+    <radialGradient id="fav-valley-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFDE2" stop-opacity="0.95" />
+      <stop offset="48%" stop-color="#FDE19B" stop-opacity="0.58" />
+      <stop offset="100%" stop-color="#FDE19B" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="fav-meadow" x1="40%" y1="0%" x2="60%" y2="100%">
+      <stop offset="0%" stop-color="#7BC284" />
+      <stop offset="100%" stop-color="#448B6B" />
+    </linearGradient>
+
+    <linearGradient id="fav-stream" x1="45%" y1="0%" x2="55%" y2="100%">
+      <stop offset="0%" stop-color="#A5EAE2" />
+      <stop offset="46%" stop-color="#69C5BF" />
+      <stop offset="100%" stop-color="#48A9A4" />
+    </linearGradient>
+
+    <linearGradient id="fav-water-gold" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7CE" stop-opacity="0.76" />
+      <stop offset="100%" stop-color="#FDE2A0" stop-opacity="0" />
+    </linearGradient>
+
+    <linearGradient id="fav-leaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A6E084" />
+      <stop offset="100%" stop-color="#53A468" />
+    </linearGradient>
+
+    <linearGradient id="fav-petal-grad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8FA" />
+      <stop offset="30%" stop-color="#FCC7D8" />
+      <stop offset="72%" stop-color="#EF89A8" />
+      <stop offset="100%" stop-color="#D15A81" />
+    </linearGradient>
+
+    <radialGradient id="fav-blossom-core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#BD456D" />
+      <stop offset="65%" stop-color="#D76087" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#EF89A8" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="fav-bud-grad" x1="25%" y1="0%" x2="75%" y2="100%">
+      <stop offset="0%" stop-color="#FFE6ED" />
+      <stop offset="48%" stop-color="#F395B2" />
+      <stop offset="100%" stop-color="#CE587F" />
+    </linearGradient>
+
+    <g id="fav-leaf-unit">
+      <path d="M0,0 C3.5,-6.2 10.8,-9.0 17.8,-7.0 C14.8,-0.4 8.6,3.2 0,0 Z" fill="url(#fav-leaf)" />
+      <path d="M0,0 C8.6,3.2 14.8,-0.4 17.8,-7.0 C11.4,-3.8 5.4,-1.6 0,0 Z" fill="#468F5E" fill-opacity="0.56" />
+      <path d="M1.2,-0.3 Q8.8,-3.3 16.0,-6.2" fill="none" stroke="#D8F7BC" stroke-width="0.85" stroke-linecap="round" opacity="0.86" />
+    </g>
+
+    <g id="fav-petal">
+      <path
+        d="M0,-1.8 C-5.2,-4.4 -8.2,-9.6 -6.8,-14.0 C-5.8,-16.8 -2.8,-17.8 -0.9,-16.3 L0,-15.1 L0.9,-16.3 C2.8,-17.8 5.8,-16.8 6.8,-14.0 C8.2,-9.6 5.2,-4.4 0,-1.8 Z"
+        fill="url(#fav-petal-grad)"
+        stroke="#D46688"
+        stroke-width="0.58"
+        stroke-opacity="0.6"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M-2.2,-6.5 C-3.8,-9.2 -3.6,-12.5 -1.9,-14.1 C-0.5,-13.0 0.4,-11.0 0.2,-6.5 Z"
+        fill="#FFFFFF"
+        fill-opacity="0.34"
+      />
+    </g>
+  </defs>
+
+  <g clip-path="url(#fav-clip)">
+    <!-- 1. Fresh Morning Sky, Sun & Gouache Cloud -->
+    <rect width="64" height="64" fill="url(#fav-sky)" />
+    <circle cx="15.5" cy="14.5" r="14.5" fill="url(#fav-sun-halo)" />
+    <circle cx="15.5" cy="14.5" r="4.6" fill="url(#fav-sun-disc)" />
+    <path
+      d="M36.5,18.6 C37.2,15.6 40.5,14.2 43.4,14.8 C45.2,11.4 49.8,10.6 53.0,13.0 C55.4,11.6 59.0,12.6 60.4,15.2 C62.0,15.6 62.6,17.2 61.8,18.6 Z"
+      fill="url(#fav-cloud)"
+    />
+
+    <!-- 2. Misty Blue-Jade Far Peak & Celadon Hills Framing Valley Saddle -->
+    <path
+      d="M0,41 L0,29.5 Q9.5,26.5 18.5,31.5 Q25,35 34.5,29.8 Q45.5,23.2 55.5,22.2 Q60,21.8 64,24.8 L64,43 Z"
+      fill="url(#fav-mtn-far)"
+    />
+    <path
+      d="M0,46 L0,32.5 Q8.5,30.2 15.8,35.2 Q19.5,37.8 22.8,41.2 L22.8,48 L0,48 Z"
+      fill="url(#fav-hill-l)"
+    />
+    <path
+      d="M19.8,42.0 Q28,37.8 36.5,32.5 Q46.5,26.2 56.5,28.5 Q61,29.6 64,31.8 L64,48 L19.8,48 Z"
+      fill="url(#fav-hill-r)"
+    />
+    <path
+      d="M23.5,40.0 Q31.5,35.8 39.5,30.8 Q47.8,26.2 56.5,28.5"
+      fill="none"
+      stroke="#CBEBB8"
+      stroke-width="1.15"
+      stroke-linecap="round"
+      opacity="0.72"
+    />
+
+    <!-- Soft Warm Golden Mist Glow in Valley Saddle ("仿佛若有光") -->
+    <ellipse cx="21.5" cy="39.5" rx="11.5" ry="7.2" fill="url(#fav-valley-glow)" />
+
+    <!-- 3. Lush Meadow & Winding Crystal-Jade Stream ("缘溪行") -->
+    <path
+      d="M0,43.2 Q11.5,40.6 22.5,41.4 Q38,42.6 64,40.0 L64,64 L0,64 Z"
+      fill="url(#fav-meadow)"
+    />
+    <path
+      d="M20.5,41.0 C19.8,44.4 14.5,46.8 12.2,50.8 C10.0,54.6 10.6,58.8 9.2,64 L31.2,64 C28.4,59.4 24.4,56.0 23.0,52.4 C21.6,48.6 23.8,44.8 24.4,41.2 Z"
+      fill="url(#fav-stream)"
+    />
+    <path
+      d="M21.0,41.2 C20.4,44.2 17.6,46.4 15.6,49.2 C18.8,47.6 22.2,45.0 23.8,41.2 Z"
+      fill="url(#fav-water-gold)"
+    />
+    <g fill="none" stroke="#FFFDF5" stroke-linecap="round" opacity="0.72">
+      <path d="M13.6,52.8 Q16.6,52.0 19.6,52.8" stroke-width="0.65" />
+      <path d="M16.2,59.2 Q20.4,58.3 24.6,59.4" stroke-width="0.7" />
+    </g>
+    <path
+      d="M20.2,54.6 C19.2,54.0 18.2,54.6 18.4,55.5 C18.6,56.3 19.9,56.8 21.0,56.4 C21.8,56.1 22.0,55.2 21.1,54.7 L20.6,55.1 Z"
+      fill="#FFD5E2"
+      fill-opacity="0.94"
+    />
+
+    <!-- 4. Hero Fresh-Illustrated Peach Branch, Leaves, Blossom & Bud -->
+    <!-- Sweeping Chestnut Twig -->
+    <path
+      d="M-1.0,60.6 C10.5,53.0 21.5,44.0 33.2,34.8 C39.5,29.6 44.2,26.0 47.6,23.4"
+      fill="none"
+      stroke="#754F3E"
+      stroke-width="2.5"
+      stroke-linecap="round"
+    />
+    <path
+      d="M-0.5,59.6 C11.0,52.0 21.8,43.0 33.0,34.2 C39.0,29.2 43.8,25.6 47.0,23.2"
+      fill="none"
+      stroke="#A87A64"
+      stroke-width="0.82"
+      stroke-linecap="round"
+      opacity="0.78"
+    />
+    <path
+      d="M25.0,41.2 C22.5,38.0 20.0,34.2 18.2,29.8"
+      fill="none"
+      stroke="#754F3E"
+      stroke-width="1.45"
+      stroke-linecap="round"
+    />
+
+    <!-- Soft Grounding Shadow Behind Blossom -->
+    <circle cx="33.8" cy="36.4" r="15.0" fill="#286254" fill-opacity="0.18" />
+
+    <!-- Two Organic Two-Tone Spring Leaves (sunlit sides facing upward) -->
+    <use href="#fav-leaf-unit" transform="translate(22.2, 30.2) scale(-1, 1) rotate(-22) scale(0.98)" />
+    <use href="#fav-leaf-unit" transform="translate(41.5, 41.2) rotate(14) scale(0.92)" />
+
+    <!-- Hero 5-Petal Notched Peach Blossom -->
+    <g transform="translate(33.2, 34.8) rotate(-12)">
+      <use href="#fav-petal" />
+      <use href="#fav-petal" transform="rotate(72)" />
+      <use href="#fav-petal" transform="rotate(144)" />
+      <use href="#fav-petal" transform="rotate(216)" />
+      <use href="#fav-petal" transform="rotate(288)" />
+
+      <circle cx="0" cy="0" r="5.2" fill="url(#fav-blossom-core)" />
+
+      <!-- Radiating Creamy-Gold Stamens & Anthers (offset 36 deg between petals) -->
+      <g stroke="#FFF4C2" stroke-width="0.8" stroke-linecap="round">
+        <line x1="0" y1="0" x2="3.8" y2="-5.2" />
+        <line x1="0" y1="0" x2="6.1" y2="2.0" />
+        <line x1="0" y1="0" x2="0" y2="6.4" />
+        <line x1="0" y1="0" x2="-6.1" y2="2.0" />
+        <line x1="0" y1="0" x2="-3.8" y2="-5.2" />
+      </g>
+      <g fill="#FFD452" stroke="#D98E2B" stroke-width="0.35">
+        <circle cx="3.8" cy="-5.2" r="1.25" />
+        <circle cx="6.1" cy="2.0" r="1.25" />
+        <circle cx="0" cy="6.4" r="1.25" />
+        <circle cx="-6.1" cy="2.0" r="1.25" />
+        <circle cx="-3.8" cy="-5.2" r="1.25" />
+      </g>
+      <circle cx="0" cy="0" r="2.25" fill="#FFE678" stroke="#DE972E" stroke-width="0.35" />
+      <circle cx="-0.5" cy="-0.5" r="0.85" fill="#FFFDF2" fill-opacity="0.88" />
+    </g>
+
+    <!-- Plump Rosy Peach Bud & Green Calyx -->
+    <g transform="translate(48.8, 22.4) rotate(52) scale(1.06)">
+      <path d="M0,-6.2 C2.8,-4.5 3.6,-0.8 2.4,2.0 C1.6,3.4 -1.6,3.4 -2.4,2.0 C-3.6,-0.8 -2.8,-4.5 0,-6.2 Z" fill="url(#fav-bud-grad)" />
+      <ellipse cx="-0.8" cy="-2.2" rx="0.85" ry="2.1" fill="#FFF9FA" fill-opacity="0.58" />
+      <path d="M-2.7,1.2 Q0,4.2 2.7,1.2 Q1.2,2.6 0,2.2 Q-1.2,2.6 -2.7,1.2 Z" fill="#58A466" />
+    </g>
+  </g>
+
+  <!-- Subtle Sunlit Inner Sheen & Celadon Outer Frame Rim -->
+  <rect x="2.1" y="2.1" width="59.8" height="59.8" rx="14.4" fill="none" stroke="#FFFFFF" stroke-width="1.1" stroke-opacity="0.46" />
+  <rect x="1.5" y="1.5" width="61" height="61" rx="15" fill="none" stroke="#3B806D" stroke-width="0.85" stroke-opacity="0.28" />
+</svg>
