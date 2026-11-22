@@ -1,0 +1,120 @@
+{
+  "toasts": {
+    "spring": "春深 · 芳草鲜美，落英缤纷",
+    "summer": "夏初 · 绿阴如盖，清塘新荷",
+    "autumn": "秋熟 · 良田金粟，丹枫黄菊",
+    "winter": "冬寂 · 薄雪覆岸，岁寒松竹"
+  },
+  "sky": {
+    "summer": {
+      "skyTopTint": "#3F87CF",
+      "skyTopMix": 0.24,
+      "skyBottomTint": "#BEE0D8",
+      "skyBottomMix": 0.16,
+      "fogTint": "#C5E0DC",
+      "fogMix": 0.16,
+      "fogNearMul": 1.0,
+      "fogFarMul": 0.98,
+      "sunTint": "#FFF7DF",
+      "sunMix": 0.14,
+      "hemiGroundTint": "#5E8B52",
+      "hemiGroundMix": 0.36,
+      "cloudCoverDelta": 0.04
+    },
+    "autumn": {
+      "skyTopTint": "#4F87BD",
+      "skyTopMix": 0.20,
+      "skyBottomTint": "#EED8B4",
+      "skyBottomMix": 0.24,
+      "fogTint": "#E5D5BA",
+      "fogMix": 0.22,
+      "fogNearMul": 1.06,
+      "fogFarMul": 1.12,
+      "sunTint": "#FFE0A8",
+      "sunMix": 0.26,
+      "hemiGroundTint": "#9E7E46",
+      "hemiGroundMix": 0.42,
+      "cloudCoverDelta": -0.06
+    },
+    "winter": {
+      "skyTopTint": "#9AB0C4",
+      "skyTopMix": 0.24,
+      "skyBottomTint": "#E2E8EA",
+      "skyBottomMix": 0.32,
+      "fogTint": "#DEE5E8",
+      "fogMix": 0.30,
+      "fogNearMul": 0.92,
+      "fogFarMul": 0.94,
+      "sunTint": "#F4F6FA",
+      "sunMix": 0.22,
+      "hemiGroundTint": "#B9C0BC",
+      "hemiGroundMix": 0.48,
+      "cloudCoverDelta": 0.05
+    }
+  },
+  "mountains": {
+    "summerTiers": ["#568272", "#749C8C", "#9DC0B2"],
+    "summerStrength": 0.68,
+    "autumnTiers": ["#8E7A64", "#AA9A86", "#C6BDB0"],
+    "autumnStrength": 0.68,
+    "winterTiers": ["#DCE4E6", "#E6ECEE", "#F0F4F4"],
+    "winterStrength": 0.75
+  },
+  "snowWeather": {
+    "name": "雪",
+    "hint": "朔雪纷飞，千山万径皆成素白",
+    "fogNear": 0.48,
+    "fogFar": 0.50,
+    "light": 0.78,
+    "skyMix": 0.68,
+    "skyTint": "#DCE3E7",
+    "rain": 0,
+    "snow": 1,
+    "mist": 0.30,
+    "wind": 0.28,
+    "unlit": 0.92,
+    "hill": 0.68,
+    "cloudColor": "#E8EEF0",
+    "cloudBlend": 0.82,
+    "cloudCover": 0.44,
+    "cloudOpacity": 0.12,
+    "cloudSoft": 0.08,
+    "cloudShade": 0.14,
+    "cloudSpeed": 0.72,
+    "cloudLow": 0.72,
+    "sound": {
+      "rain": 0,
+      "wind": 0.32
+    }
+  },
+  "snowParticles": {
+    "count": 2600,
+    "width": 44,
+    "height": 24,
+    "fallSpeed": 2.35,
+    "swayAmp": 0.95,
+    "sizeRange": [2.2, 6.4],
+    "opacity": 0.86,
+    "color": "#F7F6F0"
+  },
+  "palettes": {
+    "grass": {
+      "summer": ["#3A783F", "#478A4A", "#569A55"],
+      "autumn": ["#C8A34E", "#D6B55E", "#A68E48", "#BA8642"],
+      "winter": "#E9E7DF"
+    },
+    "flora": {
+      "summerLeaf": ["#2F6338", "#498448", "#6CA659"],
+      "summerFruit": ["#BED87A", "#DCE094"],
+      "autumnCrown": ["#C94E34", "#E07A38", "#EBAD42", "#D66530"]
+    },
+    "flowers": {
+      "summer": ["#EF9836", "#7692D6", "#F6F7F0", "#E8869A"],
+      "autumn": ["#F2BC32", "#F9D65C", "#DA7236", "#EFE0A6"]
+    },
+    "mulberry": {
+      "summer": ["#3E7442", "#4F884C"],
+      "autumn": ["#DFB13E", "#C89532"]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+/* Imported after style.css. All values come from the same palette as both canvases. */
+#map, #minimap { --map-paper: #f2ead9; --map-ink: #262626; --map-muted: #514d45; --map-seal: #b4483a; --map-line: #a39c8d; --map-wash: #e2dacb; }
+#map .map__sheet, #map .map__side, #minimap, #minimap canvas { background: var(--map-paper); color: var(--map-ink); }
+#map .map__sheet::after, #minimap::after { border-color: var(--map-line); }
+#map .map__head, #map .map__note, #minimap .minimap__cap, #minimap .minimap__key { border-color: var(--map-line); }
+#map .map__item button, #map .map__close { color: var(--map-ink); }
+#map .map__close { border-color: var(--map-muted); }
+#map .map__meta, #map .map__meta .k, #map .map__count, #map .map__item .idx,
+#map .map__poem, #map .map__dist, #map .map__hint, #minimap .minimap__cap, #minimap .minimap__key { color: var(--map-muted); opacity: 1; }
+#map #map-time { color: var(--map-ink); }
+#map .map__seal, #map .map__count.is-all, #map .map__item.is-dest button { color: var(--map-seal); }
+#map .map__seal { border-color: var(--map-seal); }
+#map .map__item .dot { border-color: var(--map-muted); }
+#map .map__item.is-visited .dot { background: var(--map-ink); border-color: var(--map-ink); }
+#map .map__item.is-dest .dot { background: var(--map-seal); border-color: var(--map-seal); }
+#map .map__item button:hover, #map .map__item.is-hover button, #map .map__close:hover { background: var(--map-wash); }
+#map .map__item button:focus-visible, #map .map__close:focus-visible, #minimap:focus-visible { background: var(--map-wash); outline: 2px solid var(--map-seal); outline-offset: 2px; }
+#map .map__item--scenic-first { border-color: var(--map-line); }
+#map .map__item--scenic-first::before { color: var(--map-muted); opacity: 1; }
+#map .map__tools, #map .map__scroll-card { background: var(--map-paper); color: var(--map-ink); border-color: var(--map-line); }
+#map .map__tools button, #map .map__scroll-card-close { color: var(--map-ink); border-color: var(--map-line); }
+#map .map__tools button:hover:not(:disabled), #map .map__scroll-card-close:hover { background: var(--map-wash); }
+#map .map__scroll-card-verse { color: var(--map-muted); opacity: 1; }

@@ -1,0 +1,481 @@
+{
+  "storageKey": "taohua.quests.v1",
+  "main": {
+    "id": "main-taohuayuan",
+    "title": "桃源本传",
+    "subtitle": "晋太元中 · 武陵渔人行记",
+    "summary": "循陶渊明《桃花源记》原文行迹：缘溪入林、穿口开朗、避秦留饮、辞去复寻而终隐烟波。",
+    "seal": "无问津者",
+    "colophon": "南阳刘子骥，高尚士也，闻之，欣然规往。未果，寻病终。后遂无问津者。",
+    "steps": [
+      {
+        "id": "act1-peach-grove",
+        "act": "第一幕 · 缘溪行",
+        "title": "缘溪寻芳",
+        "clue": "撑篙或沿武陵溪北上，寻两岸芳草桃花林（约五十步可见桃林深处）。",
+        "classic": "夹岸数百步，中无杂树，芳草鲜美，落英缤纷",
+        "wayfinder": { "poiId": "taolin", "x": -10, "z": 78, "name": "桃花林", "poem": "夹岸数百步，芳草鲜美，落英缤纷" }
+      },
+      {
+        "id": "act1-cave-glimmer",
+        "act": "第一幕 · 缘溪行",
+        "title": "林尽微光",
+        "clue": "穿过夹岸桃花林至水源尽处，望见石壁一线小口透出微光。",
+        "classic": "林尽水源，便得一山，山有小口，仿佛若有光",
+        "wayfinder": { "poiId": "kou", "x": 22, "z": 13.5, "name": "山有小口", "poem": "林尽水源，山有小口，仿佛若有光" }
+      },
+      {
+        "id": "act1-valley-open",
+        "act": "第一幕 · 缘溪行",
+        "title": "豁然开朗",
+        "clue": "登岸涉过幽狭石缝数十步，出洞入得山中平川。",
+        "classic": "初极狭，才通人。复行数十步，豁然开朗",
+        "wayfinder": { "poiId": "kou", "x": 23, "z": -10, "name": "幽狭石口", "poem": "初极狭，才通人。复行数十步，豁然开朗" }
+      },
+      {
+        "id": "act2-village-walk",
+        "act": "第二幕 · 豁然开朗",
+        "title": "村陌游历",
+        "clue": "顺土路漫步桃源村，访良田、美池、桑竹与黄发垂髫之乐。",
+        "classic": "土地平旷，屋舍俨然，有良田美池桑竹之属",
+        "wayfinder": { "poiId": "cun", "x": 30, "z": -96, "name": "桃源村", "poem": "阡陌交通，鸡犬相闻，怡然自乐" }
+      },
+      {
+        "id": "act2-hospitality-feast",
+        "act": "第二幕 · 豁然开朗",
+        "title": "设酒杀鸡",
+        "clue": "往村前院落就座举杯或与设宴村主长者叙话，听其自云避秦来由。",
+        "classic": "便要还家，设酒杀鸡作食……乃不知有汉，无论魏晋",
+        "wayfinder": { "dynamic": "hospitalityFeast", "x": 22, "z": -60, "name": "设宴院落", "poem": "设酒杀鸡作食，乃不知有汉，无论魏晋" }
+      },
+      {
+        "id": "act3-farewell-mark",
+        "act": "第三幕 · 出而复寻",
+        "title": "辞去志之",
+        "clue": "既历村中景致，折返山口辞别，沿外溪畔叠石系帛志之（至少二处），再往下津乘舟诣太守。",
+        "classic": "停数日，辞去……既出，得其船，便扶向路，处处志之",
+        "wayfinder": { "dynamic": "act3Mark", "x": 24, "z": -22, "name": "归途山口", "poem": "便扶向路，处处志之，往诣太守" }
+      },
+      {
+        "id": "act3-lost-way",
+        "act": "第三幕 · 出而复寻",
+        "title": "迷津不复",
+        "clue": "随太守遣人溯溪重返山口，察看旧志残痕与重岚锁洞之象。",
+        "classic": "太守即遣人随其往，寻向所志，遂迷，不复得路",
+        "wayfinder": { "poiId": "kou", "x": 22, "z": 8, "name": "迷津山口", "poem": "寻向所志，遂迷，不复得路" }
+      },
+      {
+        "id": "act3-epilogue",
+        "act": "终章 · 烟波留白",
+        "title": "后无问津",
+        "clue": "于雾锁山口前驻足终章，或留步烟溪、于武陵孤舟系舟一梦重返山中闲居。",
+        "classic": "南阳刘子骥，高尚士也，闻之，欣然规往。未果，寻病终。后遂无问津者",
+        "wayfinder": { "poiId": "kou", "x": 22, "z": 8, "name": "山口题跋", "poem": "后遂无问津者，孤舟烟波" }
+      }
+    ]
+  },
+  "sides": [
+    {
+      "id": "side-tea-message",
+      "title": "施茶传信",
+      "category": "neighbor",
+      "categoryLabel": "乡邻托付",
+      "giverRole": "outskirt_greeter",
+      "giverName": "村口施茶老丈",
+      "summary": "村口施茶老丈年岁已高，近日北岭松风茶寮新采的霜桑野茶正待捎话下山，托你登岭与松风茶翁叙一叙。",
+      "rumorHint": "可至村口施茶草寮与老丈攀谈接下此事，或直接往北岭松风茶寮一带问询。",
+      "seal": "松风茶信",
+      "colophon": "一盏山茗连村口与云岭，山中人往来不凭书契，唯借过客几句口信相传。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "问老丈可有什么托付需捎往北岭",
+          "npcReply": "若客官顺路往北岭走，烦请去松风茶寮跟那茶翁打声招呼，问问今岁晒的野茶与甘菊够不够村口茶瓮用到入冬？",
+          "closingReply": "多谢客官跑这一趟腿，那茶寮就在北山松阴高坡上，一路顺着石阶走便见到了。"
+        },
+        "inProgress": {
+          "replyLabel": "禀知正欲前往北岭松风茶寮",
+          "npcReply": "不忙不忙，山中风景正好，客官只管一路赏着层梯泉声慢慢上岭，见到松风茶翁再捎话回来便是。",
+          "closingReply": "喝完茶再动身也不迟，草寮瓦瓮里的热茶常满着呢。"
+        },
+        "turnIn": {
+          "replyLabel": "捎回北岭松风茶寮的茶信",
+          "npcReply": "原来北岭今年茶芽肥厚、连甘菊也晒足了三竹匾！有这几句口信，老汉这口施茶瓦瓮便能暖暖和和供到开春啰。",
+          "closingReply": "山水迢递劳客官跑腿，往后何时路过草寮，只管舀满一碗热山茗润喉！"
+        }
+      },
+      "ordered": true,
+      "steps": [
+        {
+          "id": "visit-pine-tea",
+          "title": "登北岭松风茶寮",
+          "clue": "往北岭松风茶寮寻松风茶翁或采茶山姑攀谈（亦可按 E 落座品茗）。",
+          "wayfinder": { "poiId": "songfeng", "x": 82, "z": -235.5, "name": "松风茶寮", "poem": "泥炉蟹眼沸，松阴一盏春" }
+        },
+        {
+          "id": "return-tea-greeter",
+          "title": "回村口草寮报信",
+          "clue": "回至村口施茶草寮，向施茶老丈捎回松风茶寮的话音。",
+          "wayfinder": { "x": 18.8, "z": -46.6, "name": "村口施茶草寮", "poem": "草寮暖茗迎归客，一路松风报春安" }
+        }
+      ]
+    },
+    {
+      "id": "side-silk-loom",
+      "title": "桑麻尺素",
+      "category": "neighbor",
+      "categoryLabel": "乡邻托付",
+      "giverRole": "weaver",
+      "giverName": "织染村妇",
+      "summary": "织室梭声不停，织染村妇挂念西郊采桑园的新叶收成与蚕匾晾晒，想托过客往西郊石桥畔捎个问候。",
+      "rumorHint": "可至村中织室与织染村妇交谈，再去西郊桑林访采桑妇。",
+      "seal": "桑林尺素",
+      "colophon": "春蚕沙沙食新叶，织机咔哒续青麻；两处竹篱相望，全凭邻里记挂。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "问织室可需向西郊采桑妇捎句话",
+          "npcReply": "正有劳客人呢！我守着这架斜织机脱不开身，你若去西郊桑园，替我问问采桑大嫂那两匾春蚕新叶收齐了没，若晒不够，我这里腾得出竹匾。",
+          "closingReply": "出门顺着西边土路过桥便是老桑林，劳烦客人替我问候一声啦。"
+        },
+        "inProgress": {
+          "replyLabel": "告知正往西郊桑林去探看",
+          "npcReply": "慢慢行，西郊路平好走，顺道还能望见野梨花和蚕架。",
+          "closingReply": "有空再来织室坐着歇口气。"
+        },
+        "turnIn": {
+          "replyLabel": "捎回西郊采桑妇的回话",
+          "npcReply": "哎呀，听你说西郊桑叶肥厚、新茧又紧实，我这心里可算踏实啰！这匹刚染透的青麻布正合赶制几身夏衣。",
+          "closingReply": "劳你往返奔走，山里清风吹干葛麻，日子便这般一天天织过去。"
+        }
+      },
+      "ordered": true,
+      "steps": [
+        {
+          "id": "visit-mulberry-gatherer",
+          "title": "访西郊采桑妇",
+          "clue": "往西郊老桑林寻采桑妇交谈，询问春蚕新叶与竹匾之事。",
+          "wayfinder": { "x": -15.8, "z": -132.4, "name": "西郊桑林", "poem": "西郊老桑叶肥厚，竹匾春蚕沙沙声" }
+        },
+        {
+          "id": "return-weaver",
+          "title": "回织室报与村妇",
+          "clue": "返回村中织室，向织染村妇捎回西郊桑林的消息。",
+          "wayfinder": { "dynamic": "weaving", "x": 42, "z": -120, "name": "织室", "poem": "斜织机声映竹竿，青麻新染待风干" }
+        }
+      ]
+    },
+    {
+      "id": "side-waterwheel-craft",
+      "title": "筒车听木",
+      "category": "neighbor",
+      "categoryLabel": "乡邻托付",
+      "giverRole": "carpenter",
+      "giverName": "老木匠",
+      "summary": "老木匠手头正赶制食案，记挂着东渠水车木牙与水碓舂杵近日转得可稳当，托你顺水去察听一番。",
+      "rumorHint": "可往木作院问候老木匠，或前往东渠筒车水碓旁近观、静听或以 G 识物。",
+      "seal": "水碓木工",
+      "colophon": "竹筒舀溪浇高垄，木牙咬合不用半枚铁钉，水声舂杵里藏着秦汉巧思。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "问木作院可需往东渠瞧瞧筒车水碓",
+          "npcReply": "这倒正合我意！前几日我刚替东渠筒车换过两枚硬栎木水牙，手头刨着食案走不开；客人若去东头水边，帮我听听水车水碓转得稳不稳、竹笕漏水不？",
+          "closingReply": "水车就在东渠溪湾旁，走近听听声响或按 G 端详水碓，回来捎我一句便够。"
+        },
+        "inProgress": {
+          "replyLabel": "说起正往东渠察看筒车水碓",
+          "npcReply": "竹木受了活水最怕卯榫松动，听声音若清脆稳当，便说明严丝合缝呢。",
+          "closingReply": "东渠水边风凉，客人慢走。"
+        },
+        "turnIn": {
+          "replyLabel": "禀知东渠筒车水碓运转安稳",
+          "npcReply": "哈哈，听你讲水车转得匀实、连筒引水也畅顺，我这心里就敞亮啰！卯榫活计只要对准了木纹，再水冲几年也不散。",
+          "closingReply": "多谢客人跑这一趟，木作院的矮凳随时给你留着。"
+        }
+      },
+      "ordered": true,
+      "steps": [
+        {
+          "id": "inspect-waterworks",
+          "title": "察东渠筒车水碓",
+          "clue": "往东渠筒车水碓旁驻足近观，按 C 静听「筒车流水」或按 G 识得水车/水碓。",
+          "wayfinder": { "poiId": "shuidui", "dynamic": "waterworks", "x": 112, "z": -82, "name": "筒车水碓", "poem": "清渠引山泉，筒车昼夜转" }
+        },
+        {
+          "id": "return-carpenter",
+          "title": "回木作院告老木匠",
+          "clue": "回至木作院，与老木匠或编篾老丈叙说水车稳当之象。",
+          "wayfinder": { "dynamic": "carpentry", "x": 36, "z": -136, "name": "木作院", "poem": "松花飘香墨斗稳，卯榫严丝不用钉" }
+        }
+      ]
+    },
+    {
+      "id": "side-qin-records",
+      "title": "避秦遗迹",
+      "category": "lore",
+      "categoryLabel": "风物传闻",
+      "giverRole": "shrine_elder",
+      "giverName": "社树长老",
+      "summary": "山中先人遁世数百年，既不立官署亦无史册，唯苔石残简、东皋古碑与西南古社坛犹存避秦初年旧痕。",
+      "rumorHint": "可往社树下听长老追忆旧事，并寻访谷内三处避秦旧迹。",
+      "seal": "避秦旧铭",
+      "colophon": "苔石残简、断碑古隶、老樟社坛，三处不记年号的旧物，拼出先世入山始末。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "打听先世避秦入谷还留有什么旧迹",
+          "npcReply": "当年老辈遁入此山不复出，可总有零星旧迹留在山石草木间：山门内苔案上有先秦竹简，东皋松坡立着避秦残碑，西南古樟下还有座春祈秋报的避秦古社坛。",
+          "closingReply": "若客人有心访古，不妨各处拂苔一观，便知咱们为何不知有汉、无论魏晋。"
+        },
+        "inProgress": {
+          "replyLabel": "论及谷中先秦竹简与残碑古坛",
+          "npcReply": "那三处旧迹分落山水东西，不催不急，漫步访到一处便是一处缘分。",
+          "closingReply": "山中岁月长，客官慢慢探访便是。"
+        },
+        "turnIn": {
+          "replyLabel": "提起已遍访竹简、残碑与古社坛",
+          "npcReply": "难得客官把这三处旧铭都亲手抚读过一遍——咱们先祖『避秦保聚，永敦邻好』八字，求的从来不是传名千古，只是岁岁太平啊。",
+          "closingReply": "愿这谷里清风常拂石坛，外头尘嚣莫扰桑麻。"
+        }
+      },
+      "ordered": false,
+      "steps": [
+        {
+          "id": "lore-bamboo-slips",
+          "title": "展读先秦竹简残卷",
+          "clue": "在山口内侧苔石案处按 E 展读「先秦竹简残卷」。",
+          "wayfinder": { "dynamic": "egg:qin-bamboo-slips", "x": 26, "z": -52, "name": "先秦竹简残卷", "poem": "乃不知有汉，无论魏晋" }
+        },
+        {
+          "id": "lore-qin-stele",
+          "title": "拂苔辨避秦残碑",
+          "clue": "往东皋松坡寻「避秦记事残碑」，按 E 拂苔辨字。",
+          "wayfinder": { "x": 127, "z": -150.5, "name": "避秦记事残碑", "poem": "不记帝王年号，唯录岁稔人和" }
+        },
+        {
+          "id": "lore-ancient-altar",
+          "title": "拜访西南古社避秦坛",
+          "clue": "往西南古樟树下寻「西南古社避秦坛」拜社，或与社祝老翁交谈。",
+          "wayfinder": { "poiId": "gushe", "x": -124, "z": -116, "name": "古社避秦坛", "poem": "古樟阴石坛，春祈千岁安" }
+        }
+      ]
+    },
+    {
+      "id": "side-guqin-deer",
+      "title": "幽林琴鹿",
+      "category": "lore",
+      "categoryLabel": "风物传闻",
+      "giverRole": "spring_scholar",
+      "giverName": "北涧书生",
+      "summary": "山野传闻东坡石坪有素漆古琴自鸣松风，西岭深处常有霜色白鹿与双鹿饮露不惊，唯静心寻幽者得遇。",
+      "rumorHint": "可向北涧书生或山中茶客打听琴台与白鹿踪迹，亲赴石坪拨弦、西林观鹿。",
+      "seal": "琴韵霜鹿",
+      "colophon": "散音入竹，白鹿回眸，山中万物不相猜忌，方有此一响一顾之清趣。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "打听传闻中的石坪古琴与幽林白鹿",
+          "npcReply": "听茶农说过：东侧竹林石坪常置一张素漆七弦琴，拨动散音能与泉风相和；西岭深林与鹿柴望川台边，还偶有一头霜色白鹿安然饮露，见人不惊呢！",
+          "closingReply": "君若往游东西山林，切记缓步轻行，也可按 1–5 抚弄五音。"
+        },
+        "inProgress": {
+          "replyLabel": "聊起古琴清响与林间白鹿",
+          "npcReply": "琴音贵在疏朗留白，白鹿亦喜清静，越不急切越容易相逢。",
+          "closingReply": "山林清幽，望君得遇清音。"
+        },
+        "turnIn": {
+          "replyLabel": "述说已闻古琴清韵并见幽林白鹿",
+          "npcReply": "妙极！既得竹间七弦一响，又见西岭白鹿回首——此行虽无丝竹管弦之盛，亦足以畅叙幽情矣！",
+          "closingReply": "待月朗风清之时，再往冷泉听琴看鹿，别是一番境界。"
+        }
+      },
+      "ordered": false,
+      "steps": [
+        {
+          "id": "lore-play-guqin",
+          "title": "云台石坪拨弦",
+          "clue": "寻访「云台卧石古琴」按 E 拨弦，或于古琴旁/亭台按 1–5 弹奏五声。",
+          "wayfinder": { "dynamic": "egg:cloud-guqin-stone", "x": 92, "z": -172, "name": "云台卧石古琴", "poem": "七弦散音穿过竹梢，与山风合为一曲" }
+        },
+        {
+          "id": "lore-white-stag",
+          "title": "西岭寻访白鹿",
+          "clue": "往深林按 E 静观「幽林白鹿」，或登「西岭鹿柴望川台」凭栏观鹿。",
+          "wayfinder": { "poiId": "luchai", "x": -82, "z": -176, "name": "鹿柴望川", "poem": "返景入深林，鹿饮苔泉清" }
+        }
+      ]
+    },
+    {
+      "id": "side-lanke-brew",
+      "title": "烂柯曲水",
+      "category": "lore",
+      "categoryLabel": "风物传闻",
+      "giverRole": "liubo_player",
+      "giverName": "亭中博弈者",
+      "summary": "亭下对弈者笑谈谷中三雅：池畔石槽犹见曲水流觞漆耳杯、古树洞藏着桃花酿、东岭高崖更有烂柯残局。",
+      "rumorHint": "可与六博亭林弈者或东岭烂柯石枰长老攀谈，访齐曲水耳杯、洞藏酒与烂柯枰。",
+      "seal": "烂柯一醉",
+      "colophon": "浮觞打转、泥封桃香、青石残局，所谓山中无甲子，皆在这三处闲趣里。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "打听谷中曲水耳杯与东岭烂柯石枰",
+          "npcReply": "哈哈，这谷里最会享闲的，一是在池畔石槽放只漆耳杯曲水流觞，二是把春酿桃花酒泥封在古树洞底，三便是东岭高崖那方松子落枰的烂柯残局！",
+          "closingReply": "你慢慢逛着寻去，若找齐了这三处闲趣，回来与我同浮一大白。"
+        },
+        "inProgress": {
+          "replyLabel": "谈起曲水流觞与烂柯棋局",
+          "npcReply": "那树洞桃花酿藏在老根旁，清香微浮；东岭烂柯石枰要顺着东皋石阶再往高处走。",
+          "closingReply": "输赢皆成空，唯山中酒茶真味常在。"
+        },
+        "turnIn": {
+          "replyLabel": "笑言已遍赏耳杯、树洞酿与烂柯残局",
+          "npcReply": "真乃雅人也！曲水有杯、古木有酒、青崖有棋——难怪外间人常说烂柯一局人间百年，咱们倒只觉清风半日而已。",
+          "closingReply": "亭下石凳永为你留着一席凉荫。"
+        }
+      },
+      "ordered": false,
+      "steps": [
+        {
+          "id": "lore-floating-cup",
+          "title": "临流观曲水耳杯",
+          "clue": "在美池周边石槽按 E 临流观「曲水漆耳杯」。",
+          "wayfinder": { "dynamic": "egg:floating-wine-cup", "x": 50, "z": -150, "name": "曲水漆耳杯", "poem": "朱黑漆耳杯载两片落桃，随水打转" }
+        },
+        {
+          "id": "lore-hollow-brew",
+          "title": "轻嗅树洞桃花酿",
+          "clue": "往林下老树根按 E 轻嗅「古树洞藏桃花酿」。",
+          "wayfinder": { "dynamic": "egg:camphor-hollow-brew", "x": -6, "z": -114, "name": "古树洞藏桃花酿", "poem": "泥封小陶瓮，满是春日桃花米酒香" }
+        },
+        {
+          "id": "lore-lanke-crag",
+          "title": "东岭观烂柯石枰",
+          "clue": "登东岭寻「烂柯石枰」按 E 观局，或与烂柯弈叟交谈。",
+          "wayfinder": { "poiId": "lanke", "x": 156, "z": -164, "name": "烂柯石枰", "poem": "青石残局冷，松子落枰声" }
+        }
+      ]
+    },
+    {
+      "id": "side-spring-plow",
+      "title": "春畴观耕",
+      "category": "season",
+      "categoryLabel": "四时雅集",
+      "giverRole": "plowman",
+      "giverName": "扶犁农人",
+      "summary": "春风吹润阡陌，东垄水田正套着青牯水牛扶曲木犁翻开新泥，听牛哞沙沙犁响，始知桃源衣食所自来。",
+      "rumorHint": "保持或按 K 切至「春」候（非大雨天），往东垄阡陌牛耕处观耕或与扶犁农人交谈。",
+      "seal": "春犁润土",
+      "colophon": "生铁铧破润土，麻雀随犁啄虫，一牛一犁稳行在春风桃阴之下。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "问春天这东垄扶犁耕作之法",
+          "npcReply": "趁春候土气润，正宜牵青牯下田翻耕！客官若切在春深晴朗之时（按 K 可转四时），来东垄阡陌边走一遭、听听牛哞犁泥声，便全明白啦。",
+          "closingReply": "顺东边阡陌闻见泥土生香处便是，青牯性子温顺，尽管近前看。"
+        },
+        "inProgress": {
+          "replyLabel": "问何时最宜来看东垄春耕",
+          "npcReply": "春深天暖无急雨时，我和青牯就在东垄沿着直道来回翻熟泥。",
+          "closingReply": "得空来田头瓜庐喝碗井水歇脚。"
+        },
+        "turnIn": {
+          "replyLabel": "称赞春畴青牯翻犁平稳有章法",
+          "npcReply": "可不是嘛！咱们谷里几户伴耕轮牛，人不负地、地不负人，翻透这一垄春泥，秋日便有满场金粟。",
+          "closingReply": "这株大桑树底下的凉荫，待歇犁时正好纳凉。"
+        }
+      },
+      "ordered": true,
+      "steps": [
+        {
+          "id": "season-watch-plow",
+          "title": "春候东垄观牛耕",
+          "clue": "在「春」候（可按 K 切换）往东垄牛耕处与扶犁农人/瓜庐田夫交谈，或临田畔驻足观耕。",
+          "wayfinder": { "dynamic": "oxPlowing", "x": 56, "z": -84, "name": "东垄春耕", "poem": "青牯稳扶曲木犁，新泥翻处燕雀随" }
+        }
+      ]
+    },
+    {
+      "id": "side-night-fou",
+      "title": "晴夜击缶",
+      "category": "season",
+      "categoryLabel": "四时雅集",
+      "giverRole": "fou_singer",
+      "giverName": "击缶村人",
+      "summary": "白日各理农桑，唯有无风无雨的晴夜，村邻才在晒谷场燃起松枝篝火，击大陶缶、酌粟米酒、唱古老耕谣。",
+      "rumorHint": "按 T 切至「夜」、按 R 切至「晴」，往村中晒谷场松枝篝火旁听缶歌或与击缶村人同乐。",
+      "seal": "夜阑缶歌",
+      "colophon": "星斗垂野，松火照衣，叩陶缶而歌先世耕谣，比钟鼓管弦更近本心。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "打听村中何时会设篝火击缶夜宴",
+          "npcReply": "若赶上无风无雨的晴夜（按 T 切夜、R 切晴），大伙便在晒谷场空地燃起松枝火堆，搬出大陶缶敲着唱山谣！客官夜里若闲，尽管来草席边同饮。",
+          "closingReply": "夜晴风软时晒谷场火光远远就能望见，莫要拘束。"
+        },
+        "inProgress": {
+          "replyLabel": "问晴夜击缶夜宴在村中何处",
+          "npcReply": "就在村中晒谷场平地上，等天黑透了、无雨无雪时松柴一点便开席。",
+          "closingReply": "届时一碗温酒配缶歌，最解白日劳乏。"
+        },
+        "turnIn": {
+          "replyLabel": "共赏这晴夜松火缶歌与村酿",
+          "npcReply": "哈哈！听老汉拍这大陶缶配着满院松火声，是不是觉着外头王侯钟鼓也不过如此？来，再满饮这半碗粟米新醅！",
+          "closingReply": "良夜短而欢意长，今夜便安心在谷中听风歇息。"
+        }
+      },
+      "ordered": true,
+      "steps": [
+        {
+          "id": "season-night-hearth",
+          "title": "晴夜赴晒谷场听缶",
+          "clue": "于「夜」且「晴」（可按 T / R 切换）往晒谷场篝火处与击缶村人/夜宴乡邻交谈，或临席驻足静听。",
+          "wayfinder": { "dynamic": "hearth", "x": 38, "z": -108, "name": "晒谷场篝火", "poem": "松枝篝火照草席，叩缶高歌醉村醪" }
+        }
+      ]
+    },
+    {
+      "id": "side-four-seasons-tea",
+      "title": "亭林四时",
+      "category": "season",
+      "categoryLabel": "四时雅集",
+      "giverRole": "herbalist",
+      "giverName": "采药老丈",
+      "summary": "桃源妙处不止春芳。夏荷六博、秋岚观云、冬雪暖茗，一岁四时流转皆在咫尺溪山之间（按 K 可转物候）。",
+      "rumorHint": "可借 K 键切换夏、秋、冬三候，分赴六博亭林、东皋观云亭与村口草寮体验四时景致。",
+      "seal": "四时入画",
+      "colophon": "夏看荷塘残局，秋登东皋晴岚，冬掬村口姜茗——四时俱足，方见活态桃源。",
+      "dialogue": {
+        "offer": {
+          "replyLabel": "问春桃之外，桃源夏秋冬另有何奇景",
+          "npcReply": "山中四时各有一绝！夏候宜去六博亭林看满池红荷与博弈；秋深宜登东皋观云亭望金粟层林；冬雪时则往村口施茶草寮掬饮一碗热姜茗（按 K 可随时切换物候）。",
+          "closingReply": "这三时三景不限时日，随你何候行过，都算作四时入画。"
+        },
+        "inProgress": {
+          "replyLabel": "重温夏荷、秋云与冬茗三时去处",
+          "npcReply": "夏往美池边六博亭林，秋上东皋观云亭，冬去村口施茶草寮——按 K 键便能细赏四时风物更替。",
+          "closingReply": "四时风物无一不可入卷，慢慢逛去罢。"
+        },
+        "turnIn": {
+          "replyLabel": "细说已遍赏夏荷、秋云与冬日暖茗",
+          "npcReply": "客官竟把桃源春夏秋冬一岁荣枯都细细体味遍了！既有春芳之喜，复得冬藏之静，这一程便真算圆融自足啰。",
+          "closingReply": "四时既周，桃花复开，山中随时欢迎故人再来。"
+        }
+      },
+      "ordered": false,
+      "steps": [
+        {
+          "id": "season-summer-liubo",
+          "title": "夏候 · 亭林观荷博弈",
+          "clue": "按 K 切至「夏」候，赴美池旁「六博亭林」与弈客交谈、落座或临亭赏荷。",
+          "wayfinder": { "poiId": "tinglin", "x": 58, "z": -130, "name": "六博亭林", "poem": "竹阴覆石枰，闲坐听荷风" }
+        },
+        {
+          "id": "season-autumn-cloud",
+          "title": "秋候 · 东皋凭栏观云",
+          "clue": "按 K 切至「秋」候，登「东皋观云亭」凭栏落座或驻足望远。",
+          "wayfinder": { "poiId": "guanyun", "x": 124.5, "z": -170, "name": "东皋观云", "poem": "登高望云海，松风拂衣袂" }
+        },
+        {
+          "id": "season-winter-tea",
+          "title": "冬候 · 草寮掬饮暖茗",
+          "clue": "按 K 切至「冬」候，于村口施茶草寮按 E 掬饮「村口迎客施茶瓦瓮」或与施茶老丈交谈。",
+          "wayfinder": { "x": 16.4, "z": -48.6, "name": "村口施茶草寮", "poem": "檐下冰凌微垂，瓦瓮姜茗生烟" }
+        }
+      ]
+    }
+  ]
+}

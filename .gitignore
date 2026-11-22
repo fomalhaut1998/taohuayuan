@@ -1,0 +1,14 @@
+node_modules
+dist
+.check/
+preview/
+tmp/
+nohup.out
+.dsh-guard/
+.visual-baseline/
+.visual-round*-baseline/
+.DS_Store
+
+# 根目录开发截图与无关示例（精选截图见 docs/images/）
+/preview*.png
+/pelican-bicycle.html

@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>桃花源记 · 水墨青绿 3D 活态世界</title>
+  <meta name="description" content="以东晋陶渊明《桃花源记》为蓝本的水墨青绿低多边形 3D 活态交互世界：缘溪行、入小口、游良田美池、赏四时晨昏晴雨雪与丹青题跋。" />
+  <meta name="theme-color" content="#F2EAD9" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="桃花源记 · 水墨青绿 3D 活态世界" />
+  <meta property="og:description" content="缘溪行，忘路之远近。零压力东方水墨 3D 漫游：四时物候、晴雨霜雪、泛舟听雨、丹青题跋与大音希声。" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23F2EAD9'/%3E%3Crect x='7' y='7' width='50' height='50' rx='5' fill='%23A43A2E'/%3E%3Crect x='11' y='11' width='42' height='42' rx='3' fill='none' stroke='%23F7EFE0' stroke-width='1.8' stroke-opacity='0.78'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='serif' font-size='31' font-weight='700' fill='%23F7EFE0'%3E%E6%A1%83%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <canvas id="scene" tabindex="-1"></canvas>
+  <div id="veil" data-cover-season="spring" aria-hidden="false">
+    <div class="cover-backdrop" aria-hidden="true">
+      <svg class="cover-scene-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="cov-sky" x1="16%" y1="0%" x2="76%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-sky-0, #9BD6E6)" />
+            <stop offset="28%" style="stop-color: var(--cov-sky-1, #C8ECE9)" />
+            <stop offset="56%" style="stop-color: var(--cov-sky-2, #ECF5E7)" />
+            <stop offset="80%" style="stop-color: var(--cov-sky-3, #FCF2E0)" />
+            <stop offset="100%" style="stop-color: var(--cov-sky-4, #FADBD2)" />
+          </linearGradient>
+          <radialGradient id="cov-sunHalo" cx="18%" cy="20%" r="36%">
+            <stop offset="0%" style="stop-color: var(--cov-sun-0, #FFFDF2)" stop-opacity="0.96" />
+            <stop offset="22%" style="stop-color: var(--cov-sun-1, #FFF5D6)" stop-opacity="0.64" />
+            <stop offset="56%" style="stop-color: var(--cov-sun-2, #FCE4C4)" stop-opacity="0.2" />
+            <stop offset="100%" style="stop-color: var(--cov-sun-2, #FCE4C4)" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="cov-rayGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-sun-0, #FFFDF0)" stop-opacity="0.32" />
+            <stop offset="56%" style="stop-color: var(--cov-sun-1, #FCEFD4)" stop-opacity="0.1" />
+            <stop offset="100%" style="stop-color: var(--cov-sun-1, #FCEFD4)" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="cov-cloudWarm" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-cloud-top, #FFFDF8)" stop-opacity="0.92" />
+            <stop offset="68%" style="stop-color: var(--cov-cloud-mid, #FBF3E8)" stop-opacity="0.7" />
+            <stop offset="100%" style="stop-color: var(--cov-cloud-bot, #F4DED4)" stop-opacity="0.18" />
+          </linearGradient>
+          <linearGradient id="cov-cloudCool" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-cloud-top, #FFFFFF)" stop-opacity="0.88" />
+            <stop offset="72%" style="stop-color: var(--cov-cloud-cool-mid, #E7F3F2)" stop-opacity="0.62" />
+            <stop offset="100%" style="stop-color: var(--cov-cloud-cool-bot, #D3E6E6)" stop-opacity="0.14" />
+          </linearGradient>
+          <linearGradient id="cov-mtnFar1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-mtn1-0, #8EC3C6)" stop-opacity="0.72" />
+            <stop offset="62%" style="stop-color: var(--cov-mtn1-1, #C0E1DD)" stop-opacity="0.54" />
+            <stop offset="100%" style="stop-color: var(--cov-mtn1-2, #ECF5EC)" stop-opacity="0.06" />
+          </linearGradient>
+          <linearGradient id="cov-mtnFar2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-mtn2-0, #6BADA6)" stop-opacity="0.82" />
+            <stop offset="58%" style="stop-color: var(--cov-mtn2-1, #9FD1C2)" stop-opacity="0.66" />
+            <stop offset="100%" style="stop-color: var(--cov-mtn2-2, #E4F1E5)" stop-opacity="0.18" />
+          </linearGradient>
+          <linearGradient id="cov-hillMidL" x1="15%" y1="0%" x2="85%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-hill-0, #9BD19E)" />
+            <stop offset="48%" style="stop-color: var(--cov-hill-1, #6EB08D)" />
+            <stop offset="100%" style="stop-color: var(--cov-hill-2, #4D8B77)" />
+          </linearGradient>
+          <linearGradient id="cov-cliffR" x1="12%" y1="0%" x2="90%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-cliff-0, #8BC4A2)" />
+            <stop offset="44%" style="stop-color: var(--cov-cliff-1, #599B8A)" />
+            <stop offset="100%" style="stop-color: var(--cov-cliff-2, #3A736A)" />
+          </linearGradient>
+          <linearGradient id="cov-cliffShade" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-cliff-shade-0, #4A867A)" stop-opacity="0.84" />
+            <stop offset="100%" style="stop-color: var(--cov-cliff-shade-1, #2D5E59)" stop-opacity="0.74" />
+          </linearGradient>
+          <radialGradient id="cov-caveBloom" cx="50%" cy="54%" r="50%">
+            <stop offset="0%" stop-color="#FFFBE0" stop-opacity="0.96" />
+            <stop offset="32%" stop-color="#FDE3A3" stop-opacity="0.68" />
+            <stop offset="68%" stop-color="#F8C78D" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#F8C78D" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="cov-caveCore" cx="50%" cy="62%" r="54%">
+            <stop offset="0%" stop-color="#FFFFF2" />
+            <stop offset="56%" stop-color="#FDE7AA" />
+            <stop offset="100%" stop-color="#EBA96B" />
+          </radialGradient>
+          <linearGradient id="cov-mistRibbon" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color: var(--cov-mist, #FFFDF6)" stop-opacity="0" />
+            <stop offset="22%" style="stop-color: var(--cov-mist, #FFFDF6)" stop-opacity="0.72" />
+            <stop offset="52%" style="stop-color: var(--cov-mist-mid, #F7F5EA)" stop-opacity="0.62" />
+            <stop offset="82%" style="stop-color: var(--cov-mist, #FFFDF6)" stop-opacity="0.52" />
+            <stop offset="100%" style="stop-color: var(--cov-mist, #FFFDF6)" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="cov-valleyFloor" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-valley-0, #B9E19C)" />
+            <stop offset="36%" style="stop-color: var(--cov-valley-1, #87C389)" />
+            <stop offset="76%" style="stop-color: var(--cov-valley-2, #5FA27A)" />
+            <stop offset="100%" style="stop-color: var(--cov-valley-3, #458268)" />
+          </linearGradient>
+          <linearGradient id="cov-meadowSunL" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-meadow-hi, #CDEAA8)" stop-opacity="0.72" />
+            <stop offset="60%" style="stop-color: var(--cov-meadow-mid, #96CF90)" stop-opacity="0.32" />
+            <stop offset="100%" style="stop-color: var(--cov-valley-2, #6EB080)" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="cov-meadowSunR" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-meadow-hi, #C4E4A2)" stop-opacity="0.65" />
+            <stop offset="62%" style="stop-color: var(--cov-meadow-mid, #88C38B)" stop-opacity="0.28" />
+            <stop offset="100%" style="stop-color: var(--cov-valley-2, #5DA079)" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="cov-groveCloud" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-crown-3, #FFF1F4)" />
+            <stop offset="46%" style="stop-color: var(--cov-crown-2, #FAD0DA)" />
+            <stop offset="86%" style="stop-color: var(--cov-crown-1, #EE9FB2)" />
+            <stop offset="100%" style="stop-color: var(--cov-crown-0, #DC849B)" />
+          </linearGradient>
+          <linearGradient id="cov-groveCloudDeep" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-crown-2, #FBD6DF)" />
+            <stop offset="56%" style="stop-color: var(--cov-crown-1, #EEA2B5)" />
+            <stop offset="100%" style="stop-color: var(--cov-crown-0, #D67C94)" />
+          </linearGradient>
+          <linearGradient id="cov-streamMain" x1="56%" y1="0%" x2="44%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-stream-0, #9EDCD4)" />
+            <stop offset="28%" style="stop-color: var(--cov-stream-1, #76C5BE)" />
+            <stop offset="68%" style="stop-color: var(--cov-stream-2, #9AD9D2)" />
+            <stop offset="100%" style="stop-color: var(--cov-stream-3, #C8ECE6)" />
+          </linearGradient>
+          <linearGradient id="cov-waterPink" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-water-ref-0, #F8BCC7)" stop-opacity="0.46" />
+            <stop offset="65%" style="stop-color: var(--cov-water-ref-1, #FAD4DC)" stop-opacity="0.2" />
+            <stop offset="100%" style="stop-color: var(--cov-water-ref-1, #FAD4DC)" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="cov-waterGold" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#FFF6D1" stop-opacity="0.78" />
+            <stop offset="55%" stop-color="#FDE0A6" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#FDE0A6" stop-opacity="0" />
+          </linearGradient>
+          <radialGradient id="cov-lanternGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFDF0" stop-opacity="0.98" />
+            <stop offset="45%" stop-color="#FDE092" stop-opacity="0.62" />
+            <stop offset="100%" stop-color="#F5B86E" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="cov-fgSlopeL" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-fg-0, #6CB282)" />
+            <stop offset="56%" style="stop-color: var(--cov-fg-1, #4B8E6E)" />
+            <stop offset="100%" style="stop-color: var(--cov-fg-2, #356D59)" />
+          </linearGradient>
+          <linearGradient id="cov-fgSlopeR" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-fg-0, #69AE7F)" />
+            <stop offset="56%" style="stop-color: var(--cov-fg-1, #488A6C)" />
+            <stop offset="100%" style="stop-color: var(--cov-fg-2, #326956)" />
+          </linearGradient>
+
+          <!-- Hand-crafted organic storybook peach trees (themed cleanly across all 4 seasons) -->
+          <g id="cov-tree-grand">
+            <ellipse cx="4" cy="48" rx="64" ry="13" style="fill: var(--cov-tree-shadow, #3B785B)" fill-opacity="0.2" />
+            <g style="fill: var(--cov-crown-2, #FAD0DA)" fill-opacity="0.76">
+              <ellipse cx="-26" cy="48" rx="14" ry="3.5" /><ellipse cx="18" cy="51" rx="18" ry="4" />
+              <ellipse cx="-6" cy="54" rx="10" ry="2.6" /><ellipse cx="40" cy="46" rx="9" ry="2.4" />
+            </g>
+            <path d="M-8,48 C-10,28 -4,12 2,-4 C8,-16 20,-24 38,-28 M-2,24 C-16,12 -30,2 -46,-6 M4,4 C16,-4 28,-10 46,-12 M-6,12 C-16,-2 -20,-16 -24,-30" fill="none" stroke="#684A3E" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M-6,46 C-7,28 -2,14 4,-2" fill="none" stroke="#8F6A59" stroke-width="1.8" stroke-linecap="round" opacity="0.62" />
+            <path d="M-62,-12 C-66,-28 -48,-40 -32,-34 C-26,-52 -2,-58 16,-48 C30,-56 54,-46 58,-28 C72,-20 68,2 48,4 C34,12 10,12 -8,6 C-26,12 -56,6 -62,-12 Z" style="fill: var(--cov-crown-0, #E28BA0)" fill-opacity="0.88" />
+            <path d="M-60,-18 C-62,-34 -44,-44 -28,-38 C-20,-56 4,-62 20,-50 C36,-58 58,-46 58,-30 C68,-22 62,-4 44,-2 C30,4 8,4 -10,-2 C-28,4 -54,-2 -60,-18 Z" style="fill: var(--cov-crown-1, #F5B2C0)" />
+            <path d="M-50,-24 C-50,-38 -34,-46 -20,-42 C-12,-58 10,-62 24,-52 C38,-56 52,-44 50,-30 C44,-18 22,-14 6,-18 C-14,-12 -44,-14 -50,-24 Z" style="fill: var(--cov-crown-2, #FCD9E1)" />
+            <path d="M-34,-34 C-26,-48 -4,-56 14,-50 C26,-52 40,-44 38,-34 C28,-28 10,-28 -4,-30 C-18,-26 -32,-28 -34,-34 Z" style="fill: var(--cov-crown-3, #FFF4F6)" fill-opacity="0.92" />
+            <g style="fill: var(--cov-leaf-0, #84BE75)" fill-opacity="0.82">
+              <ellipse cx="-56" cy="-4" rx="6.5" ry="2.6" transform="rotate(-18 -56 -4)" />
+              <ellipse cx="62" cy="-14" rx="6" ry="2.5" transform="rotate(24 62 -14)" />
+              <ellipse cx="-14" cy="-54" rx="5.5" ry="2.3" transform="rotate(-12 -14 -54)" />
+            </g>
+          </g>
+
+          <g id="cov-tree-lean">
+            <ellipse cx="14" cy="46" rx="46" ry="10" style="fill: var(--cov-tree-shadow, #3B785B)" fill-opacity="0.18" />
+            <path d="M-18,46 C-12,24 2,8 22,-8 C34,-18 48,-22 62,-24 M4,10 C-8,-2 -18,-10 -30,-16 M22,-4 C34,-2 48,2 58,8" fill="none" stroke="#6B4D40" stroke-width="4.6" stroke-linecap="round" />
+            <path d="M-38,-14 C-42,-28 -24,-36 -10,-30 C-2,-44 20,-48 34,-38 C50,-44 70,-34 72,-18 C76,-4 58,6 40,2 C26,6 4,4 -10,-2 C-24,2 -36,-4 -38,-14 Z" style="fill: var(--cov-crown-0, #E38CA1)" fill-opacity="0.86" />
+            <path d="M-36,-20 C-38,-32 -22,-38 -8,-34 C2,-48 22,-50 36,-40 C50,-46 68,-34 68,-20 C68,-8 52,0 36,-4 C22,0 2,-2 -12,-8 C-24,-6 -34,-10 -36,-20 Z" style="fill: var(--cov-crown-1, #F6B8C5)" />
+            <path d="M-24,-24 C-22,-34 -8,-40 6,-36 C16,-48 34,-48 46,-38 C56,-38 62,-28 56,-20 C44,-14 24,-16 10,-18 C-4,-14 -20,-16 -24,-24 Z" style="fill: var(--cov-crown-2, #FDE0E7)" />
+            <path d="M4,-36 C14,-46 32,-46 42,-38 C46,-34 40,-28 28,-28 C16,-28 4,-30 4,-36 Z" style="fill: var(--cov-crown-3, #FFF5F7)" fill-opacity="0.92" />
+          </g>
+
+          <g id="cov-bamboo-clump">
+            <g style="stroke: var(--cov-bamboo-stem, #4E8D6B)" stroke-linecap="round" fill="none">
+              <path d="M-12,50 Q-14,15 -20,-34" stroke-width="3" />
+              <path d="M0,50 Q1,12 4,-44" stroke-width="3.4" />
+              <path d="M11,50 Q15,18 22,-28" stroke-width="2.6" />
+            </g>
+            <g style="fill: var(--cov-bamboo-leaf, #6FB07F)" fill-opacity="0.86">
+              <ellipse cx="-24" cy="-22" rx="12" ry="3.2" transform="rotate(-22 -24 -22)" />
+              <ellipse cx="-14" cy="-36" rx="11" ry="3" transform="rotate(14 -14 -36)" />
+              <ellipse cx="2" cy="-44" rx="13" ry="3.3" transform="rotate(-16 2 -44)" />
+              <ellipse cx="14" cy="-34" rx="12" ry="3.1" transform="rotate(24 14 -34)" />
+              <ellipse cx="26" cy="-20" rx="11" ry="3" transform="rotate(-18 26 -20)" />
+              <ellipse cx="-8" cy="-8" rx="10" ry="2.8" transform="rotate(22 -8 -8)" />
+              <ellipse cx="16" cy="-6" rx="10" ry="2.8" transform="rotate(-26 16 -6)" />
+            </g>
+            <g style="fill: var(--cov-bamboo-hi, #A2D49A)" fill-opacity="0.78">
+              <ellipse cx="-20" cy="-30" rx="8" ry="2.2" transform="rotate(-32 -20 -30)" />
+              <ellipse cx="8" cy="-48" rx="9" ry="2.4" transform="rotate(18 8 -48)" />
+              <ellipse cx="22" cy="-26" rx="8" ry="2.2" transform="rotate(28 22 -26)" />
+            </g>
+          </g>
+        </defs>
+
+        <!-- 1. Luminous Fresh Morning Sky & Sunbeams -->
+        <rect width="1600" height="900" fill="url(#cov-sky)" />
+        <circle cx="285" cy="176" r="340" fill="url(#cov-sunHalo)" />
+        <g class="cover-sunrays">
+          <polygon points="236,138 336,118 785,590 605,610" fill="url(#cov-rayGrad)" />
+          <polygon points="312,148 382,134 1025,545 895,565" fill="url(#cov-rayGrad)" opacity="0.7" />
+          <polygon points="178,188 248,174 475,620 325,635" fill="url(#cov-rayGrad)" opacity="0.58" />
+        </g>
+        <circle cx="284" cy="174" r="62" fill="#FFFBF0" fill-opacity="0.28" />
+        <circle cx="284" cy="174" r="37" fill="#FFFDF5" fill-opacity="0.92" />
+
+        <!-- 2. Layered Drifting Gouache Clouds -->
+        <g class="cover-clouds-far">
+          <path d="M55,212 C62,188 88,176 116,180 C128,154 162,142 194,154 C216,136 258,138 278,160 C306,154 338,168 348,192 C368,192 384,202 388,214 Z" fill="url(#cov-cloudWarm)" />
+          <path d="M1075,182 C1084,158 1114,146 1144,152 C1162,126 1204,114 1242,130 C1268,108 1320,112 1344,138 C1376,130 1412,148 1422,174 C1448,172 1470,184 1476,198 L1065,198 Z" fill="url(#cov-cloudCool)" />
+          <path d="M445,326 C455,308 482,298 508,304 C528,284 566,282 588,300 C614,294 644,306 652,326 Z" fill="url(#cov-cloudWarm)" opacity="0.68" />
+          <path d="M1055,318 C1068,298 1098,290 1126,298 C1146,278 1184,278 1208,296 C1234,292 1262,304 1270,320 Z" fill="url(#cov-cloudCool)" opacity="0.68" />
+        </g>
+
+        <!-- 3. Spring Swallows Gliding in the Morning Sky -->
+        <g class="cover-swallows" fill="#3B6B64">
+          <path d="M1132,186 Q1142,176 1152,184 Q1162,174 1172,183 Q1161,182 1152,189 Q1142,182 1132,186 Z" opacity="0.74" />
+          <path d="M1186,166 Q1194,158 1202,165 Q1210,157 1218,164 Q1209,163 1202,169 Q1194,163 1186,166 Z" opacity="0.66" />
+          <path d="M1236,198 Q1243,191 1250,197 Q1258,190 1265,196 Q1257,195 1250,200 Q1243,195 1236,198 Z" opacity="0.6" />
+          <path d="M368,244 Q376,236 384,242 Q392,235 400,241 Q391,240 384,246 Q376,240 368,244 Z" opacity="0.56" />
+        </g>
+
+        <!-- 4. Distant Misty Blue-Jade Mountain Ranges -->
+        <path d="M-20,540 L-20,390 Q95,310 218,332 Q328,350 432,402 Q545,454 662,438 Q758,425 846,448 Q955,474 1068,402 Q1190,322 1326,304 Q1465,286 1620,378 L1620,560 Z" fill="url(#cov-mtnFar1)" />
+        <path d="M-20,575 L-20,445 Q130,364 268,388 Q386,408 498,468 Q620,522 764,492 Q896,464 1018,430 Q1142,395 1262,366 Q1410,332 1620,432 L1620,610 Z" fill="url(#cov-mtnFar2)" />
+        <path d="M68,408 Q178,370 278,392 M1105,408 Q1218,368 1335,368" fill="none" stroke="#ECF8EC" stroke-width="2.2" stroke-linecap="round" opacity="0.46" />
+
+        <!-- Floating Valley Silk Mist 1 -->
+        <g class="cover-mist-drift">
+          <path d="M120,468 Q410,438 720,466 T1320,458 Q1450,455 1540,476 L1540,518 Q1280,502 980,516 T360,514 Q210,516 120,498 Z" fill="url(#cov-mistRibbon)" />
+        </g>
+
+        <!-- 5. Midground Celadon Hills & Sculpted Cliff with Glowing Cave Opening -->
+        <path d="M-20,660 L-20,492 Q125,442 292,468 Q455,494 615,548 Q710,578 795,595 L795,720 L-20,720 Z" fill="url(#cov-hillMidL)" />
+        <path d="M-10,506 Q142,456 296,478 Q426,496 540,536" fill="none" style="stroke: var(--cov-fg-rim, #CBE9B9)" stroke-width="3.2" stroke-linecap="round" opacity="0.62" />
+
+        <!-- Right Sculpted Qinglv Cliff ("山有小口，仿佛若有光") -->
+        <path d="M885,575 Q952,512 1012,468 Q1074,422 1142,382 Q1210,348 1288,386 Q1358,420 1442,402 Q1530,384 1620,446 L1620,660 L885,660 Z" fill="url(#cov-cliffR)" />
+        <path d="M1142,382 Q1174,432 1196,492 Q1242,468 1288,386 Q1218,354 1142,382 Z" style="fill: var(--cov-cliff-0, #A6D4AF)" fill-opacity="0.4" />
+        <path d="M1012,468 Q1068,450 1126,474 Q1152,516 1168,568 L948,572 Z" fill="url(#cov-cliffShade)" opacity="0.56" />
+        <path d="M1288,386 Q1336,442 1358,524 L1472,535 Q1440,455 1442,402 Q1362,422 1288,386 Z" style="fill: var(--cov-cliff-2, #3B756A)" fill-opacity="0.32" />
+        <path d="M1020,466 Q1086,416 1148,384 Q1214,354 1284,386" fill="none" style="stroke: var(--cov-fg-rim, #D5EFC8)" stroke-width="2.8" stroke-linecap="round" opacity="0.7" />
+
+        <!-- Iconic Glowing Cave Mouth ("仿佛若有光") -->
+        <g class="cover-cave-gleam">
+          <ellipse cx="1018" cy="518" rx="92" ry="64" fill="url(#cov-caveBloom)" />
+          <path d="M986,544 C986,506 1000,486 1018,486 C1036,486 1050,506 1050,544 Z" fill="#33635C" fill-opacity="0.72" />
+          <path d="M994,544 C994,513 1005,495 1018,495 C1031,495 1042,513 1042,544 Z" fill="url(#cov-caveCore)" />
+          <ellipse cx="1018" cy="532" rx="14" ry="20" fill="#FFFFFF" fill-opacity="0.72" />
+        </g>
+
+        <!-- Low Valley Mist Ribbon 2 -->
+        <path d="M490,546 Q740,520 980,545 T1460,536 L1460,572 Q1180,564 900,575 T490,570 Z" fill="url(#cov-mistRibbon)" opacity="0.64" />
+
+        <!-- 6. Continuous Lush Spring Valley Floor (zero gaps across every aspect ratio!) -->
+        <path d="M-20,562 Q185,538 395,574 Q625,612 850,584 Q1025,556 1255,562 Q1445,568 1620,544 L1620,920 L-20,920 Z" fill="url(#cov-valleyFloor)" />
+        <!-- Sunlit painterly grass contour bands -->
+        <path d="M-20,582 Q210,552 440,598 Q620,636 740,646 L740,760 Q450,740 220,762 L-20,780 Z" fill="url(#cov-meadowSunL)" />
+        <path d="M1620,565 Q1385,548 1185,595 Q1025,634 920,656 L920,780 Q1180,745 1420,774 L1620,792 Z" fill="url(#cov-meadowSunR)" />
+        <!-- Continuous curved lower valley shade (zero vertical edges, cleanly overlaid by creek) -->
+        <path d="M-20,692 Q195,656 410,708 Q640,762 800,764 Q960,766 1190,704 Q1405,648 1620,680 L1620,920 L-20,920 Z" style="fill: var(--cov-valley-shade, #4E906F)" fill-opacity="0.38" />
+
+        <!-- Winding Crystal-Jade Creek ("缘溪行") cleanly layered over continuous valley -->
+        <path d="M982,542 C960,572 864,584 768,608 C674,632 638,676 688,722 C734,764 646,826 516,912 L1098,912 C1002,814 958,756 926,712 C892,664 934,626 984,592 C1018,568 1038,554 1044,542 Z" fill="#E6E1C8" fill-opacity="0.42" />
+        <path d="M990,542 C968,574 872,588 776,612 C684,636 654,678 706,722 C754,762 670,824 544,912 L1076,912 C988,814 944,758 914,714 C882,666 924,628 976,594 C1010,570 1032,554 1038,542 Z" fill="url(#cov-streamMain)" />
+
+        <!-- Golden Cave Reflection & Blossom Reflections on Water -->
+        <path d="M998,544 C984,578 936,596 892,616 C926,612 978,594 1020,544 Z" fill="url(#cov-waterGold)" />
+        <path d="M768,616 C692,638 666,676 710,716 C746,748 708,800 606,876 L552,908 C658,832 710,766 684,724 C644,674 676,634 768,616 Z" fill="url(#cov-waterPink)" />
+        <path d="M976,600 C928,632 886,668 916,714 C946,760 988,812 1064,904 L1012,904 C950,818 908,766 888,720 C862,670 904,628 976,600 Z" fill="url(#cov-waterPink)" opacity="0.82" />
+
+        <!-- Sparkling Sunlit Water Ripples & Drifting Stream Petals -->
+        <g fill="none" stroke="#FFFFFF" stroke-linecap="round" opacity="0.54">
+          <path d="M936,574 Q964,570 992,575" stroke-width="1.8" />
+          <path d="M845,605 Q886,598 924,606" stroke-width="2" />
+          <path d="M730,644 Q780,636 828,646" stroke-width="2.1" />
+          <path d="M812,674 Q854,668 888,676" stroke-width="1.8" />
+          <path d="M728,744 Q788,734 854,746" stroke-width="2.4" />
+          <path d="M770,784 Q842,774 908,786" stroke-width="2.2" />
+          <path d="M680,828 Q760,817 838,830" stroke-width="2.5" opacity="0.48" />
+          <path d="M742,866 Q844,854 944,868" stroke-width="2.4" opacity="0.42" />
+        </g>
+        <g style="fill: var(--cov-crown-2, #FBCAD4)" fill-opacity="0.88">
+          <ellipse cx="892" cy="624" rx="4.2" ry="1.8" transform="rotate(-12 892 624)" />
+          <ellipse cx="732" cy="662" rx="4.8" ry="2" transform="rotate(14 732 662)" />
+          <ellipse cx="866" cy="734" rx="5.2" ry="2.1" transform="rotate(-8 866 734)" />
+          <ellipse cx="758" cy="798" rx="5.6" ry="2.3" transform="rotate(18 758 798)" />
+          <ellipse cx="888" cy="836" rx="5" ry="2" transform="rotate(-15 888 836)" />
+          <ellipse cx="696" cy="856" rx="4.6" ry="1.9" transform="rotate(9 696 856)" />
+        </g>
+
+        <!-- 7. Sweeping Cloud-Like Midground Peach Blossom Groves ("夹岸数百步，中无杂树") -->
+        <!-- Distant right thatched riverside arbor -->
+        <g transform="translate(1296, 540) scale(0.92)">
+          <ellipse cx="0" cy="24" rx="42" ry="9" fill="#3B795C" fill-opacity="0.22" />
+          <rect x="-24" y="0" width="4.2" height="24" rx="1.5" fill="#6F4F3F" />
+          <rect x="19.8" y="0" width="4.2" height="24" rx="1.5" fill="#6F4F3F" />
+          <rect x="-24" y="12" width="48" height="2.6" fill="#8B6852" />
+          <path d="M-38,4 Q-16,-16 0,-22 Q16,-16 38,4 Q16,0 0,2 Q-16,0 -38,4 Z" fill="#E3C794" />
+          <path d="M-36,4 Q0,-4 36,4 L31,8 Q0,2 -31,8 Z" fill="#C49E68" />
+          <circle cx="0" cy="-23" r="3" fill="#B68B56" />
+        </g>
+
+        <!-- Continuous layered blossom grove clouds along left & right hillsides -->
+        <g opacity="0.92">
+          <!-- Left far grove ridge -->
+          <path d="M-20,618 C12,566 64,548 112,562 C142,526 202,518 248,544 C284,524 342,534 374,562 C412,548 462,560 486,588 C524,580 564,592 586,618 L-20,636 Z" fill="url(#cov-groveCloudDeep)" />
+          <path d="M-20,602 C22,554 78,542 126,554 C160,518 222,516 262,542 C302,526 356,538 386,564 C424,554 468,566 492,590 C524,586 554,596 570,612 L-20,620 Z" fill="url(#cov-groveCloud)" />
+          <!-- Right far grove ridge -->
+          <path d="M1080,612 C1106,574 1154,558 1196,572 C1232,542 1294,538 1336,562 C1376,534 1442,526 1492,552 C1536,536 1588,548 1620,582 L1620,636 L1068,628 Z" fill="url(#cov-groveCloudDeep)" />
+          <path d="M1096,602 C1122,568 1166,558 1206,570 C1244,542 1300,540 1340,564 C1382,538 1444,532 1492,556 C1534,542 1584,554 1620,582 L1620,618 L1088,614 Z" fill="url(#cov-groveCloud)" />
+        </g>
+
+        <!-- Bamboo accents nestled by the groves -->
+        <use href="#cov-bamboo-clump" transform="translate(492, 578) scale(0.76)" />
+        <use href="#cov-bamboo-clump" transform="translate(1224, 558) scale(0.78)" />
+        <use href="#cov-bamboo-clump" transform="translate(1366, 574) scale(0.84) scale(-1,1)" />
+        <use href="#cov-bamboo-clump" transform="translate(110, 588) scale(0.88)" />
+
+        <!-- Hero Sculpted Peach Trees Framing Both Riverbanks -->
+        <use href="#cov-tree-lean" transform="translate(618, 616) scale(0.84)" />
+        <use href="#cov-tree-grand" transform="translate(292, 654) scale(1.16)" />
+        <use href="#cov-tree-grand" transform="translate(106, 678) scale(1.26) scale(-1,1)" />
+        <use href="#cov-tree-lean" transform="translate(476, 698) scale(1.04)" />
+        <use href="#cov-tree-grand" transform="translate(274, 782) scale(1.32)" />
+
+        <use href="#cov-tree-lean" transform="translate(1032, 618) scale(0.82) scale(-1,1)" />
+        <use href="#cov-tree-grand" transform="translate(1338, 662) scale(1.16) scale(-1,1)" />
+        <use href="#cov-tree-grand" transform="translate(1512, 686) scale(1.26)" />
+        <use href="#cov-tree-lean" transform="translate(1148, 706) scale(1.06) scale(-1,1)" />
+        <use href="#cov-tree-grand" transform="translate(1322, 788) scale(1.3)" />
+
+        <!-- Sunlit Spring Meadow Wildflowers, Fallen Petals & Smooth Mossy Stones -->
+        <g style="fill: var(--cov-crown-2, #FBCAD5)" fill-opacity="0.72">
+          <ellipse cx="448" cy="756" rx="14" ry="3.4" /><ellipse cx="524" cy="792" rx="12" ry="3" />
+          <ellipse cx="1114" cy="768" rx="15" ry="3.6" /><ellipse cx="1056" cy="806" rx="11" ry="2.8" />
+        </g>
+        <g fill="#FFF9E6" fill-opacity="0.9">
+          <circle cx="424" cy="744" r="3" /><circle cx="442" cy="756" r="2.4" /><circle cx="468" cy="742" r="2.8" />
+          <circle cx="388" cy="804" r="3.2" /><circle cx="416" cy="816" r="2.6" /><circle cx="512" cy="802" r="2.8" />
+          <circle cx="1116" cy="762" r="3" /><circle cx="1142" cy="776" r="2.5" /><circle cx="1178" cy="752" r="2.8" />
+          <circle cx="1064" cy="824" r="3.2" /><circle cx="1192" cy="828" r="2.6" />
+        </g>
+        <g fill="#F8D978" fill-opacity="0.88">
+          <circle cx="434" cy="749" r="2.2" /><circle cx="496" cy="788" r="2.3" />
+          <circle cx="1128" cy="768" r="2.2" /><circle cx="1096" cy="812" r="2.4" />
+        </g>
+        <g fill="#6E9985" fill-opacity="0.78">
+          <ellipse cx="642" cy="742" rx="17" ry="7" /><ellipse cx="668" cy="748" rx="10" ry="4.5" />
+          <ellipse cx="964" cy="758" rx="18" ry="7.5" /><ellipse cx="942" cy="766" rx="11" ry="4.8" />
+        </g>
+
+        <!-- 8. Iconic Illustrated Wooden Skiff & Fisherman ("武陵人捕鱼为业") -->
+        <g class="cover-boat-group" transform="translate(794, 718)">
+          <ellipse cx="2" cy="22" rx="74" ry="14" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.52" />
+          <ellipse cx="4" cy="24" rx="50" ry="9" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.38" />
+          <path d="M-46,20 Q0,34 52,20 Q20,28 -46,20 Z" fill="#467E77" fill-opacity="0.28" />
+          <line x1="-22" y1="-16" x2="-62" y2="29" stroke="#7A5F46" stroke-width="2.2" stroke-linecap="round" />
+          <ellipse cx="-63" cy="29" rx="9" ry="2.6" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.65" />
+          <path d="M-28,6 C-28,-8 -20,-15 -14,-15 C-8,-15 -4,-6 -4,6 Z" fill="#4B757B" />
+          <path d="M-24,-6 Q-14,-2 -6,-6" fill="none" stroke="#85AEB2" stroke-width="1.6" stroke-linecap="round" opacity="0.65" />
+          <path d="M-31,-15 Q-16,-28 -1,-15 Q-16,-11 -31,-15 Z" fill="#E3C382" />
+          <path d="M-29,-15 Q-16,-12 -3,-15" fill="none" stroke="#B48E4E" stroke-width="1.4" />
+          <path d="M-4,8 C-2,-12 10,-20 24,-18 C36,-16 42,-4 42,8 Z" fill="#DFC08E" />
+          <path d="M-4,8 C-2,-10 10,-18 22,-17 C16,-7 14,1 14,8 Z" fill="#C7A26E" fill-opacity="0.55" />
+          <path d="M8,-17 Q11,-4 10,8 M22,-18 Q25,-5 24,8 M34,-12 Q36,-2 35,8" fill="none" stroke="#9F7A4D" stroke-width="1.2" opacity="0.65" />
+          <path d="M-56,5 Q-22,10 18,9 Q44,8 62,1 C56,14 44,21 20,22 L-24,22 C-42,21 -52,15 -56,5 Z" fill="#8C593C" />
+          <path d="M-56,5 Q-22,10 18,9 Q44,8 62,1 L58,6 Q38,12 14,13 L-26,13 Q-44,12 -54,8 Z" fill="#C28A5D" />
+          <line x1="54" y1="3" x2="58" y2="-10" stroke="#704B36" stroke-width="1.6" stroke-linecap="round" />
+          <circle cx="58" cy="-8" r="14" fill="url(#cov-lanternGlow)" />
+          <ellipse cx="58" cy="-7" rx="3.4" ry="4.5" fill="#FFF3C4" stroke="#D99B52" stroke-width="1" />
+        </g>
+
+        <!-- 9. Seamless Foreground Rolling Spring Embankments & Swaying River Reeds -->
+        <path d="M-20,740 Q125,716 268,772 Q382,818 486,912 L-20,912 Z" fill="url(#cov-fgSlopeL)" />
+        <path d="M-10,752 Q132,728 272,782" fill="none" style="stroke: var(--cov-fg-rim, #A6D896)" stroke-width="3" stroke-linecap="round" opacity="0.56" />
+        <path d="M1620,730 Q1470,708 1322,768 Q1210,816 1106,912 L1620,912 Z" fill="url(#cov-fgSlopeR)" />
+        <path d="M1610,742 Q1464,720 1320,778" fill="none" style="stroke: var(--cov-fg-rim, #A6D896)" stroke-width="3" stroke-linecap="round" opacity="0.56" />
+        <!-- Left & right foreground reeds -->
+        <g style="stroke: var(--cov-reed-stem, #3D7C62)" stroke-linecap="round" fill="none" opacity="0.88">
+          <path d="M72,906 Q62,820 92,732" stroke-width="3.6" />
+          <path d="M104,908 Q112,818 144,748" stroke-width="3" />
+          <path d="M148,910 Q166,834 202,776" stroke-width="2.6" />
+          <path d="M204,912 Q218,848 250,802" stroke-width="2.4" />
+          <path d="M1524,906 Q1534,820 1502,728" stroke-width="3.6" />
+          <path d="M1490,908 Q1480,820 1446,748" stroke-width="3" />
+          <path d="M1442,910 Q1424,836 1388,780" stroke-width="2.6" />
+          <path d="M1384,912 Q1370,848 1338,806" stroke-width="2.4" />
+        </g>
+        <g style="fill: var(--cov-reed-leaf, #7EC088)" fill-opacity="0.72">
+          <path d="M84,774 Q112,756 130,762 Q108,774 84,774 Z" />
+          <path d="M164,826 Q192,808 210,816 Q188,828 164,826 Z" />
+          <path d="M1512,772 Q1482,754 1464,762 Q1488,774 1512,772 Z" />
+          <path d="M1426,828 Q1398,812 1380,820 Q1402,832 1426,828 Z" />
+          <ellipse cx="93" cy="728" rx="3.4" ry="12" fill="#8C6B50" transform="rotate(14 93 728)" />
+          <ellipse cx="146" cy="746" rx="3" ry="10" fill="#8C6B50" transform="rotate(20 146 746)" />
+          <ellipse cx="1500" cy="724" rx="3.4" ry="12" fill="#8C6B50" transform="rotate(-14 1500 724)" />
+          <ellipse cx="1444" cy="746" rx="3" ry="10" fill="#8C6B50" transform="rotate(-20 1444 746)" />
+        </g>
+        <g fill="#FFF7E4" fill-opacity="0.88">
+          <circle cx="176" cy="844" r="3.6" /><circle cx="204" cy="858" r="2.8" /><circle cx="260" cy="848" r="3.2" />
+          <circle cx="1420" cy="844" r="3.5" /><circle cx="1390" cy="858" r="2.8" /><circle cx="1332" cy="852" r="3.2" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- Split Foreground Painted Peach-Blossom Curtains (seam-free on desktop & mobile, glide apart on entry) -->
+    <div class="ink-curtain-half ink-left" aria-hidden="true">
+      <svg class="ink-landscape-svg ink-landscape-left" viewBox="0 0 760 900" preserveAspectRatio="xMinYMin meet">
+        <defs>
+          <linearGradient id="covL-petalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-blossom-0, #FFF4F6)" />
+            <stop offset="56%" style="stop-color: var(--cov-blossom-1, #FBCAD5)" />
+            <stop offset="100%" style="stop-color: var(--cov-blossom-2, #EB94A8)" />
+          </linearGradient>
+          <linearGradient id="covL-mistEdge" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color: var(--cov-mist, #FFFDF7)" stop-opacity="0.32" />
+            <stop offset="65%" style="stop-color: var(--cov-mist-mid, #F8F3E8)" stop-opacity="0.1" />
+            <stop offset="100%" style="stop-color: var(--cov-mist-mid, #F8F3E8)" stop-opacity="0" />
+          </linearGradient>
+          <g id="covL-flower">
+            <g fill="url(#covL-petalGrad)">
+              <ellipse cx="0" cy="-10" rx="5.6" ry="8.8" />
+              <ellipse cx="9.5" cy="-3" rx="5.6" ry="8.8" transform="rotate(72 9.5 -3)" />
+              <ellipse cx="5.9" cy="8.2" rx="5.6" ry="8.8" transform="rotate(144 5.9 8.2)" />
+              <ellipse cx="-5.9" cy="8.2" rx="5.6" ry="8.8" transform="rotate(-144 -5.9 8.2)" />
+              <ellipse cx="-9.5" cy="-3" rx="5.6" ry="8.8" transform="rotate(-72 -9.5 -3)" />
+            </g>
+            <circle cx="0" cy="0" r="3.8" style="fill: var(--cov-blossom-core, #E17790)" fill-opacity="0.72" />
+            <g fill="#FCE089">
+              <circle cx="0" cy="-3.4" r="1.2" /><circle cx="3.2" cy="-1" r="1.2" />
+              <circle cx="2" cy="2.8" r="1.2" /><circle cx="-2" cy="2.8" r="1.2" />
+              <circle cx="-3.2" cy="-1" r="1.2" /><circle cx="0" cy="0" r="1.4" />
+            </g>
+          </g>
+          <g id="covL-bud">
+            <ellipse cx="0" cy="0" rx="4.4" ry="7.4" style="fill: var(--cov-blossom-2, #F098AC)" />
+            <ellipse cx="-1" cy="-2" rx="2.1" ry="4" style="fill: var(--cov-blossom-1, #FCD6DF)" />
+            <path d="M-3.5,5 Q0,8.5 3.5,5 Q0,4 -3.5,5 Z" style="fill: var(--cov-leaf-0, #6AA86D)" />
+          </g>
+          <g id="covL-leaf">
+            <path d="M0,0 C9,-8 22,-8 31,-1 C22,6 10,6 0,0 Z" style="fill: var(--cov-leaf-0, #7AB96F)" />
+            <path d="M2,0 Q15,-2 28,-1" fill="none" style="stroke: var(--cov-leaf-hi, #B7E29D)" stroke-width="1" opacity="0.78" />
+          </g>
+        </defs>
+
+        <!-- Upper-Left Sweeping Botanical Peach-Blossom Bough -->
+        <g class="cover-branch-left">
+          <path d="M-24,142 C82,156 176,128 264,170 C318,196 364,188 416,210" fill="none" stroke="#5E4339" stroke-width="8.5" stroke-linecap="round" />
+          <path d="M-18,139 C86,152 174,125 260,166" fill="none" stroke="#856355" stroke-width="2.4" stroke-linecap="round" opacity="0.65" />
+          <path d="M124,146 C170,108 216,80 282,68" fill="none" stroke="#64483D" stroke-width="4.4" stroke-linecap="round" />
+          <path d="M210,156 C254,198 290,236 350,256" fill="none" stroke="#64483D" stroke-width="3.8" stroke-linecap="round" />
+          <path d="M42,152 C86,190 120,226 180,240" fill="none" stroke="#64483D" stroke-width="4.2" stroke-linecap="round" />
+          <use href="#covL-leaf" transform="translate(86, 140) rotate(-26) scale(1.05)" />
+          <use href="#covL-leaf" transform="translate(172, 114) rotate(-42) scale(0.92)" />
+          <use href="#covL-leaf" transform="translate(238, 160) rotate(28) scale(0.95)" />
+          <use href="#covL-leaf" transform="translate(324, 190) rotate(-22) scale(0.86)" />
+          <use href="#covL-leaf" transform="translate(114, 200) rotate(36) scale(0.9)" />
+          <use href="#covL-leaf" transform="translate(292, 234) rotate(14) scale(0.82)" />
+          <use href="#covL-flower" transform="translate(44, 146) scale(1.26) rotate(-12)" />
+          <use href="#covL-flower" transform="translate(116, 138) scale(1.08) rotate(18)" />
+          <use href="#covL-flower" transform="translate(196, 104) scale(1.16) rotate(-20)" />
+          <use href="#covL-flower" transform="translate(242, 80) scale(0.96) rotate(24)" />
+          <use href="#covL-flower" transform="translate(280, 68) scale(0.84) rotate(-8)" />
+          <use href="#covL-flower" transform="translate(260, 168) scale(1.24) rotate(14)" />
+          <use href="#covL-flower" transform="translate(310, 188) scale(1.02) rotate(-26)" />
+          <use href="#covL-flower" transform="translate(364, 198) scale(1.18) rotate(8)" />
+          <use href="#covL-flower" transform="translate(408, 212) scale(0.92) rotate(32)" />
+          <use href="#covL-flower" transform="translate(152, 226) scale(1.04) rotate(-16)" />
+          <use href="#covL-flower" transform="translate(294, 232) scale(1.08) rotate(20)" />
+          <use href="#covL-flower" transform="translate(344, 254) scale(0.88) rotate(-14)" />
+          <use href="#covL-bud" transform="translate(218, 68) rotate(-28)" />
+          <use href="#covL-bud" transform="translate(388, 178) rotate(36)" />
+          <use href="#covL-bud" transform="translate(182, 240) rotate(68)" />
+          <use href="#covL-bud" transform="translate(360, 262) rotate(72)" />
+        </g>
+        <ellipse cx="120" cy="640" rx="200" ry="58" fill="url(#covL-mistEdge)" />
+      </svg>
+      <div class="ink-mist-band"></div>
+    </div>
+
+    <div class="ink-curtain-half ink-right" aria-hidden="true">
+      <svg class="ink-landscape-svg ink-landscape-right" viewBox="0 0 760 900" preserveAspectRatio="xMaxYMin meet">
+        <defs>
+          <linearGradient id="covR-petalGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--cov-blossom-0, #FFF5F7)" />
+            <stop offset="56%" style="stop-color: var(--cov-blossom-1, #FBCAD6)" />
+            <stop offset="100%" style="stop-color: var(--cov-blossom-2, #EA93A8)" />
+          </linearGradient>
+          <linearGradient id="covR-mistEdge" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" style="stop-color: var(--cov-mist, #FFFDF7)" stop-opacity="0.32" />
+            <stop offset="65%" style="stop-color: var(--cov-mist-mid, #F8F3E8)" stop-opacity="0.1" />
+            <stop offset="100%" style="stop-color: var(--cov-mist-mid, #F8F3E8)" stop-opacity="0" />
+          </linearGradient>
+          <g id="covR-flower">
+            <g fill="url(#covR-petalGrad)">
+              <ellipse cx="0" cy="-10" rx="5.6" ry="8.8" />
+              <ellipse cx="9.5" cy="-3" rx="5.6" ry="8.8" transform="rotate(72 9.5 -3)" />
+              <ellipse cx="5.9" cy="8.2" rx="5.6" ry="8.8" transform="rotate(144 5.9 8.2)" />
+              <ellipse cx="-5.9" cy="8.2" rx="5.6" ry="8.8" transform="rotate(-144 -5.9 8.2)" />
+              <ellipse cx="-9.5" cy="-3" rx="5.6" ry="8.8" transform="rotate(-72 -9.5 -3)" />
+            </g>
+            <circle cx="0" cy="0" r="3.8" style="fill: var(--cov-blossom-core, #E17790)" fill-opacity="0.72" />
+            <g fill="#FCE089">
+              <circle cx="0" cy="-3.4" r="1.2" /><circle cx="3.2" cy="-1" r="1.2" />
+              <circle cx="2" cy="2.8" r="1.2" /><circle cx="-2" cy="2.8" r="1.2" />
+              <circle cx="-3.2" cy="-1" r="1.2" /><circle cx="0" cy="0" r="1.4" />
+            </g>
+          </g>
+          <g id="covR-bud">
+            <ellipse cx="0" cy="0" rx="4.2" ry="7.2" style="fill: var(--cov-blossom-2, #F098AC)" />
+            <ellipse cx="1" cy="-2" rx="2" ry="3.8" style="fill: var(--cov-blossom-1, #FCD6DF)" />
+            <path d="M-3.5,5 Q0,8.5 3.5,5 Q0,4 -3.5,5 Z" style="fill: var(--cov-leaf-0, #6AA86D)" />
+          </g>
+          <g id="covR-leaf">
+            <path d="M0,0 C-9,-8 -22,-8 -31,-1 C-22,6 -10,6 0,0 Z" style="fill: var(--cov-leaf-0, #7AB96F)" />
+            <path d="M-2,0 Q-15,-2 -28,-1" fill="none" style="stroke: var(--cov-leaf-hi, #B7E29D)" stroke-width="1" opacity="0.78" />
+          </g>
+        </defs>
+
+        <!-- Upper-Right Sweeping Botanical Peach Branch & Trailing Willow Fronds -->
+        <g class="cover-branch-right">
+          <path d="M784,114 C686,140 604,116 524,162 C474,190 430,182 384,206" fill="none" stroke="#5E4339" stroke-width="7.8" stroke-linecap="round" />
+          <path d="M778,111 C684,136 606,113 528,158" fill="none" stroke="#856355" stroke-width="2.2" stroke-linecap="round" opacity="0.62" />
+          <path d="M624,132 C580,174 546,208 482,226" fill="none" stroke="#64483D" stroke-width="3.8" stroke-linecap="round" />
+          <path d="M694,130 C664,172 636,214 590,242" fill="none" stroke="#64483D" stroke-width="3.2" stroke-linecap="round" />
+          <g style="stroke: var(--cov-leaf-0, #6EA875)" stroke-width="1.5" fill="none" opacity="0.62">
+            <path d="M724,124 Q712,208 726,300" />
+            <path d="M666,136 Q656,202 666,272" />
+          </g>
+          <g style="fill: var(--cov-leaf-0, #8AC580)" fill-opacity="0.72">
+            <ellipse cx="716" cy="184" rx="2.8" ry="8.5" transform="rotate(14 716 184)" />
+            <ellipse cx="722" cy="234" rx="2.6" ry="8" transform="rotate(-10 722 234)" />
+            <ellipse cx="724" cy="280" rx="2.4" ry="7.5" transform="rotate(8 724 280)" />
+            <ellipse cx="660" cy="194" rx="2.6" ry="7.8" transform="rotate(-12 660 194)" />
+            <ellipse cx="664" cy="242" rx="2.4" ry="7.2" transform="rotate(10 664 242)" />
+          </g>
+          <use href="#covR-leaf" transform="translate(662, 126) rotate(24) scale(1.02)" />
+          <use href="#covR-leaf" transform="translate(560, 146) rotate(-26) scale(0.92)" />
+          <use href="#covR-leaf" transform="translate(470, 184) rotate(22) scale(0.88)" />
+          <use href="#covR-leaf" transform="translate(548, 204) rotate(-18) scale(0.86)" />
+          <use href="#covR-flower" transform="translate(706, 128) scale(1.2) rotate(14)" />
+          <use href="#covR-flower" transform="translate(634, 130) scale(1.06) rotate(-18)" />
+          <use href="#covR-flower" transform="translate(564, 144) scale(1.18) rotate(10)" />
+          <use href="#covR-flower" transform="translate(508, 172) scale(1.08) rotate(-22)" />
+          <use href="#covR-flower" transform="translate(446, 188) scale(1.14) rotate(16)" />
+          <use href="#covR-flower" transform="translate(394, 206) scale(0.92) rotate(-28)" />
+          <use href="#covR-flower" transform="translate(544, 204) scale(1.04) rotate(22)" />
+          <use href="#covR-flower" transform="translate(490, 224) scale(0.92) rotate(-12)" />
+          <use href="#covR-flower" transform="translate(606, 234) scale(0.96) rotate(18)" />
+          <use href="#covR-bud" transform="translate(418, 176) rotate(-40)" />
+          <use href="#covR-bud" transform="translate(470, 230) rotate(-72)" />
+          <use href="#covR-bud" transform="translate(582, 246) rotate(-56)" />
+        </g>
+        <ellipse cx="640" cy="640" rx="200" ry="58" fill="url(#covR-mistEdge)" />
+      </svg>
+      <div class="ink-mist-band"></div>
+    </div>
+
+    <div class="ink-paper-grain" aria-hidden="true"></div>
+    <canvas id="cover-petals-canvas" class="cover-petals-canvas" aria-hidden="true"></canvas>
+
+    <!-- Delicate Editorial Frame & Top Poetic Header with Four-Season Switcher -->
+    <div class="cover-frame">
+      <span class="cover-corner cover-corner--tl" aria-hidden="true"></span>
+      <span class="cover-corner cover-corner--tr" aria-hidden="true"></span>
+      <span class="cover-corner cover-corner--bl" aria-hidden="true"></span>
+      <span class="cover-corner cover-corner--br" aria-hidden="true"></span>
+      <div class="cover-header">
+        <span class="cover-badge" id="cover-season-badge"><i class="cover-badge-dot" aria-hidden="true"></i><span id="cover-season-label">春深落英 · 东晋太元中</span></span>
+        <div class="cover-season-bar" role="radiogroup" aria-label="选择入画四时">
+          <button class="cover-season-btn is-active" type="button" role="radio" aria-checked="true" data-season="spring">春晓</button>
+          <button class="cover-season-btn" type="button" role="radio" aria-checked="false" data-season="summer">夏翠</button>
+          <button class="cover-season-btn" type="button" role="radio" aria-checked="false" data-season="autumn">秋霞</button>
+          <button class="cover-season-btn" type="button" role="radio" aria-checked="false" data-season="winter">冬雪</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ink-curtain-prompt">
+      <div class="ink-title-wrap">
+        <div class="ink-title-block">
+          <h1 class="ink-title">桃花源记</h1>
+          <p class="ink-author">晋·陶渊明</p>
+        </div>
+        <span class="ink-seal" aria-hidden="true">武陵<br />桃源</span>
+      </div>
+      <p id="cover-epigraph" class="cover-epigraph">缘溪行 · 忘路之远近 · 忽逢桃花林</p>
+
+      <div class="cover-action-slot">
+        <div class="cover-cta-group">
+          <button id="cover-enter-btn" class="cover-enter-btn" type="button">
+            <span class="cover-enter-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+                <g fill="currentColor" opacity="0.92">
+                  <ellipse cx="12" cy="6.2" rx="2.6" ry="4.2" />
+                  <ellipse cx="17.5" cy="10.2" rx="2.6" ry="4.2" transform="rotate(72 17.5 10.2)" />
+                  <ellipse cx="15.4" cy="16.6" rx="2.6" ry="4.2" transform="rotate(144 15.4 16.6)" />
+                  <ellipse cx="8.6" cy="16.6" rx="2.6" ry="4.2" transform="rotate(-144 8.6 16.6)" />
+                  <ellipse cx="6.5" cy="10.2" rx="2.6" ry="4.2" transform="rotate(-72 6.5 10.2)" />
+                </g>
+                <circle cx="12" cy="12" r="2.1" fill="#F8D882" />
+              </svg>
+            </span>
+            <span class="cover-enter-label">轻舟入画</span>
+            <span class="cover-enter-sep" aria-hidden="true"></span>
+            <span class="cover-enter-sub">点击进入</span>
+            <span class="cover-enter-arrow" aria-hidden="true">→</span>
+          </button>
+          <span class="ink-tip">按 Enter / Space 亦可启程 · 开启山水声景</span>
+        </div>
+
+        <div class="cover-loader" hidden aria-live="polite">
+          <div class="cover-loader-head">
+            <span id="cover-load-stage" class="cover-load-stage">研墨敷青 · 绘武陵溪山</span>
+            <span id="cover-load-percent" class="cover-load-percent">0%</span>
+          </div>
+          <div id="cover-progress-track" class="cover-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="进入桃花源加载进度">
+            <div class="cover-progress-fill" id="cover-progress-fill"></div>
+            <span class="cover-progress-spark" id="cover-progress-spark" aria-hidden="true"></span>
+          </div>
+          <div class="cover-milestones" aria-hidden="true">
+            <span class="cover-step" data-step="0"><i></i>溪山</span>
+            <span class="cover-step" data-step="1"><i></i>桃林</span>
+            <span class="cover-step" data-step="2"><i></i>声景</span>
+            <span class="cover-step" data-step="3"><i></i>入画</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ink-transition-card" hidden aria-live="polite">
+      <span class="ink-trans-seal" aria-hidden="true">复寻</span>
+      <p class="ink-trans-classic"></p>
+      <p class="ink-trans-plain"></p>
+    </div>
+    <div class="ink-epilogue-scroll" hidden aria-live="polite">
+      <div class="ink-epilogue-paper">
+        <div class="ink-epilogue-body">
+          <div class="ink-epilogue-colophons">
+            <p class="ink-epilogue-classic">南阳刘子骥，高尚士也，闻之，欣然规往。未果，寻病终。后遂无问津者。</p>
+            <span class="ink-epilogue-seal" aria-hidden="true">无问<br />津者</span>
+          </div>
+          <p class="ink-epilogue-plain">山岚复锁，旧志尽湮。昔日渔人所逢之桃花深谷，终隐烟波，不复可得。</p>
+        </div>
+        <div class="ink-epilogue-actions">
+          <button id="epilogue-linger" class="ink-btn ink-btn--secondary" type="button">留步烟溪 · 漫游外津 <span>1</span></button>
+          <button id="epilogue-replay" class="ink-btn ink-btn--primary" type="button">重开行迹 · 再访桃源 <span>2</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="gloom"></div>
+
+  <div id="subtitle" class="subtitle" aria-live="polite"></div>
+  <div id="classic" class="classic" aria-live="polite"></div>
+  <div id="plain" class="plain" aria-live="polite"></div>
+
+
+
+  <div id="reticle" aria-hidden="true"></div>
+  <div id="prompt" aria-hidden="true"><span class="key">E</span><span id="prompt-text">近观</span></div>
+  <div id="observe" class="observe" aria-live="polite"></div>
+  <div id="mystery-note" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="talk" aria-live="polite">
+    <div id="talk-who"></div>
+    <div id="talk-line"></div>
+  </div>
+
+  <div id="minimap" class="minimap" title="M 展开舆图">
+    <canvas id="minimap-canvas"></canvas>
+    <div class="minimap__cap"><span id="minimap-region">武陵溪</span><span class="minimap__key">M 舆图</span></div>
+  </div>
+
+  <div id="sky" class="sky" aria-live="polite">
+    <div class="sky__modern" id="sky-modern-time">公元386年04月06日 09时30分</div>
+    <div class="sky__row" id="sky-time-row"><span class="sky__k">天时</span><span class="sky__v" id="sky-time">昼</span><span class="key">T</span></div>
+    <div class="sky__row" id="sky-weather-row"><span class="sky__k">天气</span><span class="sky__v" id="sky-weather">晴</span><span class="key">R</span></div>
+  </div>
+
+  <div id="sky-toast" class="sky-toast" aria-live="polite"></div>
+
+  <div id="toast" class="toast" aria-live="polite"><span class="toast__k" id="toast-k">已至</span><span id="toast-name"></span></div>
+
+  <div id="map" class="map" aria-hidden="true">
+    <div class="map__inner">
+      <div class="map__sheet" id="map-sheet">
+        <canvas id="map-canvas"></canvas>
+      </div>
+      <aside class="map__side">
+        <header class="map__head">
+          <h1 class="map__title">桃源图</h1>
+          <span class="map__seal" aria-hidden="true">志</span>
+          <button id="map-close" class="map__close" type="button">合</button>
+        </header>
+        <p class="map__meta"><span class="k">所处</span><span id="map-region">武陵溪</span></p>
+        <p class="map__meta"><span class="k">所往</span><span id="map-dest">未定</span></p>
+        <p class="map__meta map__meta--time"><span class="k">时历</span><span id="map-time">公元386年04月06日 09时30分</span></p>
+        <p class="map__count" id="map-count">已至 一 / 八</p>
+        <ol class="map__list" id="map-list"></ol>
+        <div class="map__note">
+          <p class="map__note-name" id="map-note-name">武陵溪</p>
+          <p class="map__poem" id="map-note-poem">缘溪行，忘路之远近</p>
+          <p class="map__dist" id="map-dist"></p>
+        </div>
+        <p class="map__hint">点地名即往 · 再点撤之<br />M / Esc 合图</p>
+      </aside>
+    </div>
+  </div>
+
+  <nav id="hud-top-dock" class="hud-top-dock" aria-label="卷册与功能入口">
+    <button id="journal-open" class="journal-open" type="button" aria-keyshortcuts="J">游记 <span>J</span></button>
+  </nav>
+  <dialog id="journal" class="journal" aria-labelledby="journal-title">
+    <header class="journal__head"><div><p class="journal__eyebrow">桃源 · 行迹</p><h2 id="journal-title">游记</h2></div><button id="journal-close" type="button" aria-label="关闭游记">合</button></header>
+    <p class="journal__intro">山水有迹，偶遇成篇。记录仅保存在此浏览器中。</p>
+    <div id="journal-status" class="journal__status" role="status"></div>
+    <nav class="journal__tabs" aria-label="游记分页"><button type="button" id="journal-tab-notes" aria-pressed="true">行迹</button><button type="button" id="journal-tab-field" aria-pressed="false">图鉴</button></nav>
+    <div class="journal__sections" id="journal-notes">
+      <section><h3>所至</h3><ul id="journal-places"></ul></section>
+      <section><h3>所遇</h3><ul id="journal-people"></ul></section>
+      <section><h3>所闻 · 原文</h3><button id="subtitle-replay" type="button">重看开篇字幕</button><ul id="journal-classics"></ul></section>
+    </div>
+    <div id="journal-field" class="journal__sections" hidden><p class="journal__intro">看向近处景物或动物，按 G 识物并记下所见。不必收集齐全。</p><section><h3>植物</h3><ul id="journal-plants"></ul></section><section><h3>动物</h3><ul id="journal-animals"></ul></section><section><h3>地貌</h3><ul id="journal-landforms"></ul></section></div>
+    <footer><button id="journal-clear" type="button">清除游记与图鉴</button><span>同时清除行迹、相遇与图鉴，不影响其他设置</span></footer>
+  </dialog>
+
+
+  <div id="entry-welcome-guide" class="entry-welcome-guide" role="status" aria-live="polite" hidden>
+    <span class="entry-welcome-dot" aria-hidden="true"></span>
+    <span id="entry-welcome-text">轻点画面环顾溪山 · W/S 撑篙泛舟 · E 舍船登岸 · K 换四时</span>
+  </div>
+  <div id="quiet-notice" class="quiet-notice" aria-live="polite"></div>
+  <button id="quiet-exit" class="quiet-exit" type="button" hidden>离开静听</button>
+  <button id="ui-toggle" class="ui-toggle" type="button" aria-pressed="false" aria-keyshortcuts="H">隐界面 <span>H</span></button>
+  <div id="hud-footer">
+    <div class="hud-footer__meta">
+      <div id="view" class="view view--third" aria-live="polite">
+        <span class="view__k">视角</span><span id="view-name">第三人称</span><span class="view__key">V</span>
+      </div>
+      <div id="fps" class="fps" aria-hidden="true"><b id="fps-num">--</b><span class="fps__u">fps</span></div>
+    </div>
+    <div id="stats" hidden>
+      <div><span class="k">帧率</span><span id="s-fps">--</span></div>
+      <div><span class="k">帧时</span><span id="s-ms">--</span></div>
+      <div><span class="k">p95</span><span id="s-p95">--</span></div>
+      <div><span class="k">1% low</span><span id="s-low">--</span></div>
+      <div><span class="k">calls</span><span id="s-calls">--</span></div>
+      <div><span class="k">tris</span><span id="s-tris">--</span></div>
+      <canvas id="s-graph" width="224" height="54"></canvas>
+    </div>
+    <div id="hint" aria-label="点击画面进入 · WASD 行走 · 空格 跳跃 · Shift 疾行 · 近观 E · 识物 G · V 视角 · P 御风 · L 入画 · T 天时 · R 天气 · K 物候 · O 丹青 · N 雅音 · M 舆图 · J 游记 · Q 简册 · C 静听 · ? 小笺 · H 隐界面 · F 帧率 · Esc 退出">
+      <span class="hint__group">点击画面进入</span>
+      <span class="hint__group">WASD 行走</span>
+      <span class="hint__group">空格 跳跃</span>
+      <span class="hint__group hint__group--detail">Shift 疾行</span>
+      <span class="hint__group">近观 E</span>
+      <span class="hint__group">识物 G</span>
+      <span class="hint__group">V 视角</span>
+      <span class="hint__group hint__group--detail">P 御风</span>
+      <span class="hint__group hint__group--detail">L 入画</span>
+      <span class="hint__group hint__group--detail">T 天时</span>
+      <span class="hint__group hint__group--detail">R 天气</span>
+      <span class="hint__group hint__group--detail">K 物候</span>
+      <span class="hint__group hint__group--detail">O 丹青</span>
+      <span class="hint__group hint__group--detail">N 雅音</span>
+      <span class="hint__group">M 舆图</span>
+      <span class="hint__group hint__group--detail">J 游记</span>
+      <span class="hint__group hint__group--detail">Q 简册</span>
+      <span class="hint__group hint__group--detail">C 静听</span>
+      <span class="hint__group hint__group--detail">? 小笺</span>
+      <span class="hint__group hint__group--detail">H 隐界面</span>
+      <span class="hint__group hint__group--detail">F 帧率</span>
+      <span class="hint__group">Esc 退出</span>
+    </div>
+  </div>
+  <!-- hud-footer end -->
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

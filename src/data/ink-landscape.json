@@ -1,0 +1,53 @@
+{
+  "terrain": {
+    "bankBlend": [
+      -0.85,
+      0.32
+    ],
+    "warmDirection": [
+      0.8,
+      -0.6
+    ],
+    "warmColor": "#CCB17D",
+    "coolColor": "#628B8A",
+    "mossColor": "#577D5F",
+    "wetColor": "#586E62",
+    "slopeRange": [
+      0.06,
+      0.72
+    ],
+    "aspectStrength": 0.32,
+    "mossStrength": 0.24,
+    "wetStrength": 0.26,
+    "wetRange": [
+      -0.65,
+      1.95
+    ],
+    "pimaMalachite": "#528870",
+    "pimaAzurite": "#467378",
+    "pimaOchre": "#967B56",
+    "pimaInk": "#395348",
+    "pimaStrata": "#7E7A66",
+    "pimaStrength": 0.58
+  },
+  "mountains": {
+    "heightRange": [
+      -16,
+      46
+    ],
+    "distanceRange": [
+      385,
+      575
+    ],
+    "footStrength": 0.64,
+    "distanceStrength": 0.26,
+    "rainStrength": 0.20,
+    "maxOpacity": 0.84,
+    "crestStrength": 0.36,
+    "cragStrength": 0.22,
+    "fallbackFog": "#BAD8E7",
+    "noonTiers": ["#6A877F", "#8EA59F", "#B6C8C5"],
+    "noonStrength": 0.86,
+    "noonRainDamp": 0.6
+  }
+}

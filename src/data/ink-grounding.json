@@ -1,0 +1,48 @@
+{
+  "enabled": true,
+  "inkColor": "#242B25",
+  "maxStaticInstances": 320,
+  "maxActorInstances": 128,
+  "maxStaticTargets": 4096,
+  "maxActorTargets": 160,
+  "staticDistance": 78,
+  "actorDistance": 52,
+  "fadeStart": 0.74,
+  "groundOffset": 0.02,
+  "maxGroundGap": 0.68,
+  "waterClearance": 0.035,
+  "patchSegments": 3,
+  "maxStencilRadiusCells": 4,
+  "dayStrength": 1,
+  "dawnStrength": 0.8,
+  "duskStrength": 0.74,
+  "nightStrength": 0.16,
+  "rainAttenuation": 0.4,
+  "treeOpacity": 0.3,
+  "houseOpacity": 0.25,
+  "actorOpacity": 0.33,
+  "treeRadius": [
+    1.02,
+    0.94
+  ],
+  "houseRadius": [
+    0.96,
+    0.82
+  ],
+  "personRadius": [
+    0.34,
+    0.44
+  ],
+  "personRootRadius": [
+    0.46,
+    0.48
+  ],
+  "hoofRadius": [
+    0.42,
+    0.54
+  ],
+  "animalRadius": [
+    0.32,
+    0.38
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "enabled": true,
+  "seed": 20261118,
+  "palette": {
+    "stone": "#828A7E",
+    "stoneDark": "#5C655C",
+    "stoneLight": "#A6ACA0",
+    "moss": "#6A8C54",
+    "mossDeep": "#4E6D44",
+    "trailEarth": "#C2B594",
+    "trailEdge": "#9B9176",
+    "flagstone": "#989E91",
+    "timber": "#795F40",
+    "timberDark": "#58432C",
+    "bark": "#4E3E33",
+    "pineDeep": "#2D4C42",
+    "pineMid": "#446C5D",
+    "pineLight": "#628B77",
+    "mapleSpring": "#6E9656",
+    "mapleSummer": "#558348",
+    "mapleAutumn": "#C86442",
+    "mapleGold": "#D69E49",
+    "blossomPink": "#EBAAB3",
+    "blossomPale": "#F3D7DA",
+    "bambooCulm": "#899E63",
+    "bambooLeaf": "#68864D",
+    "kilnEarth": "#B89F7D",
+    "kilnBrick": "#9A684D",
+    "kilnSoot": "#49433E",
+    "potteryGrey": "#7D7B73",
+    "potteryRed": "#A4634A",
+    "water": "#7CA89B",
+    "waterFoam": "#EAF4F0",
+    "deerCoat": "#B9895B",
+    "deerBelly": "#E4D7C3",
+    "emberGlow": "#FF9848",
+    "foothillMist": "#A8B8AE"
+  },
+  "sanctuaries": {
+    "lankeCrag": {
+      "id": "lanke-chess-crag",
+      "name": "东岭烂柯石枰",
+      "action": "观局",
+      "x": 156.0,
+      "z": -164.0,
+      "radius": 4.2,
+      "lines": [
+        "青石枰上残局未收，黑白溪石棋子微沾松花——不知山中长者弈罢归去，已历几度春秋。",
+        "石凳生满苍苔，旁置一只素匏酒葫芦，山风拂过苍松，松子偶落石枰铮然有声。",
+        "抬眼西望，观云亭与千亩良田尽在脚下烟霭之中，真乃『山中无甲子，寒尽不知年』。"
+      ]
+    },
+    "logBridge": {
+      "id": "split-log-bridge",
+      "name": "东涧独木山桥",
+      "action": "临涧",
+      "x": 148.5,
+      "z": -123.5,
+      "yaw": -0.38,
+      "length": 5.4,
+      "width": 1.35,
+      "radius": 3.6,
+      "lines": [
+        "劈杉为桥横跨清涧，桥下活水漱玉穿苔，两岸野薇与山蕨随湿风轻摇。",
+        "涧边扁石上搁着一只采药竹篓，清泉自东岭岩隙淙淙而下，掬水入口清冽甘甜。"
+      ]
+    },
+    "climbingKiln": {
+      "id": "ancient-climbing-kiln",
+      "name": "山阿秦汉古窑",
+      "action": "探窑",
+      "x": 136.5,
+      "z": -221.5,
+      "rot": -0.52,
+      "radius": 5.0,
+      "lines": [
+        "依东北山阿缓坡筑起馒头土窑，取谷中澄泥抟作瓮缶耳杯，松柴余温尚暖。",
+        "晾坯茅棚下整齐排开未施釉的灰陶瓮与三足鬲，村人盛春酒、贮秋粟皆赖此窑。",
+        "窑膛火门微透红炭暖光，一缕淡白窑烟顺松梢袅袅融进北岭云气。"
+      ]
+    },
+    "deerHermitage": {
+      "id": "deer-brushwood-hermitage",
+      "name": "西岭鹿柴望川台",
+      "action": "凭栏",
+      "x": -82.0,
+      "z": -176.0,
+      "rot": 1.35,
+      "radius": 4.8,
+      "lines": [
+        "空山不见人，唯见竹篱柴扉半掩、青苔返景；林下双鹿安然食苹，见客亦不惊避。",
+        "登临木栈凭栏东望，全村屋舍俨然、美池桑竹与远山横云尽收画卷之中。"
+      ]
+    },
+    "mountainTeaHut": {
+      "id": "mountain-tea-shelter",
+      "name": "北岭松风茶寮",
+      "action": "品茗",
+      "x": 82.0,
+      "z": -235.5,
+      "rot": 0.28,
+      "radius": 4.6,
+      "lines": [
+        "半山樵径转入松阴，四柱茅顶茶寮下泥炉微沸，竹匾摊着刚采的带露野茶，清香扑鼻。",
+        "担柴樵夫与采茶山姑常在此歇肩饮泉，俯望谷中层梯水镜与千家炊烟，山上山下皆是人间暖意。"
+      ]
+    },
+    "woodcutterHut": {
+      "id": "cloud-ridge-woodcutter-hut",
+      "name": "西岭云樵茅舍",
+      "action": "访樵",
+      "x": -68.0,
+      "z": -234.0,
+      "rot": 0.72,
+      "radius": 4.6,
+      "lines": [
+        "依西北云岭缓坡筑起夯土茅舍，廊下码满松柴与竹扁担，劈柴木墩上犹留松脂清香。",
+        "屋脊矮烟囱飘出一缕淡白炊烟，与山下村落遥遥相望，空山深处亦有人家安居。"
+      ]
+    }
+  },
+  "rill": {
+    "width": 1.38,
+    "points": [
+      [185.0, -104.5],
+      [176.5, -115.5],
+      [166.0, -112.0],
+      [156.5, -121.5],
+      [148.5, -123.5],
+      [141.0, -121.0],
+      [134.5, -129.5],
+      [129.0, -135.5]
+    ]
+  },
+  "trails": [
+    {
+      "id": "east-lanke-trail",
+      "width": 1.35,
+      "kind": "flagstone",
+      "points": [
+        [124.5, -170.0],
+        [135.0, -168.2],
+        [146.0, -166.0],
+        [154.0, -164.5]
+      ]
+    },
+    {
+      "id": "east-rill-trail",
+      "width": 1.30,
+      "kind": "earth",
+      "points": [
+        [127.0, -150.5],
+        [136.5, -141.0],
+        [144.5, -130.5],
+        [148.5, -123.5],
+        [154.0, -115.0],
+        [163.0, -106.0]
+      ]
+    },
+    {
+      "id": "east-ridge-link",
+      "width": 1.20,
+      "kind": "earth",
+      "points": [
+        [156.0, -164.0],
+        [156.5, -148.0],
+        [151.5, -133.0],
+        [148.5, -123.5]
+      ]
+    },
+    {
+      "id": "northeast-kiln-trail",
+      "width": 1.35,
+      "kind": "earth",
+      "points": [
+        [94.0, -196.0],
+        [108.5, -205.0],
+        [122.0, -214.0],
+        [133.5, -220.0]
+      ]
+    },
+    {
+      "id": "northeast-lanke-spur",
+      "width": 1.15,
+      "kind": "earth",
+      "points": [
+        [136.5, -218.0],
+        [145.5, -198.0],
+        [152.5, -179.0],
+        [156.0, -166.5]
+      ]
+    },
+    {
+      "id": "west-deer-trail",
+      "width": 1.35,
+      "kind": "earth",
+      "points": [
+        [-30.0, -188.0],
+        [-46.0, -184.5],
+        [-63.0, -181.0],
+        [-78.5, -176.8]
+      ]
+    },
+    {
+      "id": "northwest-tea-deer-link",
+      "width": 1.20,
+      "kind": "flagstone",
+      "points": [
+        [-45.0, -212.0],
+        [-61.5, -201.5],
+        [-73.5, -189.0],
+        [-81.0, -179.0]
+      ]
+    },
+    {
+      "id": "north-tea-ridge-trail",
+      "width": 1.32,
+      "kind": "flagstone",
+      "points": [
+        [46.0, -214.5],
+        [62.0, -225.5],
+        [79.0, -233.5],
+        [105.0, -230.5],
+        [133.5, -220.0]
+      ]
+    },
+    {
+      "id": "northwest-woodcutter-trail",
+      "width": 1.26,
+      "kind": "earth",
+      "points": [
+        [-45.0, -212.0],
+        [-55.5, -222.5],
+        [-65.5, -231.5],
+        [-82.0, -242.5]
+      ]
+    }
+  ],
+  "counts": {
+    "pines": 350,
+    "maples": 225,
+    "wildBlossoms": 150,
+    "bambooClumps": 145,
+    "teaShrubs": 175,
+    "crags": 215,
+    "fernsAndTufts": 760,
+    "deer": 2
+  },
+  "quietSpots": [
+    { "x": 156.0, "z": -164.0, "radius": 7.5, "name": "松坪落子" },
+    { "x": 148.5, "z": -123.5, "radius": 7.0, "name": "东涧漱玉" },
+    { "x": -82.0, "z": -176.0, "radius": 8.0, "name": "空山鹿柴" },
+    { "x": 82.0, "z": -235.5, "radius": 7.5, "name": "松寮茶烟" },
+    { "x": -68.0, "z": -234.0, "radius": 7.5, "name": "云岭樵歌" }
+  ]
+}

@@ -1,0 +1,265 @@
+{
+  "enabled": true,
+  "seed": 20261116,
+  "palette": {
+    "stone": "#838A7F",
+    "stoneDark": "#5F675F",
+    "stoneLight": "#A5AA9B",
+    "moss": "#6E8F56",
+    "mossBright": "#84A464",
+    "path": "#C4B896",
+    "pathEdge": "#9E9578",
+    "flagstone": "#9BA093",
+    "timber": "#785F40",
+    "timberDark": "#5B462E",
+    "bamboo": "#7E945B",
+    "bambooCulm": "#8FA166",
+    "bambooDry": "#BEA870",
+    "thatch": "#AE986B",
+    "thatchLight": "#C7B283",
+    "rammedEarth": "#C6B393",
+    "plaster": "#DFD5BE",
+    "pineBark": "#4D3F35",
+    "pineDeep": "#2E4D43",
+    "pineMid": "#456D5E",
+    "pineLight": "#628B76",
+    "apricot": "#EED0D4",
+    "apricotDeep": "#DCACB4",
+    "plumWhite": "#ECEFE2",
+    "plumCalyx": "#9EB68B",
+    "teaDeep": "#4F7542",
+    "teaMid": "#678E52",
+    "teaBud": "#92B16B",
+    "herbPerilla": "#7D5E7E",
+    "herbChrys": "#D8BC5E",
+    "herbCalamus": "#5B8759",
+    "paddyShoot": "#82AC5A",
+    "water": "#7EA99B",
+    "waterDeep": "#4E7D72",
+    "waterFoam": "#EBF4F0",
+    "clayRed": "#9E5E47",
+    "clayGrey": "#7B7A72",
+    "chili": "#B64938",
+    "cornGold": "#D4B35B",
+    "radishDry": "#E5DEC9",
+    "lanternWarm": "#FFE1A4",
+    "firefly": "#DCF294"
+  },
+  "landmarks": {
+    "cloudPavilion": {
+      "id": "cloud-pavilion",
+      "name": "东皋观云亭",
+      "x": 124.5,
+      "z": -170.0,
+      "platformLift": 1.15,
+      "radius": 4.4
+    },
+    "sunningTerrace": {
+      "id": "sunning-terrace",
+      "name": "东皋晒秋坪",
+      "x": 101.8,
+      "z": -169.0,
+      "radius": 4.6
+    },
+    "ancientStele": {
+      "id": "ancient-stele",
+      "name": "避秦记事残碑",
+      "x": 127.0,
+      "z": -150.5,
+      "radius": 2.2
+    },
+    "eastPasture": {
+      "id": "east-pasture",
+      "name": "东皋牧羊坡",
+      "x": 92.5,
+      "z": -153.5,
+      "radius": 9.5
+    },
+    "watchtower": {
+      "id": "watchtower",
+      "name": "北麓望稼楼",
+      "x": 12.5,
+      "z": -226.5,
+      "radius": 3.8
+    },
+    "stoneBridge": {
+      "id": "stone-bridge",
+      "name": "北涧青石桥",
+      "x": 24.5,
+      "z": -224.0,
+      "yaw": 0.08,
+      "length": 4.8,
+      "width": 2.1
+    },
+    "waterfall": {
+      "id": "mountain-cascade",
+      "name": "北涧三叠泉",
+      "topX": 26.5,
+      "topZ": -257.5,
+      "poolX": 26.0,
+      "poolZ": -246.5,
+      "poolRadius": 5.4
+    },
+    "herbCottage": {
+      "id": "herb-cottage",
+      "name": "西坞山阴药庐",
+      "x": -18.5,
+      "z": -225.5,
+      "rot": 0.24,
+      "w": 5.0,
+      "d": 3.9,
+      "radius": 5.2
+    },
+    "teaStove": {
+      "id": "tea-stove",
+      "name": "山泉竹炉茶灶",
+      "x": -14.2,
+      "z": -222.2,
+      "radius": 1.3
+    }
+  },
+  "terraces": {
+    "centerX": 49.5,
+    "centerZ": -256.0,
+    "tiers": [
+      { "index": 0, "rInner": 33.5, "rOuter": 40.5, "angFrom": 1.18, "angTo": 1.92, "lift": 0.26 },
+      { "index": 1, "rInner": 26.8, "rOuter": 33.3, "angFrom": 1.14, "angTo": 1.96, "lift": 0.64 },
+      { "index": 2, "rInner": 20.4, "rOuter": 26.6, "angFrom": 1.10, "angTo": 2.00, "lift": 1.06 },
+      { "index": 3, "rInner": 14.4, "rOuter": 20.2, "angFrom": 1.06, "angTo": 2.02, "lift": 1.52 },
+      { "index": 4, "rInner": 8.8,  "rOuter": 14.2, "angFrom": 1.04, "angTo": 2.00, "lift": 2.02 }
+    ]
+  },
+  "brook": {
+    "width": 1.85,
+    "points": [
+      [26.0, -246.0],
+      [25.2, -238.5],
+      [24.5, -230.0],
+      [24.5, -224.0],
+      [26.2, -218.0],
+      [30.5, -214.6],
+      [33.3, -213.2],
+      [34.3, -210.9],
+      [38.2, -208.0],
+      [43.5, -206.8],
+      [48.0, -206.6],
+      [49.4, -206.5]
+    ]
+  },
+  "paths": [
+    {
+      "id": "east-cloud-trail",
+      "width": 1.45,
+      "kind": "flagstone",
+      "points": [
+        [94.0, -196.0],
+        [98.5, -182.5],
+        [101.8, -169.0],
+        [109.5, -170.2],
+        [117.5, -170.2],
+        [121.2, -170.0]
+      ]
+    },
+    {
+      "id": "east-stele-spur",
+      "width": 1.25,
+      "kind": "flagstone",
+      "points": [
+        [101.8, -169.0],
+        [97.5, -156.0],
+        [104.0, -149.5],
+        [116.5, -150.0],
+        [124.8, -150.5]
+      ]
+    },
+    {
+      "id": "east-pond-link",
+      "width": 1.30,
+      "kind": "earth",
+      "points": [
+        [95.5, -156.0],
+        [89.5, -148.0],
+        [83.5, -144.0]
+      ]
+    },
+    {
+      "id": "north-foothill-trail",
+      "width": 1.50,
+      "kind": "earth",
+      "points": [
+        [82.0, -215.0],
+        [66.0, -214.5],
+        [46.0, -214.5],
+        [32.5, -219.5],
+        [27.5, -224.0],
+        [24.5, -224.0],
+        [15.5, -223.8],
+        [2.0, -223.0],
+        [-13.5, -220.5],
+        [-24.0, -206.0],
+        [-30.0, -188.0]
+      ]
+    },
+    {
+      "id": "north-cascade-spur",
+      "width": 1.20,
+      "kind": "flagstone",
+      "points": [
+        [19.5, -224.0],
+        [19.0, -233.5],
+        [20.2, -242.0]
+      ]
+    },
+    {
+      "id": "west-tea-spur",
+      "width": 1.20,
+      "kind": "earth",
+      "points": [
+        [-13.5, -220.5],
+        [-26.5, -225.0],
+        [-38.5, -222.5],
+        [-45.0, -212.0]
+      ]
+    }
+  ],
+  "counts": {
+    "pines": 92,
+    "blossomTrees": 68,
+    "bambooClusters": 86,
+    "teaAndHerbShrubs": 176,
+    "crags": 104,
+    "meadowTufts": 440,
+    "goats": 5,
+    "egrets": 3,
+    "cranes": 2,
+    "butterflies": 8,
+    "fireflies": 18
+  },
+  "interactions": {
+    "teaStove": {
+      "id": "borderland-tea-stove",
+      "name": "山泉竹炉茶灶",
+      "action": "烹泉试茗",
+      "lines": [
+        "揭开瓦铫轻扇松枝——北涧活水蟹眼初生，新焙云雾野茶清香满坞。",
+        "竹杓分汤入粗陶盏，茶烟随山岚袅袅升起，入口微苦回甘，顿觉尘虑皆消。",
+        "泥炉红炭微明，铫中松风谡谡作响，半瓯山茗饮罢，两腋习习生风。"
+      ]
+    },
+    "ancientStele": {
+      "id": "borderland-qin-stele",
+      "name": "避秦记事残碑",
+      "action": "拂苔辨字",
+      "lines": [
+        "拂去苍苔，见青石阴刻古隶残字：「先世避乱入谷，凿渠开畴，种茶植杏，子孙永守清平……」",
+        "指尖摩挲漫漶石纹，碑背尚存先民刻下的春分祀社、谷雨采茶农事节候。",
+        "残碑半没芳草松阴间，字迹古拙质朴，不记帝王年号，唯录岁稔人和。"
+      ]
+    }
+  },
+  "quietSpots": [
+    { "x": 20.5, "z": -242.5, "radius": 8.0, "name": "飞泉漱石" },
+    { "x": 124.5, "z": -170.0, "radius": 7.5, "name": "东皋松云" },
+    { "x": -18.5, "z": -225.5, "radius": 7.0, "name": "药坞茶烟" }
+  ]
+}

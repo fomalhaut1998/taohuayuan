@@ -1,0 +1,42 @@
+{
+  "surface": {
+    "shallow": "#B8D2C4",
+    "deep": "#42736D",
+    "mix": 0.64,
+    "depthScale": 2.0,
+    "flowSpeed": 0.62,
+    "rippleAmplitude": 0.09,
+    "contrast": 0.105
+  },
+  "noon": {
+    "clarity": 0.55,
+    "foamEdge": 0.86,
+    "silhouetteBoost": 0.14,
+    "stretchScale": 0.82,
+    "paddyRowContrast": 0.06,
+    "paddySheetGain": 0.35
+  },
+  "reflection": {
+    "skyStrength": 0.30,
+    "cloudStrength": 0.22,
+    "silhouetteStrength": 0.48,
+    "verticalStretch": 1.18,
+    "slopeBias": 0.09,
+    "rippleDistort": 0.052,
+    "inkColor": "#1B2F2C",
+    "maxReflectors": 8
+  },
+  "rain": {
+    "seed": 90731,
+    "maxRings": 96,
+    "maxEaves": 48,
+    "maxDistance": 52,
+    "threshold": 0.04,
+    "ringRadius": 0.42,
+    "surfaceOffset": 0.025,
+    "ringLifetime": 0.92,
+    "opacity": 0.62,
+    "eaveOpacity": 0.28,
+    "eaveLength": 0.44
+  }
+}

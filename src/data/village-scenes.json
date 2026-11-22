@@ -1,0 +1,69 @@
+{
+  "seed": 8112026,
+  "palette": {
+    "wood": "#927D5B",
+    "woodDark": "#6B5942",
+    "bamboo": "#ACAC78",
+    "cloth": "#D4CEB4",
+    "indigo": "#8898A2",
+    "clay": "#B18A70",
+    "clayLight": "#C6A48A",
+    "stone": "#9EAA94",
+    "leaf": "#7C986B",
+    "leafLight": "#9EAE7B",
+    "flower": "#D7C4AD",
+    "pink": "#D7B7BB",
+    "path": "#B9B39D",
+    "earth": "#A59B80"
+  },
+  "scenes": [
+    {
+      "id": "wayside-tea",
+      "kind": "tea",
+      "label": "歇脚茶棚",
+      "anchor": [
+        -19,
+        -139
+      ],
+      "radius": 4.9,
+      "rot": -0.18
+    },
+    {
+      "id": "linen-court",
+      "kind": "laundry",
+      "label": "晾衣柴院",
+      "anchor": [
+        -18,
+        -176
+      ],
+      "radius": 4.2,
+      "rot": 0.12
+    },
+    {
+      "id": "potter-corner",
+      "kind": "kiln",
+      "label": "陶窑作坊",
+      "anchor": [
+        9,
+        -207
+      ],
+      "radius": 4.7,
+      "rot": -0.35
+    }
+  ],
+  "search": {
+    "step": 2,
+    "maxOffset": 32,
+    "maxRouteDistance": 22,
+    "maxGroundDelta": 0.4
+  },
+  "nature": {
+    "count": 22,
+    "radius": 1.75,
+    "attempts": 1100
+  },
+  "budget": {
+    "drawCalls": 6,
+    "triangles": 70000
+  }
+}

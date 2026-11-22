@@ -1,0 +1,25 @@
+{
+  "pass": true,
+  "comparedFrames": 180,
+  "equivalent": "all allocated matrices/weights/seeds/corners and stats byte-equivalent",
+  "cpuMicrobenchmark": {
+    "baselineMs": 0.7036001666666662,
+    "optimizedMs": 0.5304188333333332,
+    "reductionPercent": 24.61360038525666,
+    "oldRuns": [
+      0.6450847777777778,
+      0.7036001666666662,
+      0.709469111111111,
+      0.7588956666666662,
+      0.6247688333333331
+    ],
+    "newRuns": [
+      0.49790477777777775,
+      0.5304188333333332,
+      0.5609965555555553,
+      0.5522552777777785,
+      0.48488650000000033
+    ]
+  },
+  "measurement": "Node CPU shadow update only; not browser FPS"
+}

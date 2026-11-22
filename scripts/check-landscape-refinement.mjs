@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import * as THREE from 'three';
+import { createTerrain, createHeightFunction } from '../src/world/terrain.js';
+import { createFlora } from '../src/world/flora.js';
+const world = JSON.parse(fs.readFileSync(new URL('../src/data/world.json', import.meta.url)));
+const context = new Proxy({createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)})},{get:(t,k)=>t[k]??(()=>{})});
+globalThis.document = {createElement:()=>({getContext:()=>context})};
+assert.equal(world.sky.times.day.fogColor, '#BAD8E7', 'clear-day blue haze must use the field consumed by sky.computeTarget');
+const dayFog = new THREE.Color(world.sky.times.day.fogColor);
+assert(dayFog.b > dayFog.r, 'retain the clear-day blue haze contract');
+assert(!Object.hasOwn(world.sky.times.day, 'fog'), 'reject silently ignored day.fog config');
+const distance = (x,z)=>Math.abs(x)+40;
+const look = {road:world.village.road,pond:world.terrain.pond};
+const terrain = createTerrain(world.terrain,distance,look);
+const plain = createTerrain({...world.terrain,surface:undefined},distance,look);
+assert.deepEqual(terrain.mesh.geometry.attributes.position.array,plain.mesh.geometry.attributes.position.array,'surface polish cannot change collision heights');
+const oldWorld=JSON.parse(fs.readFileSync(new URL('../.visual-baseline/src/data/world.json',import.meta.url)));
+const oldHeight=createHeightFunction(oldWorld.terrain,distance);
+for(let z=-200;z<-50;z+=5)for(let x=-60;x<100;x+=5)assert.equal(terrain.heightAt(x,z),oldHeight(x,z),'height function remains unchanged');
+const A=terrain.colorAt(30,-100),B=plain.colorAt(30,-100);
+assert(Math.hypot(A.r-B.r,A.g-B.g,A.b-B.b)>0.002,'configured village surface must visibly differ from uniform grass');
+for(let x=-50;x<100;x+=3){const c=terrain.colorAt(x,-130);assert([c.r,c.g,c.b].every(v=>Number.isFinite(v)&&v>=0&&v<=1));assert.deepEqual(c,terrain.colorAt(x,-130),'surface is deterministic');}
+const field={half:400,sample:()=>2,slope:()=>0};
+const curve=new THREE.LineCurve3(new THREE.Vector3(-100,0,0),new THREE.Vector3(100,0,0));
+const flora=createFlora(world.flora,field,()=>50,curve,{x:0,z:0},(x)=>x>50);
+const again=createFlora(world.flora,field,()=>50,curve,{x:0,z:0},(x)=>x>50);
+assert.equal(flora.count,world.flora.treeCount);
+assert.deepEqual(flora.spots,again.spots,'placement seed unchanged by geometry');
+let triangles=0;for(const mesh of flora.group.children){const g=mesh.geometry;for(const name of ['position','normal','color'])assert([...g.attributes[name].array].every(Number.isFinite),name+' finite');triangles+=(g.index?.count??g.attributes.position.count)/3*mesh.count;}
+assert(flora.group.children.length<=world.flora.nearVariants+world.flora.farTree.variants,'retain instancing budget');
+assert(triangles<350000,'peach woods retain bounded geometry');
+console.log(JSON.stringify({surface:true,unchangedHeights:true,trees:flora.count,batches:flora.group.children.length,triangles}));

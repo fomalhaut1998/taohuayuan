@@ -1,0 +1,171 @@
+{
+  "enabled": true,
+  "seed": 20261121,
+  "palette": {
+    "stone": "#828A7E",
+    "stoneDark": "#5C655C",
+    "stoneLight": "#A6ACA0",
+    "moss": "#6A8C54",
+    "mossDeep": "#4E6D44",
+    "trailEarth": "#C2B594",
+    "trailEdge": "#9B9176",
+    "flagstone": "#989E91",
+    "timber": "#795F40",
+    "timberDark": "#58432C",
+    "bark": "#544032",
+    "bambooCulm": "#899E63",
+    "bambooLeaf": "#68864D",
+    "camphorLight": "#7FA461",
+    "camphorMid": "#5B8449",
+    "camphorDeep": "#3E6239",
+    "pineDeep": "#2D4C42",
+    "pineMid": "#446C5D",
+    "pineLight": "#628B77",
+    "tile": "#6C7877",
+    "tileDark": "#4F5A5A",
+    "plaster": "#DFD5BE",
+    "rammedEarth": "#C6B393",
+    "thatch": "#AE986B",
+    "thatchLight": "#C7B283",
+    "lacquerRed": "#9E4639",
+    "bronze": "#6B725F",
+    "teaDeep": "#4F7542",
+    "teaMid": "#678E52",
+    "teaBud": "#92B16B",
+    "potteryGrey": "#7D7B73",
+    "potteryRed": "#A4634A",
+    "water": "#7CA89B",
+    "waterDeep": "#4E7D72",
+    "waterFoam": "#EAF4F0",
+    "emberGlow": "#FF9E4E",
+    "lanternPaper": "#EFE0BC",
+    "lanternHalo": "#FFC472"
+  },
+  "lanternSeasons": {
+    "spring": { "ember": "#FF9E4E", "haloTint": "#FFFFFF", "gain": 1.00 },
+    "summer": { "ember": "#FFB35C", "haloTint": "#FFF3D8", "gain": 0.96 },
+    "autumn": { "ember": "#FF9142", "haloTint": "#FFD8B0", "gain": 1.04 },
+    "winter": { "ember": "#FF7F34", "haloTint": "#FFC288", "gain": 1.12 }
+  },
+  "sanctuaries": {
+    "ancientAltar": {
+      "id": "ancient-qin-altar",
+      "name": "西南古社避秦坛",
+      "action": "拜社",
+      "x": -124.0,
+      "z": -116.0,
+      "rot": 0.36,
+      "radius": 5.0,
+      "lines": [
+        "古樟巨荫遮覆两级苍苔石坛，朱赭素幡随山风轻扬，犹存先世春祈秋报之古礼。",
+        "社柱前摆着陶盘鲜果与新收粟穗竹筐，村人每逢社日便来此敬祷岁稔人和。",
+        "青石社铭仅刻『避秦保聚，永敦邻好』八字，不记年号，唯见山风松响历久常新。"
+      ]
+    },
+    "secludedStudy": {
+      "id": "cold-spring-study",
+      "name": "北涧冷泉幽轩",
+      "action": "展简",
+      "x": 60.0,
+      "z": -296.0,
+      "rot": -0.24,
+      "radius": 4.8,
+      "lines": [
+        "青瓦木轩依北山高台而筑，崖间竹笕引来冷泉入苔石方池，水声清泠如叩玉磬。",
+        "凭轩南望，层梯水镜与千亩良田铺展在烟霭之中，案头韦编竹简正摊开四时农谚。",
+        "长日静读不觉暮色渐浓，青铜油灯微明，唯有山泉与松涛伴人翻卷。"
+      ]
+    },
+    "jadeTeaTerrace": {
+      "id": "jade-rill-tea-terrace",
+      "name": "东南碧涧茶坞",
+      "action": "试茶",
+      "x": 186.0,
+      "z": -114.0,
+      "rot": -0.54,
+      "radius": 4.8,
+      "lines": [
+        "东涧源头云雾常聚，四弧老茶垄顺着缓坡错落排开，芽叶带着清晨山露。",
+        "四柱茅棚下泥灶铁锅微温，松柴清香混着炒青茶气，竹匾上摊满刚焙好的新茗。",
+        "山农汲碧涧源水烹了一盏头春老茶，入口鲜爽回甘，满坡碧影令人忘归。"
+      ]
+    }
+  },
+  "trails": [
+    {
+      "id": "sw-orchard-altar-trail",
+      "kind": "earth",
+      "width": 1.40,
+      "points": [
+        [-31.0, -132.0],
+        [-58.0, -128.0],
+        [-88.0, -122.0],
+        [-117.0, -117.0]
+      ]
+    },
+    {
+      "id": "sw-altar-deer-trail",
+      "kind": "flagstone",
+      "width": 1.28,
+      "points": [
+        [-122.0, -122.0],
+        [-112.0, -144.0],
+        [-98.0, -162.0],
+        [-82.0, -176.0]
+      ]
+    },
+    {
+      "id": "north-cascade-study-trail",
+      "kind": "flagstone",
+      "width": 1.30,
+      "points": [
+        [26.0, -246.5],
+        [34.0, -264.0],
+        [46.0, -280.0],
+        [56.0, -292.0]
+      ]
+    },
+    {
+      "id": "north-study-tea-trail",
+      "kind": "earth",
+      "width": 1.25,
+      "points": [
+        [65.0, -293.0],
+        [74.0, -276.0],
+        [80.0, -256.0],
+        [82.0, -235.5]
+      ]
+    },
+    {
+      "id": "se-rill-tea-trail",
+      "kind": "flagstone",
+      "width": 1.32,
+      "points": [
+        [163.0, -106.0],
+        [172.0, -109.0],
+        [181.0, -112.0]
+      ]
+    },
+    {
+      "id": "se-tea-lanke-trail",
+      "kind": "earth",
+      "width": 1.22,
+      "points": [
+        [184.0, -120.0],
+        [176.0, -136.0],
+        [166.0, -152.0],
+        [156.0, -164.0]
+      ]
+    }
+  ],
+  "quietSpots": [
+    { "x": -124.0, "z": -116.0, "radius": 8.0, "name": "古社听风" },
+    { "x": 60.0, "z": -296.0, "radius": 8.0, "name": "冷泉读易" },
+    { "x": 186.0, "z": -114.0, "radius": 8.0, "name": "茶坞听涧" }
+  ],
+  "counts": {
+    "teaBushes": 64,
+    "crags": 24,
+    "tufts": 96
+  }
+}

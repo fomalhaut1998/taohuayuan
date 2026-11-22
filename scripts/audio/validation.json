@@ -1,0 +1,254 @@
+{
+  "checkedAt": "2026-11-16",
+  "command": "python scripts/audio/audit-clips.py",
+  "exitCode": 0,
+  "listeningPerformed": true,
+  "verdict": "pass",
+  "clips": 21,
+  "totalBytes": 372555,
+  "categories": {
+    "voice-ack": 2,
+    "voice-laugh": 3,
+    "cluck": 2,
+    "crow": 2,
+    "frog": 2,
+    "stag": 2,
+    "bark": 2,
+    "chirp": 2,
+    "low": 2,
+    "quack": 2
+  },
+  "verified": [
+    {
+      "id": "voice-ack-01",
+      "bytes": 8251,
+      "sha256": "29a8bcd4dc00f03b34c5a0a32137b783ad949ee6ca2495c93fe875a30f401c02",
+      "duration": 0.7,
+      "decodeExit": 0
+    },
+    {
+      "id": "voice-ack-02",
+      "bytes": 7682,
+      "sha256": "a8ab83a7dde9a38a5c4db281a3b1d548cb6104ebe367448dbec324944759efa1",
+      "duration": 0.7,
+      "decodeExit": 0
+    },
+    {
+      "id": "voice-laugh-01",
+      "bytes": 12014,
+      "sha256": "0abb7546793bee8afeb3831793adaad4ea31cdedf8361caa235089493bcc05d2",
+      "duration": 1.11,
+      "decodeExit": 0
+    },
+    {
+      "id": "voice-laugh-02",
+      "bytes": 8168,
+      "sha256": "5358f5c67cd2a9903a39d0aa5babc8103aaae8497bd2ceb4884ddf6ad3afd717",
+      "duration": 0.88,
+      "decodeExit": 0
+    },
+    {
+      "id": "voice-laugh-03",
+      "bytes": 8012,
+      "sha256": "21078eb681321d04031235952554a4874fd9683d3b9bfc0c99d78a4bc14014dc",
+      "duration": 0.88,
+      "decodeExit": 0
+    },
+    {
+      "id": "cluck-01",
+      "bytes": 21782,
+      "sha256": "00d11260a53269aa85d85e1958d7c61ffb152f8cc388407f5562f97b094490f1",
+      "duration": 2.35,
+      "decodeExit": 0
+    },
+    {
+      "id": "cluck-02",
+      "bytes": 21782,
+      "sha256": "a80abcefa1030cfd752da5bf9e9edd1bf2b2047ef053df058ff5e2d6e708a3dd",
+      "duration": 2.15,
+      "decodeExit": 0
+    },
+    {
+      "id": "crow-01",
+      "bytes": 23022,
+      "sha256": "5d2690b329e929ee4ae0dbce9bbe1af63b338e71523212d05e4ffda8b58fc921",
+      "duration": 2.24,
+      "decodeExit": 0
+    },
+    {
+      "id": "crow-02",
+      "bytes": 23755,
+      "sha256": "b8d891b39fa3187712b2339861f018a66fbf2af218f892db99d80422ec7009b4",
+      "duration": 2.18,
+      "decodeExit": 0
+    },
+    {
+      "id": "frog-01",
+      "bytes": 14782,
+      "sha256": "6db7648baf60382537f9b4ded32b5a969be45e622abc2b0971ce583edb78d3e1",
+      "duration": 1.4,
+      "decodeExit": 0
+    },
+    {
+      "id": "frog-02",
+      "bytes": 18384,
+      "sha256": "ef7abf0965455fa50480555dadae80326d5b2af7f3bf679905a824d99ce1114d",
+      "duration": 1.76,
+      "decodeExit": 0
+    },
+    {
+      "id": "stag-01",
+      "bytes": 21440,
+      "sha256": "2dd9652223fbe5aae598de550c7e3a3dfe93316bada11c35f7e942e735647be5",
+      "duration": 2.24,
+      "decodeExit": 0
+    },
+    {
+      "id": "stag-02",
+      "bytes": 22528,
+      "sha256": "00db6d8a1701acf41d6b0d845a006b20952cea846502a2ea8a907980e326fbf1",
+      "duration": 2.44,
+      "decodeExit": 0
+    },
+    {
+      "id": "bark-01",
+      "bytes": 19987,
+      "sha256": "537d66f8a4cf7cc0d191c2e9c7f40175034d34935bfc8072b8c694a57f5fd565",
+      "duration": 2,
+      "decodeExit": 0
+    },
+    {
+      "id": "bark-02",
+      "bytes": 7785,
+      "sha256": "72095ecf563dda98e82ff493a5b30f90dc30e71347d333d37cdc48b40215f59d",
+      "duration": 0.8,
+      "decodeExit": 0
+    },
+    {
+      "id": "chirp-01",
+      "bytes": 27829,
+      "sha256": "e120d8006cc59fdc75a19119d541c13b32ff32c5082ec297b1b412805b136718",
+      "duration": 2.45,
+      "decodeExit": 0
+    },
+    {
+      "id": "chirp-02",
+      "bytes": 28481,
+      "sha256": "8de2a076a0bf1da8c151486adb4a3089b5085192f4fd65b66d648e46f7414f46",
+      "duration": 2.5,
+      "decodeExit": 0
+    },
+    {
+      "id": "low-01",
+      "bytes": 23202,
+      "sha256": "6b897d999f588f93f947aa4130343dc015655004a2b8f9aa781b0f859b4a03f8",
+      "duration": 2.35,
+      "decodeExit": 0
+    },
+    {
+      "id": "low-02",
+      "bytes": 26536,
+      "sha256": "00fb2f4bdf05f43b4a009c83380cb59b387f524dc8b8c89fec0919af97193ff5",
+      "duration": 2.62,
+      "decodeExit": 0
+    },
+    {
+      "id": "quack-01",
+      "bytes": 17076,
+      "sha256": "73a15f032885111462d77e483f92a7b97dd6c26d2588fd6bf82aa6060f40dbf6",
+      "duration": 1.5,
+      "decodeExit": 0
+    },
+    {
+      "id": "quack-02",
+      "bytes": 10057,
+      "sha256": "29720f4c9c8769cf723dcded13d95a80f77d4cdc974e83f7da0be085012d8ad1",
+      "duration": 0.95,
+      "decodeExit": 0
+    }
+  ],
+  "originalDigests": [
+    {
+      "sourceKey": "ack-168132",
+      "bytes": 432816,
+      "sha256": "a981ce606bc750ea1b34ebb455fa941d3936973e01b9dbffda7451a7ff852125"
+    },
+    {
+      "sourceKey": "hmm-165011",
+      "bytes": 30056,
+      "sha256": "396ad3b410c95f22ac15152efbffeaaeaf68c4857ed62d403eebffaa81c9f6af"
+    },
+    {
+      "sourceKey": "laugh-231495",
+      "bytes": 33024,
+      "sha256": "0dd454e2a3de2b2bb49a87eef8f6ba2ae75b5372e17efe3a6673dfaae3e5c191"
+    },
+    {
+      "sourceKey": "chuckles-463814",
+      "bytes": 240421,
+      "sha256": "0a5751d393d248aefc5840b5f7899ebd0ce8d348d02a2d9f5e705c47ec342a69"
+    },
+    {
+      "sourceKey": "hen-0976",
+      "bytes": 459008,
+      "sha256": "92a697cbf3bfe0fb931f9e45ee36564559dc984c217f97e20428b0e877ac0cb3"
+    },
+    {
+      "sourceKey": "hen-0978",
+      "bytes": 905408,
+      "sha256": "7987f7bb687f3d00ae6278070020f928851df0a79317a97c45a86c05f9ae0faf"
+    },
+    {
+      "sourceKey": "rooster-0283",
+      "bytes": 96155,
+      "sha256": "1622124515e4cdc38a1f9fc3f9d37afcb0825e21eb18bdacaf7491e18103006c"
+    },
+    {
+      "sourceKey": "rooster-0704",
+      "bytes": 2859008,
+      "sha256": "079de1bca01304d435353ee8638c5a9b96c341a1f48c8a7ad11d2d6985b57d35"
+    },
+    {
+      "sourceKey": "frog-0819",
+      "bytes": 586688,
+      "sha256": "95f80a9088c9900ec7362bfd25fc28de25b3cd5240db33dff62fcbf8093d9202"
+    },
+    {
+      "sourceKey": "sika-3616",
+      "bytes": 4844493,
+      "sha256": "a686943a31bd553cdec4df7ea9fb675d17295fc42695a2a3344e9da01ca3abb1"
+    },
+    {
+      "sourceKey": "dog-0288",
+      "bytes": 305142,
+      "sha256": "4b9973f89d4f600adfaa8cc80db29823b857c70f740c5cc8ce3cec7b900cbc62"
+    },
+    {
+      "sourceKey": "dog-0612",
+      "bytes": 1888448,
+      "sha256": "f831f699d0884b2e8a364aced3cdb302b39f86a817bec04915baeb4cdd7ea2b0"
+    },
+    {
+      "sourceKey": "cow-2382",
+      "bytes": 85472,
+      "sha256": "43eb6ad1e43443c7b47b365d425072da4cc27642dcd26b3509c5107f7fcd924a"
+    },
+    {
+      "sourceKey": "cow-2383",
+      "bytes": 93920,
+      "sha256": "62b05649aa29a8a530f6983136e141cc26a94148d3862f0d95bbbdcacf3c6aaf"
+    },
+    {
+      "sourceKey": "duck-0276",
+      "bytes": 873561,
+      "sha256": "903714a0b30891c0923ab25a72045450fe7a6112ba9f2cd9aab653222678a144"
+    },
+    {
+      "sourceKey": "sparrows-1068",
+      "bytes": 2092068,
+      "sha256": "70590a809763e4e49ed02a2725c0e1b804d4957678ea59e1434c390cc64a87b9"
+    }
+  ],
+  "stagingRemoved": true,
+  "audioTreeBytes": 483286
+}

@@ -1,0 +1,282 @@
+{
+  "extent": {
+    "x": [-156, 212],
+    "z": [-328, 296]
+  },
+  "pois": [
+    {
+      "id": "shuidui",
+      "name": "筒车水碓",
+      "kind": "工",
+      "dynamic": "waterworks",
+      "x": 112,
+      "z": -82,
+      "reveal": 22,
+      "poem": "清渠引山泉，筒车昼夜转",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "tinglin",
+      "name": "六博亭林",
+      "kind": "亭",
+      "dynamic": "pavilion",
+      "x": 58,
+      "z": -130,
+      "reveal": 22,
+      "poem": "竹阴覆石枰，闲坐听荷风",
+      "scenic": true,
+      "label": { "x": 7, "y": -5, "align": "start" }
+    },
+    {
+      "id": "xichou",
+      "name": "西畴果林",
+      "kind": "林",
+      "x": -24,
+      "z": -136,
+      "reveal": 28,
+      "poem": "梨雪压枝低，春深果木繁",
+      "scenic": true,
+      "label": { "x": -7, "y": 5, "align": "end" }
+    },
+    {
+      "id": "guanyun",
+      "name": "东皋观云",
+      "kind": "亭",
+      "x": 124.5,
+      "z": -170,
+      "reveal": 22,
+      "poem": "登高望云海，松风拂衣袂",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "cengti",
+      "name": "北山层梯",
+      "kind": "田",
+      "x": 32,
+      "z": -228,
+      "reveal": 26,
+      "poem": "层畴依北麓，曲水映天光",
+      "scenic": true,
+      "label": { "x": -7, "y": 6, "align": "end" }
+    },
+    {
+      "id": "feipu",
+      "name": "飞瀑三叠",
+      "kind": "泉",
+      "x": 26,
+      "z": -246.5,
+      "reveal": 24,
+      "poem": "飞泉落三叠，漱玉入澄潭",
+      "scenic": true,
+      "label": { "x": -7, "y": -5, "align": "end" }
+    },
+    {
+      "id": "yaolu",
+      "name": "竹坞药庐",
+      "kind": "庐",
+      "x": -18.5,
+      "z": -225.5,
+      "reveal": 22,
+      "poem": "竹炉煎山泉，药香隐深坞",
+      "scenic": true,
+      "label": { "x": -7, "y": 5, "align": "end" }
+    },
+    {
+      "id": "dumubridge",
+      "name": "东涧独木桥",
+      "kind": "桥",
+      "x": 148.5,
+      "z": -123.5,
+      "reveal": 22,
+      "poem": "劈杉横清涧，苔石漱寒泉",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "lanke",
+      "name": "烂柯石枰",
+      "kind": "枰",
+      "x": 156.0,
+      "z": -164.0,
+      "reveal": 22,
+      "poem": "青石残局冷，松子落枰声",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "guyao",
+      "name": "秦汉古窑",
+      "kind": "窑",
+      "x": 136.5,
+      "z": -221.5,
+      "reveal": 22,
+      "poem": "澄泥抟瓮缶，松烟入北云",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "songfeng",
+      "name": "松风茶寮",
+      "kind": "茶",
+      "x": 82.0,
+      "z": -235.5,
+      "reveal": 22,
+      "poem": "泥炉蟹眼沸，松阴一盏春",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "yunqiao",
+      "name": "云樵茅舍",
+      "kind": "舍",
+      "x": -68.0,
+      "z": -234.0,
+      "reveal": 22,
+      "poem": "夯土依松岭，炊烟接云深",
+      "scenic": true,
+      "label": { "x": -7, "y": 5, "align": "end" }
+    },
+    {
+      "id": "luchai",
+      "name": "鹿柴望川",
+      "kind": "台",
+      "x": -82.0,
+      "z": -176.0,
+      "reveal": 22,
+      "poem": "返景入深林，鹿饮苔泉清",
+      "scenic": true,
+      "label": { "x": -7, "y": 5, "align": "end" }
+    },
+    {
+      "id": "chawu",
+      "name": "碧涧茶坞",
+      "kind": "茶",
+      "x": 186.0,
+      "z": -114.0,
+      "reveal": 24,
+      "poem": "清涧生茶雾，茅棚炒新芽",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "lengquan",
+      "name": "冷泉幽轩",
+      "kind": "轩",
+      "x": 60.0,
+      "z": -296.0,
+      "reveal": 24,
+      "poem": "竹笕引冷泉，青简伴松涛",
+      "scenic": true,
+      "label": { "x": 7, "y": 5, "align": "start" }
+    },
+    {
+      "id": "gushe",
+      "name": "古社避秦坛",
+      "kind": "坛",
+      "x": -124.0,
+      "z": -116.0,
+      "reveal": 24,
+      "poem": "古樟阴石坛，春祈千岁安",
+      "scenic": true,
+      "label": { "x": 7, "y": -5, "align": "start" }
+    }
+  ],
+  "regions": [
+    { "name": "东皋观云亭", "x": 124.5, "z": -170, "r": 22, "priority": 0.38 },
+    { "name": "东皋晒秋坪", "x": 98, "z": -169.5, "r": 16, "priority": 0.32 },
+    { "name": "东皋牧羊坡", "x": 92.5, "z": -153.5, "r": 18, "priority": 0.26 },
+    { "name": "避秦残碑", "x": 127, "z": -150.5, "r": 12, "priority": 0.4 },
+    { "name": "北山层梯", "x": 32, "z": -226, "r": 24, "priority": 0.32 },
+    { "name": "北涧三叠泉", "x": 26, "z": -249, "r": 20, "priority": 0.42 },
+    { "name": "北麓望稼楼", "x": 12.5, "z": -226.5, "r": 15, "priority": 0.35 },
+    { "name": "竹坞药庐", "x": -18.5, "z": -225.5, "r": 22, "priority": 0.4 },
+    { "name": "北岭松风茶寮", "x": 82.0, "z": -235.5, "r": 20, "priority": 0.41 },
+    { "name": "山阿秦汉古窑", "x": 136.5, "z": -221.5, "r": 20, "priority": 0.40 },
+    { "name": "东岭烂柯石枰", "x": 156.0, "z": -164.0, "r": 18, "priority": 0.41 },
+    { "name": "西岭鹿柴望川台", "x": -82.0, "z": -176.0, "r": 18, "priority": 0.39 },
+    { "name": "西岭云樵茅舍", "x": -68.0, "z": -234.0, "r": 19, "priority": 0.40 },
+    { "name": "西畴果林", "x": -24, "z": -136, "r": 36, "priority": 0.28 },
+    { "name": "筒车水碓", "dynamic": "waterworks", "x": 112, "z": -82, "r": 18, "priority": 0.34 },
+    { "name": "六博亭林", "dynamic": "pavilion", "x": 58, "z": -130, "r": 18, "priority": 0.34 },
+    { "name": "东涧独木山桥", "x": 148.5, "z": -123.5, "r": 16, "priority": 0.39 },
+    { "name": "东南碧涧茶坞", "x": 186.0, "z": -114.0, "r": 22, "priority": 0.42 },
+    { "name": "北涧冷泉幽轩", "x": 60.0, "z": -296.0, "r": 22, "priority": 0.42 },
+    { "name": "西南古社避秦坛", "x": -124.0, "z": -116.0, "r": 22, "priority": 0.42 }
+  ],
+  "microLabels": [
+    { "name": "晒谷场", "dynamic": "thresh", "x": 38, "z": -108 },
+    { "name": "织室", "dynamic": "weaving", "x": 42, "z": -120 },
+    { "name": "木作院", "dynamic": "carpentry", "x": 36, "z": -136 },
+    { "name": "瓜庐", "dynamic": "fieldHut", "x": 48, "z": -154 },
+    { "name": "晒秋坪", "x": 98, "z": -169.5 },
+    { "name": "望稼楼", "x": 12.5, "z": -226.5 },
+    { "name": "青石桥", "x": 24.5, "z": -224 },
+    { "name": "竹炉茶灶", "x": -14.2, "z": -222.2 },
+    { "name": "避秦碑", "x": 127, "z": -150.5 },
+    { "name": "松风茶寮", "x": 82.0, "z": -235.5 },
+    { "name": "秦汉古窑", "x": 136.5, "z": -221.5 },
+    { "name": "烂柯石枰", "x": 156.0, "z": -164.0 },
+    { "name": "云樵茅舍", "x": -68.0, "z": -234.0 },
+    { "name": "碧涧源头", "x": 181.6, "z": -118.8 },
+    { "name": "炒茶草棚", "x": 186.0, "z": -114.0 },
+    { "name": "竹笕冷泉", "x": 55.6, "z": -295.6 },
+    { "name": "古社大樟", "x": -127.5, "z": -117.3 }
+  ],
+  "mountainLabels": [
+    { "name": "武陵东岭", "x": 152, "z": 126 },
+    { "name": "烟霞东岫", "x": 132, "z": 236 },
+    { "name": "武陵西麓", "x": -102, "z": 136 },
+    { "name": "翠屏南嶂", "x": -94, "z": 232 },
+    { "name": "桃源北障", "x": -18, "z": -292 },
+    { "name": "东岭松阿", "x": 176, "z": -188 },
+    { "name": "西岭苍麓", "x": -124, "z": -206 }
+  ],
+  "phenology": {
+    "summer": {
+      "peach": "#7AA066",
+      "peachDeep": "#588048",
+      "field": "#739E56",
+      "crop": "#82AC5D",
+      "lotus": "#D98E9A",
+      "water": "#568E82"
+    },
+    "autumn": {
+      "paper": "#F3E7CC",
+      "paperWarm": "#E4CFA6",
+      "peach": "#C98352",
+      "peachDeep": "#A65E38",
+      "field": "#C2A659",
+      "crop": "#D6B85E",
+      "mulberry": "#A98A49",
+      "willow": "#A79958",
+      "hay": "#D8B665"
+    },
+    "winter": {
+      "paper": "#F1EFEA",
+      "paperWarm": "#E3E0D7",
+      "peach": "#C4BAB0",
+      "peachDeep": "#9C9187",
+      "field": "#DCDAD1",
+      "crop": "#CFCCC2",
+      "mountain": "#B6BEBD",
+      "mountainDeep": "#899597",
+      "roof": "#C6C4BC",
+      "yard": "#E5E3DC",
+      "water": "#8CA8AE"
+    }
+  },
+  "zoom": {
+    "min": 1,
+    "max": 3.2,
+    "wheelStep": 0.18,
+    "semanticThreshold": 1.55
+  },
+  "fog": {
+    "valleySplitZ": -26,
+    "revealRadius": 44,
+    "cols": 32,
+    "rows": 18
+  }
+}

@@ -1,0 +1,2749 @@
+{
+  "hinterland": {
+    "seed": 20261110,
+    "maxBasinRadius": 112,
+    "edgeMargin": 4,
+    "waterMargin": 1.5,
+    "maxSlope": 0.38,
+    "clearance": 0.5,
+    "routeMargin": 0.5,
+    "plantGap": 0.7,
+    "pathGrid": 2,
+    "pathSample": 0.55,
+    "pathLift": 0.075,
+    "joinRadius": 5.8,
+    "maxPathNodes": 6500,
+    "palette": {
+      "bark": "#72634C",
+      "wood": "#8D7956",
+      "orchard": "#879665",
+      "mulberry": "#6C8B55",
+      "bamboo": "#8F9F68",
+      "bambooNode": "#B7BA88",
+      "thatch": "#AC976C",
+      "straw": "#C8B384",
+      "path": "#BDB28E",
+      "gourd": "#AAB67B"
+    },
+    "paths": [
+      {
+        "id": "west-middle",
+        "width": 1.55,
+        "points": [
+          [
+            32.55,
+            -130
+          ],
+          [
+            -31,
+            -132
+          ]
+        ]
+      },
+      {
+        "id": "west-south",
+        "width": 1.55,
+        "points": [
+          [
+            24.67,
+            -188
+          ],
+          [
+            -30,
+            -188
+          ]
+        ]
+      },
+      {
+        "id": "west-loop",
+        "width": 1.45,
+        "points": [
+          [
+            -30,
+            -188
+          ],
+          [
+            -31,
+            -132
+          ]
+        ]
+      },
+      {
+        "id": "west-north",
+        "width": 1.5,
+        "points": [
+          [
+            -31,
+            -132
+          ],
+          [
+            -25,
+            -89
+          ]
+        ]
+      },
+      {
+        "id": "upper-orchard",
+        "width": 1.6,
+        "points": [
+          [
+            22,
+            -212
+          ],
+          [
+            82,
+            -215
+          ]
+        ]
+      },
+      {
+        "id": "upper-return",
+        "width": 1.45,
+        "points": [
+          [
+            82,
+            -215
+          ],
+          [
+            94,
+            -196
+          ]
+        ]
+      }
+    ],
+    "structures": [
+      {
+        "id": "mulberry-shed",
+        "kind": "shed",
+        "x": -38,
+        "z": -150,
+        "w": 5.4,
+        "d": 3.5,
+        "rot": 0.22
+      },
+      {
+        "id": "bean-trellis",
+        "kind": "trellis",
+        "x": -18,
+        "z": -116,
+        "w": 3.2,
+        "d": 5,
+        "rot": -0.13
+      },
+      {
+        "id": "silkworm-drying",
+        "kind": "drying",
+        "x": -22,
+        "z": -154,
+        "w": 2.6,
+        "d": 1.4,
+        "rot": 0.3
+      },
+      {
+        "id": "orchard-shed",
+        "kind": "shed",
+        "x": 86,
+        "z": -191,
+        "w": 4.6,
+        "d": 3,
+        "rot": -0.3
+      }
+    ],
+    "groves": [
+      {
+        "id": "west-pear",
+        "kind": "orchard",
+        "x": [
+          -62,
+          -28
+        ],
+        "z": [
+          -205,
+          -147
+        ],
+        "spacing": 7.8,
+        "density": 0.86,
+        "crown": [
+          1.9,
+          2.8
+        ],
+        "height": [
+          4.3,
+          6.1
+        ]
+      },
+      {
+        "id": "west-mulberry",
+        "kind": "mulberry",
+        "x": [
+          -28,
+          -10
+        ],
+        "z": [
+          -202,
+          -154
+        ],
+        "spacing": 6.2,
+        "density": 0.91,
+        "crown": [
+          1.6,
+          2.25
+        ],
+        "height": [
+          3.7,
+          4.9
+        ]
+      },
+      {
+        "id": "west-plum",
+        "kind": "orchard",
+        "x": [
+          -57,
+          -14
+        ],
+        "z": [
+          -139,
+          -80
+        ],
+        "spacing": 7.4,
+        "density": 0.76,
+        "crown": [
+          1.7,
+          2.6
+        ],
+        "height": [
+          4,
+          5.7
+        ]
+      },
+      {
+        "id": "upper-pear",
+        "kind": "orchard",
+        "x": [
+          72,
+          109
+        ],
+        "z": [
+          -230,
+          -192
+        ],
+        "spacing": 6.9,
+        "density": 0.91,
+        "crown": [
+          1.65,
+          2.6
+        ],
+        "height": [
+          4.1,
+          5.8
+        ]
+      }
+    ],
+    "bamboo": [
+      {
+        "id": "west-edge",
+        "x": [
+          -57,
+          -44
+        ],
+        "z": [
+          -160,
+          -130
+        ],
+        "count": 17,
+        "attempts": 240
+      },
+      {
+        "id": "upper-edge",
+        "x": [
+          98,
+          111
+        ],
+        "z": [
+          -201,
+          -184
+        ],
+        "count": 10,
+        "attempts": 180
+      }
+    ]
+  },
+  "render": {
+    "background": "#C9D8E2",
+    "fogColor": "#C9D8E2",
+    "fogNear": 26,
+    "fogFar": 215,
+    "camera": {
+      "fov": 62,
+      "near": 0.1,
+      "far": 800
+    },
+    "maxPixelRatio": 2
+  },
+  "light": {
+    "sun": {
+      "color": "#FFF6E4",
+      "intensity": 1.1,
+      "position": [
+        80,
+        130,
+        70
+      ]
+    },
+    "hemi": {
+      "sky": "#F6EFDF",
+      "ground": "#9AB57A",
+      "intensity": 1.3
+    }
+  },
+  "sky": {
+    "keys": {
+      "time": "KeyT",
+      "weather": "KeyR"
+    },
+    "start": {
+      "time": "day",
+      "weather": "clear"
+    },
+    "smoothing": 0.55,
+    "auto": {
+      "enabled": false,
+      "seconds": 240
+    },
+    "order": [
+      "dawn",
+      "day",
+      "dusk",
+      "night"
+    ],
+    "weatherOrder": [
+      "clear",
+      "mist",
+      "rain",
+      "wind"
+    ],
+    "dome": {
+      "radius": 640,
+      "segments": 48,
+      "heightSegments": 24
+    },
+    "sun": {
+      "distance": 560,
+      "size": 52
+    },
+    "moon": {
+      "distance": 560,
+      "size": 34
+    },
+    "stars": {
+      "count": 420,
+      "radius": 600,
+      "sizeRange": [
+        3.4,
+        8
+      ],
+      "color": "#F5EFDF"
+    },
+    "wind": {
+      "dir": [
+        0.92,
+        0.39
+      ],
+      "speed": 3.2,
+      "swayGain": 1.6
+    },
+    "rain": {
+      "count": 3000,
+      "width": 34,
+      "height": 22,
+      "fallSpeed": 18,
+      "length": 0.5,
+      "opacity": 0.2,
+      "color": "#CFDCDE"
+    },
+    "mist": {
+      "count": 11,
+      "distRange": [
+        15,
+        48
+      ],
+      "heightRange": [
+        -0.6,
+        7.2
+      ],
+      "sizeRange": [
+        38,
+        84
+      ],
+      "opacity": 0.4
+    },
+    "clouds": {
+      "color": "#FFFFFF",
+      "cover": 0.42,
+      "soft": 0.16,
+      "shade": 0.3
+    },
+    "times": {
+      "dawn": {
+        "name": "晨",
+        "hint": "晨光初上，溪面浮着一层薄白",
+        "skyTop": "#8FB3D9",
+        "skyBottom": "#F5DEC2",
+        "fogColor": "#E5D9CB",
+        "cloudColor": "#FFEAD2",
+        "cloudCover": 0.4,
+        "cloudOpacity": 0.72,
+        "cloudShade": 0.34,
+        "fogNear": 18,
+        "fogFar": 178,
+        "sunColor": "#FFE0B4",
+        "sunIntensity": 0.78,
+        "sunDir": [
+          0.72,
+          0.2,
+          -0.35
+        ],
+        "hemiSky": "#E7E2D8",
+        "hemiGround": "#8FA06F",
+        "hemiIntensity": 1.02,
+        "fillColor": "#C9D8E6",
+        "fillIntensity": 0.3,
+        "glowColor": "#FFDCA8",
+        "glowAmount": 0.55,
+        "sunOpacity": 0.8,
+        "moonOpacity": 0.05,
+        "starOpacity": 0.08,
+        "unlitScale": 0.92,
+        "unlitTint": "#F6E2C6",
+        "unlitMix": 0.22,
+        "hillBlend": 0.3,
+        "skyMixScale": 0.75,
+        "smokeColor": "#EFE6D2"
+      },
+      "day": {
+        "name": "昼",
+        "hint": "日头正好，桃林里只剩风声",
+        "skyTop": "#68A9E2",
+        "skyBottom": "#B6D9F0",
+        "fogColor": "#BAD8E7",
+        "cloudColor": "#FFFFFF",
+        "cloudCover": 0.29,
+        "cloudOpacity": 0.86,
+        "cloudSoft": 0.095,
+        "cloudShade": 0.16,
+        "fogNear": 65,
+        "fogFar": 320,
+        "sunColor": "#FFF6E4",
+        "sunIntensity": 1.28,
+        "sunDir": [
+          0.44,
+          0.72,
+          0.39
+        ],
+        "hemiSky": "#DFEDFA",
+        "hemiGround": "#9AB57A",
+        "hemiIntensity": 1.4,
+        "fillColor": "#DDE8F2",
+        "fillIntensity": 0.34,
+        "glowColor": "#FFF3D6",
+        "glowAmount": 0.18,
+        "sunOpacity": 0.9,
+        "moonOpacity": 0,
+        "starOpacity": 0,
+        "unlitScale": 1,
+        "unlitTint": "#F2EAD9",
+        "unlitMix": 0,
+        "hillBlend": 0.1,
+        "skyMixScale": 1,
+        "smokeColor": "#F4F0E6"
+      },
+      "dusk": {
+        "name": "暮",
+        "hint": "日薄西山，一半山影沉进水里",
+        "skyTop": "#6683B4",
+        "skyBottom": "#F0C193",
+        "fogColor": "#DCC4B4",
+        "cloudColor": "#F5D0B2",
+        "cloudCover": 0.52,
+        "cloudOpacity": 0.82,
+        "cloudShade": 0.44,
+        "fogNear": 20,
+        "fogFar": 168,
+        "sunColor": "#FFC79B",
+        "sunIntensity": 0.68,
+        "sunDir": [
+          -0.68,
+          0.19,
+          -0.42
+        ],
+        "hemiSky": "#DCD2C6",
+        "hemiGround": "#7E8A63",
+        "hemiIntensity": 0.88,
+        "fillColor": "#AFC2D8",
+        "fillIntensity": 0.26,
+        "glowColor": "#FFC48E",
+        "glowAmount": 0.62,
+        "sunOpacity": 0.85,
+        "moonOpacity": 0.1,
+        "starOpacity": 0.16,
+        "unlitScale": 0.76,
+        "unlitTint": "#D9BFA4",
+        "unlitMix": 0.32,
+        "hillBlend": 0.55,
+        "skyMixScale": 0.92,
+        "smokeColor": "#E4D4C0"
+      },
+      "night": {
+        "name": "夜",
+        "hint": "月出东山，四下只余虫声",
+        "skyTop": "#0F1D33",
+        "skyBottom": "#34465B",
+        "fogColor": "#2C3A4A",
+        "cloudColor": "#8997AC",
+        "cloudCover": 0.3,
+        "cloudOpacity": 0.32,
+        "cloudShade": 0.5,
+        "fogNear": 14,
+        "fogFar": 132,
+        "sunColor": "#AFC6DE",
+        "sunIntensity": 0.42,
+        "sunDir": [
+          -0.32,
+          0.62,
+          -0.5
+        ],
+        "hemiSky": "#4E5F6E",
+        "hemiGround": "#2A322F",
+        "hemiIntensity": 0.62,
+        "fillColor": "#7E93AE",
+        "fillIntensity": 0.18,
+        "glowColor": "#CFE0F0",
+        "glowAmount": 0.3,
+        "sunOpacity": 0,
+        "moonOpacity": 0.9,
+        "starOpacity": 0.9,
+        "unlitScale": 0.34,
+        "unlitTint": "#4C5B69",
+        "unlitMix": 0.42,
+        "hillBlend": 0.88,
+        "skyMixScale": 0.32,
+        "smokeColor": "#8E9AA6"
+      }
+    },
+    "weathers": {
+      "clear": {
+        "name": "晴",
+        "hint": "天光澄澈，远山可数",
+        "fogNear": 1,
+        "fogFar": 1,
+        "light": 1,
+        "skyMix": 0,
+        "skyTint": "#C9D8E2",
+        "rain": 0,
+        "mist": 0,
+        "wind": 0,
+        "unlit": 1,
+        "hill": 0,
+        "cloudColor": "#FFFFFF",
+        "cloudBlend": 0,
+        "cloudCover": 0,
+        "cloudOpacity": 0,
+        "cloudSoft": 0,
+        "cloudShade": 0,
+        "cloudSpeed": 1,
+        "cloudLow": 0,
+        "sound": {
+          "rain": 0,
+          "wind": 0
+        }
+      },
+      "mist": {
+        "name": "雾",
+        "hint": "雾起溪上，桃花只剩一团淡影",
+        "fogNear": 0.42,
+        "fogFar": 0.46,
+        "light": 0.86,
+        "skyMix": 0.34,
+        "skyTint": "#CFD8DC",
+        "rain": 0,
+        "mist": 1,
+        "wind": 0.18,
+        "unlit": 0.92,
+        "hill": 0.65,
+        "cloudColor": "#E4EBEC",
+        "cloudBlend": 0.62,
+        "cloudCover": 0.3,
+        "cloudOpacity": 0.08,
+        "cloudSoft": 0.07,
+        "cloudShade": 0.06,
+        "cloudSpeed": 0.55,
+        "cloudLow": 0.55,
+        "sound": {
+          "rain": 0,
+          "wind": 0.25
+        }
+      },
+      "rain": {
+        "name": "雨",
+        "hint": "细雨斜飞，敲在竹叶上成声",
+        "fogNear": 0.52,
+        "fogFar": 0.52,
+        "light": 0.62,
+        "skyMix": 0.78,
+        "skyTint": "#9DABB0",
+        "rain": 1,
+        "mist": 0.35,
+        "wind": 0.5,
+        "unlit": 0.84,
+        "hill": 0.72,
+        "cloudColor": "#8E9DA5",
+        "cloudBlend": 0.85,
+        "cloudCover": 0.46,
+        "cloudOpacity": 0.1,
+        "cloudSoft": 0.05,
+        "cloudShade": 0.24,
+        "cloudSpeed": 1.45,
+        "cloudLow": 0.8,
+        "sound": {
+          "rain": 1,
+          "wind": 0.3
+        }
+      },
+      "wind": {
+        "name": "风",
+        "hint": "风过桃林，落英扑了满身",
+        "fogNear": 1,
+        "fogFar": 1,
+        "light": 0.98,
+        "skyMix": 0.08,
+        "skyTint": "#C2D3DE",
+        "rain": 0,
+        "mist": 0.12,
+        "wind": 1,
+        "unlit": 1,
+        "hill": 0.1,
+        "cloudColor": "#FFFFFF",
+        "cloudBlend": 0.15,
+        "cloudCover": 0.06,
+        "cloudOpacity": 0,
+        "cloudSoft": 0,
+        "cloudShade": -0.05,
+        "cloudSpeed": 2.3,
+        "cloudLow": 0,
+        "sound": {
+          "rain": 0,
+          "wind": 1
+        }
+      }
+    }
+  },
+  "terrain": {
+    "size": 800,
+    "segments": 192,
+    "heightScale": 24,
+    "noiseScale": 0.0062,
+    "octaves": 4,
+    "plainHeight": 2,
+    "plainRadius": 95,
+    "bankWidth": 24,
+    "riverDepth": 3,
+    "waterLevel": -1,
+    "palette": {
+      "silt": "#BFC2A6",
+      "bank": "#9AB57A",
+      "grass": "#86A566",
+      "deep": "#6E8F58",
+      "ridge": "#A8B5A0",
+      "path": "#CBBE9A"
+    },
+    "bankPower": 1.2,
+    "shoreWobble": 1.6,
+    "bankSwell": 1.3,
+    "shoreline": {
+      "strength": 0.9,
+      "startZ": 64,
+      "endZ": 380,
+      "patches": 24
+    },
+    "pathOffset": 18.5,
+    "pathWidth": 2.8,
+    "basin": {
+      "x": 30,
+      "z": -140,
+      "inner": 96,
+      "outer": 168,
+      "height": 2
+    },
+    "pond": {
+      "x": 68,
+      "z": -152,
+      "radius": 13,
+      "depth": 3.6,
+      "waterRadius": 9.2,
+      "waterY": 0.85,
+      "color": "#A8C8BC",
+      "opacity": 0.82,
+      "filmOpacity": 0.18
+    },
+    "choke": {
+      "x": 9,
+      "z": -12,
+      "r0": 26,
+      "r1": 92,
+      "factor": 0.32,
+      "bedLift": 0.7
+    },
+    "portal": {
+      "x": 22.892,
+      "z": -8.192,
+      "ux": -0.053846,
+      "uz": 0.998549,
+      "halfLen": 11,
+      "halfW": 5.5,
+      "y": 2
+    },
+    "surface": {
+      "moss": "#657C58",
+      "earth": "#B7AD87",
+      "patchScale": 0.063,
+      "dryStrength": 0.38,
+      "shoulderWidth": 5.2,
+      "edgeBreakup": 3.6,
+      "wearStrength": 0.68,
+      "pondFringe": 5.5,
+      "mossStrength": 0.34
+    }
+  },
+  "cliff": {
+    "center": [
+      30,
+      -140
+    ],
+    "radius": 132,
+    "arcFrom": 0.55,
+    "arcTo": 2.59,
+    "gapArc": 0.0235,
+    "count": 92,
+    "radiusRange": [
+      7,
+      15
+    ],
+    "heightRange": [
+      22,
+      40
+    ],
+    "sink": 0.3,
+    "color": "#B9BDB2",
+    "colorDark": "#828A7E",
+    "roofY": 9.4,
+    "roofThickness": 2.8,
+    "lintel": 2.4,
+    "slit": [
+      23,
+      -10
+    ],
+    "openWidth": 3,
+    "openHeight": 3,
+    "gateHeight": 12.5,
+    "plugLen": 7.5,
+    "plugDepth": 15,
+    "gateColor": "#AEB3A6",
+    "gateCore": "#8C9186"
+  },
+  "stream": {
+    "segments": 400,
+    "halfWidth": 22,
+    "edgeWobble": 0.35,
+    "color": "#A8C8BC",
+    "opacity": 0.85,
+    "waveAmp": 0.11,
+    "waveSpeed": 1.15,
+    "scrollSpeed": 0.055,
+    "textureSize": 256,
+    "points": [
+      [
+        6,
+        380
+      ],
+      [
+        2,
+        340
+      ],
+      [
+        9,
+        300
+      ],
+      [
+        5,
+        252
+      ],
+      [
+        10,
+        210
+      ],
+      [
+        4,
+        176
+      ],
+      [
+        4,
+        150
+      ],
+      [
+        10,
+        124
+      ],
+      [
+        2,
+        96
+      ],
+      [
+        -12,
+        70
+      ],
+      [
+        -18,
+        42
+      ],
+      [
+        -6,
+        14
+      ],
+      [
+        9,
+        -12
+      ]
+    ]
+  },
+  "flora": {
+    "treeCount": 1950,
+    "nearRiverRatio": 0.82,
+    "bandInner": 24,
+    "bandOuter": 58,
+    "scatterRadius": 200,
+    "slopeLimit": 0.55,
+    "spawnClearRadius": 18,
+    "trunkColor": "#5C4A3D",
+    "trunkRadius": 0.13,
+    "heightRange": [
+      3.4,
+      7
+    ],
+    "canopyRadius": 1.25,
+    "blossomColors": [
+      "#F09BA6",
+      "#EFAEB8",
+      "#E8838F",
+      "#F7C9CE"
+    ],
+    "greenLeaves": "#7BA05B",
+    "nearVariants": 4,
+    "nearTree": {
+      "jitter": [
+        0.86,
+        1.14
+      ],
+      "faceShade": [
+        0.84,
+        1.1
+      ],
+      "clusterCount": 12
+    },
+    "farTree": {
+      "variants": 6,
+      "seed": 4409,
+      "instanceScale": [
+        0.85,
+        1.2
+      ],
+      "instanceTint": 0.08,
+      "jitter": [
+        0.84,
+        1.16
+      ],
+      "faceShade": [
+        0.8,
+        1.14
+      ],
+      "hueShift": 0.03,
+      "lean": 0.9,
+      "trunkSides": 3,
+      "branchSides": 3,
+      "branchCount": 2,
+      "crownScale": [
+        1.1,
+        1.7
+      ],
+      "crownAspect": [
+        0.55,
+        0.9
+      ],
+      "coreDetail": "icosa",
+      "coreRadius": 0.6,
+      "coreFlatten": 0.7,
+      "satelliteClusters": 3,
+      "satelliteDetail": "octa",
+      "branchTwigs": 0,
+      "leafClusters": 0
+    }
+  },
+  "exploration": {
+    "enabled": true,
+    "seed": 20261112,
+    "pathWidth": 1.25,
+    "pathGrid": 1.5,
+    "pathSample": 0.4,
+    "maxSlope": 0.5,
+    "dryMargin": 0.4,
+    "bankMargin": 0.55,
+    "boundsMargin": 2,
+    "clearance": 0.3,
+    "spawnRadius": 4,
+    "stopRadius": 1.1,
+    "searchRadius": 24,
+    "maxPathNodes": 18000,
+    "natureCount": 24,
+    "maxTriangles": 4500
+  },
+  "reeds": {
+    "count": 1200,
+    "seed": 31415,
+    "bladesPerClump": 3,
+    "colorA": "#4C6C3C",
+    "colorB": "#6E8C52",
+    "dryColor": "#9A8C60",
+    "dryRatio": 0.14,
+    "heightRange": [
+      0.18,
+      0.44
+    ],
+    "widthRange": [
+      0.09,
+      0.2
+    ],
+    "offsetInner": 8,
+    "offsetOuter": 20,
+    "bandHeight": 2.2,
+    "sway": 0.16,
+    "segmentsPerBlade": 2
+  },
+  "petals": {
+    "count": 300,
+    "size": 0.09,
+    "color": "#F3C4CA",
+    "fallSpeed": 0.85,
+    "swirlSpeed": 0.55,
+    "swirlRadius": 1.6,
+    "spin": 1.6,
+    "radius": 30,
+    "height": 14
+  },
+  "fallenPetals": {
+    "count": 2600,
+    "sizeRange": [
+      0.055,
+      0.1
+    ],
+    "spread": 3.6,
+    "bandRatio": 0.55,
+    "bandInner": 12,
+    "bandOuter": 42,
+    "colors": [
+      "#F2C0C6",
+      "#E7A0AA",
+      "#F8D6DA",
+      "#EFB2B8"
+    ]
+  },
+  "mountains": {
+    "count": 16,
+    "color": "#A8B5A0",
+    "innerRadius": 430,
+    "outerRadius": 540,
+    "heightRange": [
+      55,
+      112
+    ],
+    "baseRadiusRange": [
+      150,
+      265
+    ],
+    "colorFar": "#B9C8CC",
+    "sink": 40,
+    "fadeNear": 0.58,
+    "fadeFar": 0.82,
+    "fadeColor": "#C9D8E2"
+  },
+  "people": {
+    "skin": "#E2BE9B",
+    "hair": "#2B2420",
+    "hat": "#C9B27E",
+    "clothes": [
+      "#C8B48C",
+      "#9FAE8E",
+      "#B98E6C",
+      "#8E9AA8",
+      "#C4A25E",
+      "#A8836A"
+    ],
+    "pants": [
+      "#6E6350",
+      "#5C5B52",
+      "#7A6A50"
+    ],
+    "elderHair": "#AAA99A",
+    "mouth": "#936F5E",
+    "eye": "#3B322B",
+    "lip": "#B08472",
+    "earShade": "#C89B79",
+    "collar": "#DED4B9",
+    "trim": "#D7C7A4",
+    "sash": "#7C6750",
+    "cuff": "#C9BEA5",
+    "trousers": "#575C51",
+    "shoe": "#3F3C32",
+    "hatBand": "#796143",
+    "basket": "#B29363",
+    "jade": "#93AA93",
+    "living": {
+      "enabled": true, "thinkInterval": 0.2, "noticeRange": 4.2, "exitRange": 6,
+      "noticeDwell": 0.4, "ackDuration": 1.6, "workRest": 3.5,
+      "deliveryRange": 3, "talkTurn": 3.6
+    },
+    "walkers": 6,
+    "talkPairs": 4,
+    "children": 4,
+    "notice": {
+      "range": 4.2,
+      "inner": 1.2,
+      "maxYaw": 0.8,
+      "weight": 0.7,
+      "speed": 3.2
+    }
+  },
+  "props": {
+    "wood": "#8A7350",
+    "woodDark": "#5E4C36",
+    "stone": "#9A958A",
+    "clay": "#8E6E52",
+    "straw": "#C6AE7E",
+    "cloth": "#C8B6A2",
+    "cabbage": "#7FA35E",
+    "paper": "#F2E9D2",
+    "door": "#4A3728",
+    "tree": {
+      "seed": 9137,
+      "puffVariants": 4,
+      "puffJitter": [
+        0.84,
+        1.16
+      ],
+      "faceShade": [
+        0.82,
+        1.12
+      ],
+      "branchRadius": 0.62,
+      "branchLength": 0.5,
+      "branchTilt": 0.26,
+      "coreRadius": 0.66,
+      "coreFlatten": 0.92,
+      "satellitePuffs": 9,
+      "satelliteRadius": [
+        0.34,
+        0.52
+      ],
+      "crownSpread": 0.56,
+      "crownVertical": 0.72,
+      "hueVar": 0.025,
+      "lightVar": 0.11,
+      "bloomPuffs": 5,
+      "bloomRadius": [
+        0.24,
+        0.38
+      ],
+      "bloomLightVar": 0.06
+    }
+  },
+  "village": {
+    "road": {
+      "points": [
+        [
+          24,
+          -36
+        ],
+        [
+          30,
+          -70
+        ],
+        [
+          34,
+          -104
+        ],
+        [
+          32,
+          -140
+        ],
+        [
+          26,
+          -176
+        ],
+        [
+          22,
+          -212
+        ]
+      ],
+      "width": 3.6,
+      "color": "#C6B896",
+      "lift": 0.055
+    },
+    "houses": {
+      "count": 8,
+      "wall": "#CDB99B",
+      "wallDark": "#B9A488",
+      "roof": "#A68E66",
+      "roofDark": "#8A7452",
+      "door": "#463A2E",
+      "roofHeight": 2.3,
+      "overhang": 0.45,
+      "offsetRange": [
+        8.5,
+        12.5
+      ],
+      "sizeRange": [
+        [
+          6,
+          2.9,
+          4.8
+        ],
+        [
+          7.4,
+          3.4,
+          5.6
+        ]
+      ],
+      "back": {
+        "count": 3,
+        "side": -1,
+        "offset": [
+          24,
+          32
+        ],
+        "ts": [
+          0.18,
+          0.5,
+          0.8
+        ]
+      }
+    },
+    "fields": {
+      "cropA": "#7FA35E",
+      "cropB": "#8CB069",
+      "ridge": "#8A7F5A",
+      "lift": 0.03,
+      "blocks": [
+        {
+          "x": 52,
+          "z": -66,
+          "cols": 3,
+          "rows": 3,
+          "plot": [
+            7.4,
+            7.4
+          ],
+          "gap": 1.7
+        },
+        {
+          "x": 78,
+          "z": -66,
+          "cols": 2,
+          "rows": 2,
+          "plot": [
+            8.4,
+            8
+          ],
+          "gap": 2
+        },
+        {
+          "x": 52,
+          "z": -96,
+          "cols": 2,
+          "rows": 2,
+          "plot": [
+            7,
+            8.2
+          ],
+          "gap": 1.8
+        },
+        {
+          "x": 70,
+          "z": -94,
+          "cols": 2,
+          "rows": 2,
+          "plot": [
+            8.4,
+            7.8
+          ],
+          "gap": 1.9
+        },
+        {
+          "x": 50,
+          "z": -166,
+          "cols": 2,
+          "rows": 2,
+          "plot": [
+            8.6,
+            8.8
+          ],
+          "gap": 1.8
+        },
+        {
+          "x": 70,
+          "z": -170,
+          "cols": 3,
+          "rows": 2,
+          "plot": [
+            7.2,
+            7.8
+          ],
+          "gap": 1.7
+        },
+        {
+          "x": 50,
+          "z": -196,
+          "cols": 2,
+          "rows": 2,
+          "plot": [
+            7.4,
+            7.4
+          ],
+          "gap": 1.7
+        }
+      ]
+    },
+    "bamboo": {
+      "count": 110,
+      "area": [
+        104,
+        -152,
+        124,
+        -106
+      ],
+      "heightRange": [
+        5.5,
+        8.6
+      ],
+      "stemColor": "#7C9A54",
+      "leafColor": "#5E7C3E",
+      "culms": 8,
+      "segs": 5,
+      "sides": 3,
+      "height": 5.2,
+      "clusters": 4,
+      "blades": 6,
+      "leafStart": 0.66,
+      "leafSpan": 0.3,
+      "leafLen": [
+        0.42,
+        0.78
+      ],
+      "leafWidth": 0.075,
+      "leafArch": 0.22,
+      "leafDroop": 0.85,
+      "leafFan": 1.5,
+      "leafShade": [
+        0.86,
+        1.12
+      ],
+      "areas": [
+        [
+          104,
+          -152,
+          124,
+          -106
+        ],
+        [
+          4,
+          -204,
+          48,
+          -44
+        ]
+      ]
+    },
+    "mulberry": {
+      "count": 40,
+      "area": [
+        10,
+        -206,
+        48,
+        -58
+      ],
+      "color": "#6C8B4E",
+      "radiusRange": [
+        1.2,
+        1.9
+      ],
+      "trunkColor": "#5C4A3D",
+      "parcels": [
+        {
+          "x": 10,
+          "z": -96,
+          "w": 24,
+          "d": 18,
+          "gap": 4.6
+        },
+        {
+          "x": 6,
+          "z": -150,
+          "w": 26,
+          "d": 20,
+          "gap": 4.8
+        }
+      ],
+      "leavesPer": 260,
+      "corePuffs": 5,
+      "coreSeed": 4477,
+      "coreJitter": [
+        0.78,
+        1.16
+      ],
+      "coreShade": [
+        0.72,
+        1.14
+      ],
+      "coreTint": -0.02,
+      "coreRadius": [
+        0.6,
+        0.5,
+        0.42,
+        0.34,
+        0.28
+      ],
+      "coreSpread": 0.62,
+      "leafShell": [
+        0.88,
+        1.1
+      ],
+      "leafScale": [
+        0.15,
+        0.26
+      ]
+    },
+    "reeds": {
+      "count": 240,
+      "color": "#6C8A46",
+      "color2": "#A6BE78",
+      "height": [
+        0.5,
+        1.15
+      ]
+    },
+    "spur": {
+      "width": 0.62,
+      "taper": 0.35,
+      "inset": 2.4,
+      "laneWidth": 1.55,
+      "stone": "#9C968A"
+    }
+  },
+  "sound": {
+    "master": 0.84,
+    "samples": {
+      "enabled": true,
+      "gain": 0.65,
+      "maxConcurrent": 6,
+      "maxVoices": 2,
+      "maxAmbientVoices": 1,
+      "emitterCooldown": 1.8,
+      "ambientCooldown": 9,
+      "interactionHold": 2.8,
+      "repeatWindow": 12,
+      "maxClipSeconds": 8,
+      "maxDecodedBytes": 50331648,
+      "maxEncodedBytes": 25165824,
+      "loadConcurrency": 3,
+      "loadTimeoutMs": 15000
+    },
+    "beds": {
+      "wind": 0.9,
+      "leaves": 0.58,
+      "river": 1,
+      "pond": 0.62,
+      "cave": 0.9,
+      "village": 0.58,
+      "rain": 0.65,
+      "night": 0.62
+    },
+    "wind": {
+      "gust": 1.2,
+      "speed": 0.11,
+      "gustSpeed": 0.23,
+      "leafGain": 0.6
+    },
+    "water": {
+      "riverWidth": 30,
+      "pondRadius": 16,
+      "caveDripGap": [
+        2.4,
+        6.8
+      ]
+    },
+    "village": {
+      "radius": 84,
+      "chatterGap": [
+        7,
+        18
+      ],
+      "clatterGap": [
+        1.8,
+        5.6
+      ]
+    },
+    "footsteps": {
+      "walk": 0.46,
+      "run": 0.3,
+      "stride": 1.35,
+      "runStride": 2,
+      "gain": 0.62
+    },
+    "animals": {
+      "cluck": 0.55,
+      "bark": 0.68,
+      "cricket": 0.08,
+      "chirp": 0.5,
+      "low": 0.6,
+      "quack": 0.55
+    },
+    "voice": {
+      "gain": 1.05,
+      "range": 30
+    },
+    "reverb": {
+      "small": 0.22,
+      "cave": 0.38
+    },
+    "levels": {
+      "floor": 0.001
+    }
+  },
+  "fauna": {
+    "chickens": {
+      "count": 5,
+      "homes": [
+        [
+          24,
+          -74
+        ],
+        [
+          36,
+          -118
+        ],
+        [
+          22,
+          -184
+        ],
+        [
+          30,
+          -88
+        ],
+        [
+          29,
+          -138
+        ]
+      ],
+      "radius": 7,
+      "speed": 0.8,
+      "body": "#F4ECDA",
+      "comb": "#C0503F",
+      "beak": "#D9A441"
+    },
+    "dogs": {
+      "count": 4,
+      "homes": [
+        [
+          31,
+          -96
+        ],
+        [
+          30,
+          -158
+        ],
+        [
+          25,
+          -200
+        ],
+        [
+          33,
+          -70
+        ]
+      ],
+      "radius": 10,
+      "speed": 1.3,
+      "body": "#8A6A4E",
+      "belly": "#B08E6C"
+    },
+    "birds": {
+      "count": 7,
+      "homes": [
+        [
+          26,
+          -52
+        ],
+        [
+          38,
+          -84
+        ],
+        [
+          27,
+          -124
+        ],
+        [
+          40,
+          -150
+        ],
+        [
+          30,
+          -104
+        ],
+        [
+          36,
+          -166
+        ]
+      ],
+      "radius": 6,
+      "speed": 0.9,
+      "body": "#7BA05B",
+      "wing": "#4A7C6F",
+      "beak": "#262626"
+    },
+    "oxen": {
+      "count": 3,
+      "homes": [
+        [
+          36,
+          -108
+        ],
+        [
+          62,
+          -138
+        ],
+        [
+          44,
+          -118
+        ]
+      ],
+      "radius": 5,
+      "speed": 0.45,
+      "body": "#8A7256",
+      "muzzle": "#B08E6C",
+      "horn": "#F2EAD9",
+      "hoof": "#514A40"
+    },
+    "ducks": {
+      "count": 6,
+      "homes": [
+        [
+          55,
+          -152
+        ],
+        [
+          81,
+          -152
+        ],
+        [
+          68,
+          -138
+        ],
+        [
+          78,
+          -164
+        ],
+        [
+          60,
+          -150
+        ],
+        [
+          76,
+          -158
+        ]
+      ],
+      "radius": 5,
+      "speed": 0.7,
+      "body": "#F2EAD9",
+      "head": "#4A7C6F",
+      "beak": "#D9A441"
+    },
+    "species": [
+      {
+        "key": "chickens",
+        "kind": "chicken"
+      },
+      {
+        "key": "dogs",
+        "kind": "dog"
+      },
+      {
+        "key": "birds",
+        "kind": "bird"
+      },
+      {
+        "key": "oxen",
+        "kind": "ox"
+      },
+      {
+        "key": "ducks",
+        "kind": "duck"
+      }
+    ],
+    "turnRate": 3.2,
+    "pauseRange": [
+      1.2,
+      4.2
+    ],
+    "soundRadius": 17,
+    "sounds": {
+      "chicken": "cluck",
+      "dog": "bark",
+      "bird": "chirp",
+      "ox": "low",
+      "duck": "quack"
+    },
+    "gaps": {
+      "chicken": [
+        2.4,
+        6
+      ],
+      "dog": [
+        3,
+        7.5
+      ],
+      "bird": [
+        2.2,
+        5
+      ],
+      "ox": [
+        4,
+        9
+      ],
+      "duck": [
+        2.6,
+        6.5
+      ],
+      "default": [
+        2.4,
+        6
+      ]
+    },
+    "scales": {
+      "chicken": 0.78,
+      "dog": 1,
+      "bird": 0.62,
+      "ox": 1.3,
+      "duck": 0.8
+    },
+    "volume": 0.45,
+    "living": {
+      "enabled": true, "thinkInterval": 0.2, "noticeRange": 4, "exitRange": 6,
+      "noticeDwell": 0.4, "tooClose": 1.1, "fastSpeed": 5.5, "startleRange": 3.2,
+      "watchDuration": 1.4, "curiousFollow": 3.5, "recovery": 2
+    },
+    "react": {
+      "fleeDistance": 2.6,
+      "fleeSpeed": 3.1,
+      "flutterTime": 0.85,
+      "hop": 0.16,
+      "followDuration": 10,
+      "followDist": 1.45,
+      "followSpeed": 2.5,
+      "leash": 24,
+      "wag": 0.08,
+      "wagSpeed": 17,
+      "flushDistance": 3.4,
+      "flushTime": 1.1,
+      "flushRise": 1.5,
+      "flushSpeed": 3,
+      "glanceDuration": 2.6,
+      "glanceStep": 0.7,
+      "glanceSpeed": 0.9,
+      "nod": 0.14,
+      "paddleDistance": 2.2,
+      "paddleTime": 1.8,
+      "paddleSpeed": 1.4,
+      "rock": 0.1,
+      "rockSpeed": 6
+    },
+    "motion": {
+      "maxStep": 0.05,
+      "headIdle": 0.055,
+      "peck": 1.35,
+      "tailIdle": 0.18,
+      "wingIdle": 0.065,
+      "wingFlight": 1.05,
+      "wingFrequency": 2.4,
+      "paddle": 0.6
+    }
+  },
+  "fish": {
+    "seed": 20260419,
+    "pathSamples": 1200,
+    "maxLateral": 8.4,
+    "lateralFill": 0.62,
+    "schoolLatSpread": 3.2,
+    "opacity": 0.5,
+    "renderOrder": 3,
+    "lift": -0.07,
+    "bobAmp": 0.03,
+    "bobSpeed": 2.6,
+    "rollAmp": 0.08,
+    "rollSpeed": 3.2,
+    "turnRate": 5.5,
+    "wiggleAmp": 0.1,
+    "wiggleSpeed": 7.2,
+    "speed": [
+      0.26,
+      0.5
+    ],
+    "latSway": 0.5,
+    "latSpeed": [
+      0.35,
+      0.75
+    ],
+    "size": [
+      0.42,
+      0.62
+    ],
+    "tint": [
+      0.62,
+      0.92
+    ],
+    "colors": {
+      "back": "#33443C",
+      "flank": "#5C6E62",
+      "belly": "#C4C8B4",
+      "fin": "#27332B",
+      "eye": "#141A17"
+    },
+    "schools": [
+      {
+        "t": 0.472,
+        "lat": -4.2,
+        "count": 9,
+        "spread": 8
+      },
+      {
+        "t": 0.535,
+        "lat": 4,
+        "count": 10,
+        "spread": 11
+      },
+      {
+        "t": 0.585,
+        "lat": -4.6,
+        "count": 8,
+        "spread": 9
+      },
+      {
+        "t": 0.625,
+        "lat": 3.6,
+        "count": 10,
+        "spread": 12
+      },
+      {
+        "t": 0.675,
+        "lat": -5,
+        "count": 9,
+        "spread": 10
+      },
+      {
+        "t": 0.725,
+        "lat": 4.2,
+        "count": 10,
+        "spread": 12
+      },
+      {
+        "t": 0.775,
+        "lat": -4,
+        "count": 9,
+        "spread": 10
+      },
+      {
+        "t": 0.825,
+        "lat": 4.8,
+        "count": 8,
+        "spread": 9
+      },
+      {
+        "t": 0.88,
+        "lat": -1,
+        "count": 8,
+        "spread": 7
+      },
+      {
+        "t": 0.935,
+        "lat": 0.2,
+        "count": 7,
+        "spread": 6
+      }
+    ],
+    "ponds": [
+      {
+        "count": 20,
+        "radiusFill": [
+          0.32,
+          0.82
+        ],
+        "edgeInset": 0.8,
+        "size": [
+          0.46,
+          0.7
+        ],
+        "tint": [
+          0.5,
+          0.78
+        ],
+        "angSpeed": [
+          0.02,
+          0.06
+        ],
+        "radialSway": 0.7,
+        "radialSpeed": [
+          0.08,
+          0.22
+        ],
+        "lift": -0.16
+      }
+    ],
+    "ripples": {
+      "count": 14,
+      "segments": 24,
+      "inner": 0.88,
+      "opacity": 0.12,
+      "renderOrder": 2,
+      "life": [
+        1.1,
+        2.3
+      ],
+      "size": 0.55,
+      "jitter": 0.9,
+      "lift": 0.03,
+      "color": "#F7F1DE",
+      "waterColor": "#A8C8BC"
+    }
+  },
+  "boats": {
+    "seed": 8123,
+    "length": 3.6,
+    "width": 1.24,
+    "freeboard": 0.42,
+    "draft": 0.26,
+    "chine": 0.18,
+    "sections": [
+      {
+        "x": -0.5,
+        "w": 0.06,
+        "rim": 0.9,
+        "bot": 0.5
+      },
+      {
+        "x": -0.3,
+        "w": 0.85,
+        "rim": 0.98,
+        "bot": 0.9
+      },
+      {
+        "x": 0.02,
+        "w": 1,
+        "rim": 0.94,
+        "bot": 1
+      },
+      {
+        "x": 0.32,
+        "w": 0.8,
+        "rim": 1,
+        "bot": 0.92
+      },
+      {
+        "x": 0.5,
+        "w": 0.05,
+        "rim": 1.35,
+        "bot": 0.45
+      }
+    ],
+    "seats": [
+      -0.26,
+      0.3
+    ],
+    "canopy": {
+      "x0": -0.36,
+      "x1": 0.16,
+      "radius": 0.54,
+      "height": 1.05,
+      "segs": 6
+    },
+    "bob": {
+      "amp": 0.045,
+      "speed": 0.62,
+      "pitch": 0.014,
+      "roll": 0.022
+    },
+    "mooring": {
+      "search": 26,
+      "step": 0.5,
+      "dry": 0.35,
+      "poleHeight": 1.5,
+      "poleRadius": 0.055,
+      "ropeRadius": 0.022,
+      "sag": 0.14,
+      "segments": 5
+    },
+    "colors": {
+      "wood": "#96754C",
+      "woodDark": "#6A5136",
+      "inside": "#6B5133",
+      "canopy": "#5F4F3A",
+      "bamboo": "#9C8A5C",
+      "rope": "#C9BC9A",
+      "net": "#B4AD92",
+      "basket": "#A9865A",
+      "fish": "#7E8C82"
+    },
+    "boats": [
+      {
+        "x": 15,
+        "z": 190,
+        "rot": 0.1,
+        "face": 1,
+        "canopy": true,
+        "fit": "oar"
+      },
+      {
+        "x": 9,
+        "z": 162,
+        "rot": -0.05,
+        "face": -1,
+        "canopy": false,
+        "fit": "net"
+      },
+      {
+        "x": -2,
+        "z": 80,
+        "rot": 0.08,
+        "face": 1,
+        "canopy": true,
+        "fit": "basket"
+      }
+    ]
+  },
+  "player": {
+    "eyeHeight": 1.68,
+    "walkSpeed": 4.2,
+    "runSpeed": 7.4,
+    "accel": 14,
+    "moveDamping": 9,
+    "lookSensitivity": 0.0021,
+    "lookSmoothing": 14,
+    "maxPitch": 1.32,
+    "wadeDepth": 0.9,
+    "spawn": {
+      "x": 26,
+      "z": 204,
+      "yaw": 0.05,
+      "pitch": 0
+    },
+    "boundsRadius": 230,
+    "view": {
+      "key": "KeyV",
+      "third": {
+        "distance": 4.3,
+        "height": 2.18,
+        "shoulder": 0.55,
+        "focusShoulder": 1.5,
+        "shoulderMinDistance": 1.2,
+        "minGround": 0.34,
+        "pad": 0.28,
+        "steps": 10,
+        "minDistance": 0.35,
+        "hideDistance": 1.15
+      }
+    },
+    "avatar": {
+      "skin": "#D8B58C",
+      "hair": "#2B2420",
+      "hat": "#C6AE7A",
+      "hatBand": "#4E4132",
+      "clothes": "#5A7A72",
+      "clothes2": "#48645E",
+      "trim": "#D5CDB4",
+      "collar": "#A8BCB1",
+      "pants": "#3E4B47",
+      "sash": "#A98157",
+      "shoe": "#3A332B",
+      "basket": "#8C6A45",
+      "pole": "#6C5A3C",
+      "eye": "#3B322B",
+      "lip": "#A97B63",
+      "earShade": "#C08F6C",
+      "turnSpeed": 9,
+      "gaitRate": 1.9,
+      "gaitBase": 0.8,
+      "legSwing": 0.62,
+      "armSwing": 0.62,
+      "bob": 0.035,
+      "lean": 0.05,
+      "idleBreath": 0.008
+    }
+  },
+  "subtitles": {
+    "text": "晋太元中，武陵人捕鱼为业",
+    "delay": 1200,
+    "fadeIn": 1800,
+    "hold": 2600,
+    "fadeOut": 2400
+  },
+  "dialogue": {
+    "file": "script.json",
+    "lift": 0
+  },
+  "gloom": {
+    "zIn": 22,
+    "zOut": -6,
+    "max": 0.62
+  },
+  "scatter": {
+    "tuft": {
+      "count": 6200,
+      "area": [
+        -6,
+        -240,
+        138,
+        20
+      ],
+      "color": "#7A9A52",
+      "color2": "#A8BE7C",
+      "blades": 3,
+      "shape": {
+        "width": [
+          0.075,
+          0.13
+        ],
+        "height": [
+          0.6,
+          1.1
+        ],
+        "lean": [
+          0.18,
+          0.42
+        ],
+        "shade": [
+          0.82,
+          1.12
+        ],
+        "bend": 0.28,
+        "rootRadius": 0.28,
+        "base": 0.5,
+        "waist": 0.85,
+        "tip": 1
+      },
+      "scale": [
+        0.1,
+        0.2
+      ],
+      "cluster": [
+        4,
+        9
+      ],
+      "clusterRadius": 1
+    },
+    "near": {
+      "count": 6800,
+      "color": "#6E8E4A",
+      "color2": "#B0C783",
+      "blades": 5,
+      "shape": {
+        "width": [
+          0.065,
+          0.11
+        ],
+        "height": [
+          0.55,
+          0.95
+        ],
+        "lean": [
+          0.14,
+          0.34
+        ],
+        "bend": 0.24
+      },
+      "scale": [
+        0.07,
+        0.14
+      ],
+      "spread": 11,
+      "area": [
+        -6,
+        -240,
+        138,
+        20
+      ]
+    },
+    "flower": {
+      "count": 700,
+      "colors": [
+        "#F2ECD8",
+        "#EBD98A",
+        "#E4B9BE"
+      ],
+      "stem": "#6F8C46",
+      "scale": [
+        0.14,
+        0.3
+      ],
+      "spread": 12
+    },
+    "stone": {
+      "count": 190,
+      "shoreCount": 72,
+      "area": [
+        4,
+        -232,
+        124,
+        -18
+      ],
+      "color": "#9AA094",
+      "color2": "#6F766B"
+    },
+    "approach": {
+      "count": 2200,
+      "spread": 7,
+      "blades": 4,
+      "shape": {
+        "width": [
+          0.08,
+          0.14
+        ],
+        "height": [
+          0.62,
+          1.05
+        ],
+        "bend": 0.3
+      },
+      "scale": [
+        0.09,
+        0.18
+      ]
+    },
+    "patch": {
+      "count": 2200,
+      "alpha": 0.42,
+      "area": [
+        4,
+        -232,
+        124,
+        20
+      ],
+      "scale": [
+        0.7,
+        1.7
+      ],
+      "color": "#6E9046",
+      "color2": "#A9C877",
+      "base": "#8FB055"
+    }
+  },
+  "smoke": {
+    "perChimney": 18,
+    "life": [
+      5,
+      8
+    ],
+    "rise": 6.4,
+    "spread": 1.1,
+    "scale": 2.6,
+    "opacity": 0.5,
+    "color": "#F4F0E6"
+  },
+  "interaction": {
+    "range": 2,
+    "viewCos": 0.55,
+    "alignBias": 0.9,
+    "key": "KeyE",
+    "talkDuration": 5200,
+    "cooldown": 1.6,
+    "greetDuration": 2.2,
+    "camera": {
+      "push": 0.18,
+      "duration": 0.6
+    },
+    "ring": {
+      "inner": 0.4,
+      "outer": 0.62,
+      "segments": 28,
+      "color": "#262626",
+      "opacity": 0.5,
+      "lift": 0.035,
+      "offset": 0.55,
+      "offsetSit": 0.9,
+      "offsetAnimal": 0,
+      "animalScale": 0.68,
+      "thirdScale": 1.35,
+      "pulse": 0.12,
+      "pulseSpeed": 3.2,
+      "fadeSpeed": 9
+    },
+    "heights": {
+      "person": 0.86,
+      "chicken": 0.32,
+      "dog": 0.42,
+      "bird": 0.22,
+      "ox": 0.9,
+      "duck": 0.26
+    }
+  },
+  "villageLife": {
+    "seed": 20261111,
+    "palette": {
+      "wood": "#8A7350",
+      "woodDark": "#5E4C36",
+      "bamboo": "#8F9F68",
+      "cloth": "#C8B6A2",
+      "indigo": "#8E9AA8",
+      "clay": "#8E6E52",
+      "clayLight": "#B08E6C",
+      "stone": "#9A958A",
+      "stoneLight": "#BDB8AB",
+      "leaf": "#7BA05B",
+      "leafLight": "#9DB678",
+      "earth": "#8A7F5A",
+      "straw": "#C6AE7E",
+      "hat": "#C9B27E",
+      "thatch": "#AC976C",
+      "gourd": "#AAB67B"
+    },
+    "avoid": {
+      "housePad": 0.5,
+      "fieldPad": 0.8,
+      "roadPad": 1,
+      "spurPad": 0.7,
+      "propPad": 0.45,
+      "plantPad": 0.55,
+      "scenePad": 0.8,
+      "pondPad": 1,
+      "edgePad": 4,
+      "waterPad": 1.2,
+      "clearance": 0.55,
+      "maxSlope": 0.34,
+      "maxGroundDelta": 0.95
+    },
+    "sizes": {
+      "fenceLength": 2.8,
+      "fenceHeight": 1.05,
+      "bedW": 2.2,
+      "bedD": 1.6,
+      "bedRows": 3,
+      "bedCols": 4,
+      "wellHeight": 0.9,
+      "wellFrame": 0.85,
+      "rackWidth": 2,
+      "rackHeight": 1.85,
+      "scarecrowHeight": 1.75,
+      "trellisHeight": 2,
+      "radius": {
+        "bambooFence": 1.7,
+        "vegetableBed": 1.5,
+        "well": 0.9,
+        "stoneMill": 0.9,
+        "dryingRack": 1.3,
+        "firewood": 0.8,
+        "chickenCoop": 0.9,
+        "scarecrow": 0.6,
+        "clayJars": 0.9,
+        "gourdTrellis": 1.2,
+        "stoneBench": 0.75,
+        "default": 1
+      }
+    },
+    "placement": {
+      "cell": 4.4,
+      "jitter": 1.8,
+      "rotJitter": 2.4,
+      "order": [
+        "well",
+        "stoneMill",
+        "scarecrow",
+        "gourdTrellis",
+        "dryingRack",
+        "chickenCoop",
+        "bambooFence",
+        "vegetableBed",
+        "clayJars",
+        "firewood",
+        "stoneBench"
+      ],
+      "quota": {
+        "bambooFence": 10,
+        "vegetableBed": 8,
+        "well": 3,
+        "stoneMill": 3,
+        "dryingRack": 3,
+        "firewood": 6,
+        "chickenCoop": 3,
+        "scarecrow": 3,
+        "clayJars": 6,
+        "gourdTrellis": 4,
+        "stoneBench": 6
+      }
+    },
+    "anchors": [
+      {
+        "x0": 6,
+        "z0": -208,
+        "cols": 10,
+        "rows": 38
+      }
+    ]
+  },
+  "map": {
+    "extent": {
+      "x": [
+        -90,
+        143
+      ],
+      "z": [
+        -260,
+        300
+      ]
+    },
+    "design": 1800,
+    "units": {
+      "stepMeters": 1.4,
+      "stepRound": 10
+    },
+    "minimap": {
+      "size": 150,
+      "range": 150
+    },
+    "palette": {
+      "paper": "#F2EAD9",
+      "paperWarm": "#E4D3B0",
+      "ink": "#262626",
+      "water": "#B4D0C2",
+      "waterEdge": "#4A7C6F",
+      "peach": "#E8A0A8",
+      "peachDeep": "#D98F97",
+      "field": "#7BA05B",
+      "crop": "#8CB069",
+      "bamboo": "#5E7C3E",
+      "mountain": "#A8B5A0",
+      "mountainDeep": "#828A7E",
+      "road": "#CBBE9A",
+      "house": "#CDB99B",
+      "roof": "#A68E66",
+      "seal": "#B4483A",
+      "yard": "#DCCDA9",
+      "hay": "#D6BC7C",
+      "stone": "#A9A294",
+      "cloth": "#E6DAC2",
+      "willow": "#7C9463",
+      "lotus": "#7FA88E",
+      "waterLine": "#CBDCD0",
+      "mulberry": "#6C8B4E"
+    },
+    "paper": {
+      "stain": 5,
+      "grain": 1700,
+      "fiber": 90
+    },
+    "relief": {
+      "step": 2,
+      "low": 3.2,
+      "high": 24,
+      "alpha": 0.05,
+      "slopeFrom": 0.4,
+      "slopeTo": 1.5,
+      "shadeAlpha": 0.26,
+      "shadeInk": 0.62,
+      "contour": {
+        "step": 4,
+        "from": 2,
+        "to": 62,
+        "alpha": 0.1,
+        "majorAlpha": 0.26
+      }
+    },
+    "peach": {
+      "dot": 1.8,
+      "big": 2.5,
+      "alpha": 0.5
+    },
+    "grove": {
+      "x": 16,
+      "z": 120,
+      "radius": 118
+    },
+    "detail": {
+      "grass": 1500,
+      "flower": 170,
+      "stone": 240,
+      "reed": 170,
+      "yard": 0.16,
+      "tileLines": 4,
+      "lotus": 10,
+      "willow": [
+        [
+          58,
+          -136
+        ],
+        [
+          79,
+          -164
+        ]
+      ],
+      "figures": [
+        [
+          0.16,
+          1,
+          1.1
+        ],
+        [
+          0.33,
+          -1,
+          1.5
+        ],
+        [
+          0.55,
+          1,
+          0.9
+        ],
+        [
+          0.74,
+          -1,
+          1.3
+        ],
+        [
+          0.9,
+          1,
+          1.2
+        ]
+      ]
+    },
+    "river": {
+      "fill": 0.78,
+      "edge": 0.55,
+      "flow": 0.2,
+      "drawScale": 0.62
+    },
+    "wall": {
+      "inner": 34,
+      "outer": 18,
+      "peak": 30,
+      "gap": 0.075,
+      "alpha": 0.5,
+      "wash": 0.18,
+      "peakEvery": 24
+    },
+    "route": {
+      "width": 1.5,
+      "dash": [
+        7,
+        6
+      ],
+      "alpha": 0.32,
+      "speed": 5,
+      "points": [
+        [
+          26,
+          204
+        ],
+        [
+          10,
+          196
+        ],
+        [
+          6,
+          178
+        ],
+        [
+          6,
+          158
+        ],
+        [
+          9,
+          140
+        ],
+        [
+          6,
+          122
+        ],
+        [
+          9,
+          104
+        ],
+        [
+          2,
+          86
+        ],
+        [
+          -6,
+          66
+        ],
+        [
+          -15,
+          44
+        ],
+        [
+          -8,
+          20
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          12,
+          -6
+        ],
+        [
+          20,
+          -9
+        ],
+        [
+          23,
+          -12
+        ],
+        [
+          24,
+          -20
+        ],
+        [
+          24,
+          -28
+        ],
+        [
+          24,
+          -36
+        ],
+        [
+          28,
+          -58
+        ],
+        [
+          31,
+          -82
+        ],
+        [
+          34,
+          -110
+        ],
+        [
+          32,
+          -144
+        ],
+        [
+          28,
+          -170
+        ],
+        [
+          27,
+          -184
+        ]
+      ]
+    },
+    "pois": [
+      {
+        "id": "wuling",
+        "name": "武陵溪",
+        "kind": "溪",
+        "x": 26,
+        "z": 204,
+        "reveal": 34,
+        "poem": "缘溪行，忘路之远近",
+        "label": {
+          "x": -6,
+          "y": 8,
+          "align": "end"
+        }
+      },
+      {
+        "id": "taolin",
+        "name": "桃花林",
+        "kind": "林",
+        "x": 16,
+        "z": 120,
+        "reveal": 40,
+        "poem": "芳草鲜美，落英缤纷",
+        "label": {
+          "x": 6,
+          "y": 7,
+          "align": "start"
+        }
+      },
+      {
+        "id": "kou",
+        "name": "山有小口",
+        "kind": "口",
+        "x": 23,
+        "z": -10,
+        "reveal": 22,
+        "poem": "仿佛若有光",
+        "label": {
+          "x": -6,
+          "y": 10,
+          "align": "end"
+        }
+      },
+      {
+        "id": "cun",
+        "name": "桃源村",
+        "kind": "村",
+        "x": 30,
+        "z": -96,
+        "reveal": 30,
+        "poem": "土地平旷，屋舍俨然",
+        "label": {
+          "x": 7,
+          "y": 4,
+          "align": "start"
+        }
+      },
+      {
+        "id": "tian",
+        "name": "良田",
+        "kind": "田",
+        "x": 52,
+        "z": -70,
+        "reveal": 26,
+        "poem": "阡陌交通，鸡犬相闻",
+        "label": {
+          "x": 7,
+          "y": 8,
+          "align": "start"
+        }
+      },
+      {
+        "id": "chi",
+        "name": "美池",
+        "kind": "池",
+        "x": 68,
+        "z": -152,
+        "reveal": 24,
+        "poem": "有良田美池桑竹之属",
+        "label": {
+          "x": 7,
+          "y": 5,
+          "align": "start"
+        },
+        "badge": [
+          -15,
+          6
+        ]
+      },
+      {
+        "id": "zhu",
+        "name": "桑竹",
+        "kind": "竹",
+        "x": 114,
+        "z": -129,
+        "reveal": 30,
+        "poem": "桑竹之属",
+        "label": {
+          "x": 7,
+          "y": 4,
+          "align": "start"
+        }
+      },
+      {
+        "id": "renjia",
+        "name": "人家",
+        "kind": "舍",
+        "x": 27,
+        "z": -182,
+        "reveal": 26,
+        "poem": "黄发垂髫，并怡然自乐",
+        "label": {
+          "x": 7,
+          "y": -4,
+          "align": "start"
+        }
+      }
+    ],
+    "regions": [
+      {
+        "name": "武陵溪",
+        "x": 26,
+        "z": 205,
+        "r": 86
+      },
+      {
+        "name": "桃花林",
+        "x": 12,
+        "z": 110,
+        "r": 106
+      },
+      {
+        "name": "水源",
+        "x": 18,
+        "z": 8,
+        "r": 34
+      },
+      {
+        "name": "山口",
+        "x": 23,
+        "z": -12,
+        "r": 14
+      },
+      {
+        "name": "初极狭",
+        "x": 27,
+        "z": -20,
+        "r": 9
+      },
+      {
+        "name": "豁然开朗",
+        "x": 28,
+        "z": -38,
+        "r": 20
+      },
+      {
+        "name": "桃源村",
+        "x": 30,
+        "z": -100,
+        "r": 78
+      },
+      {
+        "name": "良田",
+        "x": 52,
+        "z": -70,
+        "r": 24
+      },
+      {
+        "name": "良田",
+        "x": 50,
+        "z": -170,
+        "r": 24
+      },
+      {
+        "name": "美池",
+        "x": 68,
+        "z": -152,
+        "r": 22
+      },
+      {
+        "name": "桑竹",
+        "x": 114,
+        "z": -129,
+        "r": 32
+      },
+      {
+        "name": "人家",
+        "x": 27,
+        "z": -182,
+        "r": 24
+      },
+      {
+        "name": "阡陌",
+        "x": 40,
+        "z": -120,
+        "r": 18
+      }
+    ]
+  }
+}
