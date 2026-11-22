@@ -21,7 +21,7 @@ function extractRepoSlug(repoUrl) {
   }
 }
 
-const version = String(pkg?.version || '1.0.0').trim();
+const version = String(pkg?.version || '1.0.1').trim();
 const repoUrl = normalizeRepoUrl(pkg?.repository);
 const repoSlug = extractRepoSlug(repoUrl);
 const license = String(pkg?.license || 'MIT').trim();

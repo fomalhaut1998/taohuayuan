@@ -4,7 +4,7 @@ const FALLBACK_REPO = 'https://github.com/fomalhaut1998/taohuayuan';
 
 function readProjectMeta() {
   const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
-  const version = String(pkg?.version || '1.0.0').trim();
+  const version = String(pkg?.version || '1.0.1').trim();
   const rawRepo = typeof pkg?.repository === 'string' ? pkg.repository : pkg?.repository?.url;
   const repoUrl = String(rawRepo || FALLBACK_REPO)
     .trim()
