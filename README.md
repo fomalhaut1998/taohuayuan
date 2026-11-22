@@ -1,12 +1,12 @@
 # 桃花源记 · Taohuayuan
 
-[![Release](https://img.shields.io/github/v/release/fomalhaut1998/taohuayuan?label=release&color=E8A0A8)](https://github.com/fomalhaut1998/taohuayuan/releases/latest) [![License](https://img.shields.io/github/license/fomalhaut1998/taohuayuan?color=7BA05B)](LICENSE) [![Online](https://img.shields.io/badge/online-github.fomal.cc%2Ftaohuayuan-4A7C6F)](https://github.fomal.cc/taohuayuan/)
+[![Release](https://img.shields.io/github/v/release/fomalhaut1998/taohuayuan?label=release&color=E8A0A8)](https://github.com/fomalhaut1998/taohuayuan/releases/latest) [![License](https://img.shields.io/github/license/fomalhaut1998/taohuayuan?color=7BA05B)](LICENSE) [![Online](https://img.shields.io/badge/online-taohuayuan.fomal.cc-4A7C6F)](https://taohuayuan.fomal.cc/)
 
 > 忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。
 
 浏览器里的《桃花源记》水墨青绿 3D 活态世界：可漫步、可泛舟、可驻足，桌面键鼠与移动端触屏皆宜。纯静态构建、无后端、无运行时外部请求——构建后发链接即可直接点开玩。
 
-**在线体验**：<https://github.fomal.cc/taohuayuan/>（GitHub Pages 自动部署：推送 main 即更新；<https://fomalhaut1998.github.io/taohuayuan/> 同址跳转）
+**在线体验**：<https://taohuayuan.fomal.cc/>（主站，Vercel 自动部署）｜ 备用域名：<https://taohuayuan.fomal.cn/> ｜ GitHub Pages：<https://github.fomal.cc/taohuayuan/>（<https://fomalhaut1998.github.io/taohuayuan/> 同址跳转）
 
 ![桃花林 · 春深 · 晴昼](docs/images/peach-grove-spring.webp)
 
@@ -75,7 +75,7 @@
 
 ### 10. 工程与回归
 - 纯静态 Vite 构建、手动分包（three / world-data / shared-core / gameplay 等），首屏之外重面板真·动态 import。
-- 89 项自动化回归检查（`npm test`）：几何、批次、碰撞、音频许可清单、性能热路径逐项门禁。
+- 93 项自动化回归检查（`npm test`）：几何、批次、碰撞、音频许可清单、性能热路径逐项门禁。
 
 ## 快速开始
 
@@ -89,7 +89,7 @@ npm run preview   # 预览构建产物（端口 4173）
 npm test          # 自动化回归检查集
 ```
 
-运行时仅依赖 `three`；构建产物可托管于任意静态服务器（GitHub Pages、Netlify、Nginx 等）。
+运行时仅依赖 `three`；构建产物可托管于任意静态服务器（Vercel、GitHub Pages、Netlify、Nginx 等）。
 
 ## 操作键位
 
