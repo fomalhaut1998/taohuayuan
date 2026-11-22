@@ -1,5 +1,7 @@
 # 桃花源记 · Taohuayuan
 
+[![Release](https://img.shields.io/github/v/release/fomalhaut1998/taohuayuan?label=release&color=E8A0A8)](https://github.com/fomalhaut1998/taohuayuan/releases/latest) [![License](https://img.shields.io/github/license/fomalhaut1998/taohuayuan?color=7BA05B)](LICENSE) [![Online](https://img.shields.io/badge/online-github.fomal.cc%2Ftaohuayuan-4A7C6F)](https://github.fomal.cc/taohuayuan/)
+
 > 忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。
 
 浏览器里的《桃花源记》水墨青绿 3D 活态世界：可漫步、可泛舟、可驻足，桌面键鼠与移动端触屏皆宜。纯静态构建、无后端、无运行时外部请求——构建后发链接即可直接点开玩。
