@@ -174,6 +174,15 @@ function evalBridgeHeight(b, x, z, baseY) {
   return deckY * (1 - s) + baseY * s;
 }
 
+const CELL_SIZE = 8;
+const CELL_OFFSET = 32768;
+const CELL_STRIDE = 65536;
+const RIB_PACK_STRIDE = 1048576;
+
+function cellKey(gx, gz) {
+  return (gx + CELL_OFFSET) * CELL_STRIDE + (gz + CELL_OFFSET);
+}
+
 export function attachGroundSurface(field, initial = {}) {
   const ribbons = [];
   const rotPads = [];
@@ -181,6 +190,102 @@ export function attachGroundSurface(field, initial = {}) {
   const aabbPads = [];
   const bridges = [];
   const addedKeys = new Set();
+  const grid = new Map();
+  let idxRibbons = 0;
+  let idxBridges = 0;
+  let idxRotPads = 0;
+  let idxDiscs = 0;
+  let idxAabbPads = 0;
+  let ribCapacity = 0;
+  let ribStamp = new Uint32Array(0);
+  let ribBestD2 = new Float64Array(0);
+  let ribBestCx = new Float64Array(0);
+  let ribBestCz = new Float64Array(0);
+  let ribBestDx = new Float64Array(0);
+  let ribBestDz = new Float64Array(0);
+  let ribBestL2 = new Float64Array(0);
+  let touchedRibs = new Int32Array(0);
+  let stamp = 0;
+
+  function ensureCell(gx, gz) {
+    const key = cellKey(gx, gz);
+    let cell = grid.get(key);
+    if (!cell) {
+      cell = { segs: null, bridges: null, rotPads: null, discs: null, aabbPads: null };
+      grid.set(key, cell);
+    }
+    return cell;
+  }
+
+  function addBoxToGrid(minX, maxX, minZ, maxZ, fieldName, index) {
+    if (!Number.isFinite(minX) || !Number.isFinite(maxX) || !Number.isFinite(minZ) || !Number.isFinite(maxZ)) return;
+    const x0 = Math.floor(minX / CELL_SIZE);
+    const x1 = Math.floor(maxX / CELL_SIZE);
+    const z0 = Math.floor(minZ / CELL_SIZE);
+    const z1 = Math.floor(maxZ / CELL_SIZE);
+    for (let gx = x0; gx <= x1; gx++) {
+      for (let gz = z0; gz <= z1; gz++) {
+        const cell = ensureCell(gx, gz);
+        let arr = cell[fieldName];
+        if (!arr) {
+          arr = [];
+          cell[fieldName] = arr;
+        }
+        arr.push(index);
+      }
+    }
+  }
+
+  function syncGrid() {
+    while (idxRibbons < ribbons.length) {
+      const rIdx = idxRibbons++;
+      const r = ribbons[rIdx];
+      const px = r.px, pz = r.pz, n = r.n, pad = r.outer;
+      for (let s = 0; s < n - 1; s++) {
+        const ax = px[s], az = pz[s];
+        const bx = px[s + 1], bz = pz[s + 1];
+        const dx = bx - ax, dz = bz - az;
+        if (dx * dx + dz * dz < 1e-8) continue;
+        const minX = (ax < bx ? ax : bx) - pad;
+        const maxX = (ax > bx ? ax : bx) + pad;
+        const minZ = (az < bz ? az : bz) - pad;
+        const maxZ = (az > bz ? az : bz) + pad;
+        addBoxToGrid(minX, maxX, minZ, maxZ, 'segs', rIdx * RIB_PACK_STRIDE + s);
+      }
+    }
+    while (idxBridges < bridges.length) {
+      const i = idxBridges++;
+      const b = bridges[i];
+      addBoxToGrid(b.minX, b.maxX, b.minZ, b.maxZ, 'bridges', i);
+    }
+    while (idxRotPads < rotPads.length) {
+      const i = idxRotPads++;
+      const p = rotPads[i];
+      addBoxToGrid(p.minX, p.maxX, p.minZ, p.maxZ, 'rotPads', i);
+    }
+    while (idxDiscs < discs.length) {
+      const i = idxDiscs++;
+      const d = discs[i];
+      const rOut = d.r + d.bevel;
+      addBoxToGrid(d.x - rOut, d.x + rOut, d.z - rOut, d.z + rOut, 'discs', i);
+    }
+    while (idxAabbPads < aabbPads.length) {
+      const i = idxAabbPads++;
+      const b = aabbPads[i];
+      addBoxToGrid(b.minX, b.maxX, b.minZ, b.maxZ, 'aabbPads', i);
+    }
+    if (ribbons.length > ribCapacity) {
+      ribCapacity = ribbons.length;
+      ribStamp = new Uint32Array(ribCapacity);
+      ribBestD2 = new Float64Array(ribCapacity);
+      ribBestCx = new Float64Array(ribCapacity);
+      ribBestCz = new Float64Array(ribCapacity);
+      ribBestDx = new Float64Array(ribCapacity);
+      ribBestDz = new Float64Array(ribCapacity);
+      ribBestL2 = new Float64Array(ribCapacity);
+      touchedRibs = new Int32Array(ribCapacity);
+    }
+  }
 
   function addBridge(spec) {
     if (!spec || !Number.isFinite(spec.x) || !Number.isFinite(spec.z)) return;
@@ -658,128 +763,240 @@ export function attachGroundSurface(field, initial = {}) {
         }
       });
     }
+    syncGrid();
   }
 
   function walkSurface(x, z) {
     const baseY = baseTerrainY(field, x, z);
+    const cell = grid.get(cellKey(Math.floor(x / CELL_SIZE), Math.floor(z / CELL_SIZE)));
+    if (!cell) return baseY;
     let bestY = baseY;
 
-    for (let i = 0; i < ribbons.length; i++) {
-      const ry = evalRibbonHeight(ribbons[i], field, x, z, baseY);
-      if (ry > bestY) bestY = ry;
-    }
-
-    for (let i = 0; i < bridges.length; i++) {
-      const by = evalBridgeHeight(bridges[i], x, z, baseY);
-      if (by > bestY) bestY = by;
-    }
-
-    for (let i = 0; i < rotPads.length; i++) {
-      const p = rotPads[i];
-      if (x < p.minX || x > p.maxX || z < p.minZ || z > p.maxZ) continue;
-      const dx = x - p.x, dz = z - p.z;
-      const lx = Math.abs(dx * p.c - dz * p.s);
-      const lz = Math.abs(dx * p.s + dz * p.c);
-      if (lx > p.hw + p.bevel || lz > p.hd + p.bevel) continue;
-      if (lx <= p.hw && lz <= p.hd) {
-        if (p.y > bestY) bestY = p.y;
-      } else {
-        const ox = Math.max(0, lx - p.hw) / p.bevel;
-        const oz = Math.max(0, lz - p.hd) / p.bevel;
-        const u = Math.min(1, Math.hypot(ox, oz));
-        const s = u * u * (3 - 2 * u);
-        const py = p.y * (1 - s) + baseY * s;
-        if (py > bestY) bestY = py;
+    const segs = cell.segs;
+    if (segs) {
+      stamp++;
+      if (stamp >= 0xfffffff0) {
+        ribStamp.fill(0);
+        stamp = 1;
+      }
+      let touchedCount = 0;
+      for (let i = 0; i < segs.length; i++) {
+        const packed = segs[i];
+        const rIdx = Math.floor(packed / RIB_PACK_STRIDE);
+        const s = packed - rIdx * RIB_PACK_STRIDE;
+        const r = ribbons[rIdx];
+        if (x < r.minX || x > r.maxX || z < r.minZ || z > r.maxZ) continue;
+        const ax = r.px[s], az = r.pz[s];
+        const dx = r.px[s + 1] - ax, dz = r.pz[s + 1] - az;
+        const l2 = dx * dx + dz * dz;
+        let t = ((x - ax) * dx + (z - az) * dz) / l2;
+        if (t < 0) t = 0;
+        else if (t > 1) t = 1;
+        const cx = ax + dx * t;
+        const cz = az + dz * t;
+        const ex = x - cx, ez = z - cz;
+        const d2 = ex * ex + ez * ez;
+        if (ribStamp[rIdx] !== stamp) {
+          if (d2 < r.outerSq) {
+            ribStamp[rIdx] = stamp;
+            ribBestD2[rIdx] = d2;
+            ribBestCx[rIdx] = cx;
+            ribBestCz[rIdx] = cz;
+            ribBestDx[rIdx] = dx;
+            ribBestDz[rIdx] = dz;
+            ribBestL2[rIdx] = l2;
+            touchedRibs[touchedCount++] = rIdx;
+          }
+        } else if (d2 < ribBestD2[rIdx]) {
+          ribBestD2[rIdx] = d2;
+          ribBestCx[rIdx] = cx;
+          ribBestCz[rIdx] = cz;
+          ribBestDx[rIdx] = dx;
+          ribBestDz[rIdx] = dz;
+          ribBestL2[rIdx] = l2;
+        }
+      }
+      for (let t = 0; t < touchedCount; t++) {
+        const rIdx = touchedRibs[t];
+        const r = ribbons[rIdx];
+        const d = Math.sqrt(ribBestD2[rIdx]);
+        const cx = ribBestCx[rIdx], cz = ribBestCz[rIdx];
+        let treadBase = field.sample(cx, cz);
+        if (r.useHighTread) {
+          const invL = 1 / Math.sqrt(ribBestL2[rIdx]);
+          const nx = -ribBestDz[rIdx] * invL;
+          const nz = ribBestDx[rIdx] * invL;
+          const ly = field.sample(cx - nx * r.hw, cz - nz * r.hw);
+          const ry = field.sample(cx + nx * r.hw, cz + nz * r.hw);
+          if (ly > treadBase) treadBase = ly;
+          if (ry > treadBase) treadBase = ry;
+        }
+        const edgeY = treadBase + r.lift;
+        let ry;
+        if (d <= r.hw) {
+          const u = d / r.hw;
+          ry = edgeY + r.camber * (1 - u * u);
+        } else {
+          const v = (d - r.hw) / r.verge;
+          const sv = v * v * (3 - 2 * v);
+          ry = edgeY * (1 - sv) + baseY * sv;
+        }
+        if (ry > bestY) bestY = ry;
       }
     }
 
-    for (let i = 0; i < discs.length; i++) {
-      const d = discs[i];
-      const dx = x - d.x, dz = z - d.z;
-      const d2 = dx * dx + dz * dz;
-      if (d2 > d.rOuterSq) continue;
-      const dist = Math.sqrt(d2);
-      if (dist <= d.r) {
-        if (d.y > bestY) bestY = d.y;
-      } else {
-        const u = (dist - d.r) / d.bevel;
-        const s = u * u * (3 - 2 * u);
-        const py = d.y * (1 - s) + baseY * s;
-        if (py > bestY) bestY = py;
+    const cellBridges = cell.bridges;
+    if (cellBridges) {
+      for (let i = 0; i < cellBridges.length; i++) {
+        const by = evalBridgeHeight(bridges[cellBridges[i]], x, z, baseY);
+        if (by > bestY) bestY = by;
       }
     }
 
-    for (let i = 0; i < aabbPads.length; i++) {
-      const b = aabbPads[i];
-      if (x < b.minX || x > b.maxX || z < b.minZ || z > b.maxZ) continue;
-      const py = b.relativeOffset > 0 ? baseY + b.relativeOffset : b.y;
-      if (py > bestY) bestY = py;
+    const cellRotPads = cell.rotPads;
+    if (cellRotPads) {
+      for (let i = 0; i < cellRotPads.length; i++) {
+        const p = rotPads[cellRotPads[i]];
+        if (x < p.minX || x > p.maxX || z < p.minZ || z > p.maxZ) continue;
+        const dx = x - p.x, dz = z - p.z;
+        const lx = Math.abs(dx * p.c - dz * p.s);
+        const lz = Math.abs(dx * p.s + dz * p.c);
+        if (lx > p.hw + p.bevel || lz > p.hd + p.bevel) continue;
+        if (lx <= p.hw && lz <= p.hd) {
+          if (p.y > bestY) bestY = p.y;
+        } else {
+          const ox = Math.max(0, lx - p.hw) / p.bevel;
+          const oz = Math.max(0, lz - p.hd) / p.bevel;
+          const u = Math.min(1, Math.hypot(ox, oz));
+          const s = u * u * (3 - 2 * u);
+          const py = p.y * (1 - s) + baseY * s;
+          if (py > bestY) bestY = py;
+        }
+      }
+    }
+
+    const cellDiscs = cell.discs;
+    if (cellDiscs) {
+      for (let i = 0; i < cellDiscs.length; i++) {
+        const d = discs[cellDiscs[i]];
+        const dx = x - d.x, dz = z - d.z;
+        const d2 = dx * dx + dz * dz;
+        if (d2 > d.rOuterSq) continue;
+        const dist = Math.sqrt(d2);
+        if (dist <= d.r) {
+          if (d.y > bestY) bestY = d.y;
+        } else {
+          const u = (dist - d.r) / d.bevel;
+          const s = u * u * (3 - 2 * u);
+          const py = d.y * (1 - s) + baseY * s;
+          if (py > bestY) bestY = py;
+        }
+      }
+    }
+
+    const cellAabbPads = cell.aabbPads;
+    if (cellAabbPads) {
+      for (let i = 0; i < cellAabbPads.length; i++) {
+        const b = aabbPads[cellAabbPads[i]];
+        if (x < b.minX || x > b.maxX || z < b.minZ || z > b.maxZ) continue;
+        const py = b.relativeOffset > 0 ? baseY + b.relativeOffset : b.y;
+        if (py > bestY) bestY = py;
+      }
     }
 
     return bestY;
   }
 
   function surfaceMaterial(x, z) {
+    const cell = grid.get(cellKey(Math.floor(x / CELL_SIZE), Math.floor(z / CELL_SIZE)));
+    if (!cell) return 'grass';
     let bestRank = 0;
     let bestMat = 'grass';
 
-    for (let i = 0; i < bridges.length; i++) {
-      const b = bridges[i];
-      if (b.rank <= bestRank) continue;
-      if (x < b.minX || x > b.maxX || z < b.minZ || z > b.maxZ) continue;
-      const dx = x - b.x;
-      const dz = z - b.z;
-      const absAlong = Math.abs(dx * b.tx + dz * b.tz);
-      const across = Math.abs(dx * b.ux + dz * b.uz);
-      if (absAlong <= b.halfL + 0.08 && across <= b.halfW + 0.08) {
-        bestRank = b.rank;
-        bestMat = b.material;
-        if (bestRank >= 3) return bestMat;
+    const cellBridges = cell.bridges;
+    if (cellBridges) {
+      for (let i = 0; i < cellBridges.length; i++) {
+        const b = bridges[cellBridges[i]];
+        if (b.rank <= bestRank) continue;
+        if (x < b.minX || x > b.maxX || z < b.minZ || z > b.maxZ) continue;
+        const dx = x - b.x;
+        const dz = z - b.z;
+        const absAlong = Math.abs(dx * b.tx + dz * b.tz);
+        const across = Math.abs(dx * b.ux + dz * b.uz);
+        if (absAlong <= b.halfL + 0.08 && across <= b.halfW + 0.08) {
+          bestRank = b.rank;
+          bestMat = b.material;
+          if (bestRank >= 3) return bestMat;
+        }
       }
     }
 
-    for (let i = 0; i < rotPads.length; i++) {
-      const p = rotPads[i];
-      if (p.rank <= bestRank) continue;
-      if (x < p.minX || x > p.maxX || z < p.minZ || z > p.maxZ) continue;
-      const dx = x - p.x;
-      const dz = z - p.z;
-      const lx = Math.abs(dx * p.c - dz * p.s);
-      const lz = Math.abs(dx * p.s + dz * p.c);
-      if (lx <= p.hw + 0.06 && lz <= p.hd + 0.06) {
-        bestRank = p.rank;
-        bestMat = p.material;
-        if (bestRank >= 3) return bestMat;
+    const cellRotPads = cell.rotPads;
+    if (cellRotPads) {
+      for (let i = 0; i < cellRotPads.length; i++) {
+        const p = rotPads[cellRotPads[i]];
+        if (p.rank <= bestRank) continue;
+        if (x < p.minX || x > p.maxX || z < p.minZ || z > p.maxZ) continue;
+        const dx = x - p.x;
+        const dz = z - p.z;
+        const lx = Math.abs(dx * p.c - dz * p.s);
+        const lz = Math.abs(dx * p.s + dz * p.c);
+        if (lx <= p.hw + 0.06 && lz <= p.hd + 0.06) {
+          bestRank = p.rank;
+          bestMat = p.material;
+          if (bestRank >= 3) return bestMat;
+        }
       }
     }
 
-    for (let i = 0; i < discs.length; i++) {
-      const d = discs[i];
-      if (d.rank <= bestRank) continue;
-      const dx = x - d.x;
-      const dz = z - d.z;
-      if (dx * dx + dz * dz <= d.rSq) {
-        bestRank = d.rank;
-        bestMat = d.material;
-        if (bestRank >= 3) return bestMat;
+    const cellDiscs = cell.discs;
+    if (cellDiscs) {
+      for (let i = 0; i < cellDiscs.length; i++) {
+        const d = discs[cellDiscs[i]];
+        if (d.rank <= bestRank) continue;
+        const dx = x - d.x;
+        const dz = z - d.z;
+        if (dx * dx + dz * dz <= d.rSq) {
+          bestRank = d.rank;
+          bestMat = d.material;
+          if (bestRank >= 3) return bestMat;
+        }
       }
     }
 
-    for (let i = 0; i < ribbons.length; i++) {
-      const r = ribbons[i];
-      if (r.rank <= bestRank) continue;
-      if (evalRibbonHit(r, x, z)) {
-        bestRank = r.rank;
-        bestMat = r.material;
-        if (bestRank >= 3) return bestMat;
+    const segs = cell.segs;
+    if (segs) {
+      for (let i = 0; i < segs.length; i++) {
+        const packed = segs[i];
+        const rIdx = Math.floor(packed / RIB_PACK_STRIDE);
+        const r = ribbons[rIdx];
+        if (r.rank <= bestRank) continue;
+        if (x < r.minX || x > r.maxX || z < r.minZ || z > r.maxZ) continue;
+        const s = packed - rIdx * RIB_PACK_STRIDE;
+        const ax = r.px[s], az = r.pz[s];
+        const dx = r.px[s + 1] - ax, dz = r.pz[s + 1] - az;
+        const l2 = dx * dx + dz * dz;
+        let t = ((x - ax) * dx + (z - az) * dz) / l2;
+        if (t < 0) t = 0;
+        else if (t > 1) t = 1;
+        const ex = x - (ax + dx * t);
+        const ez = z - (az + dz * t);
+        if (ex * ex + ez * ez <= r.matOuterSq) {
+          bestRank = r.rank;
+          bestMat = r.material;
+          if (bestRank >= 3) return bestMat;
+        }
       }
     }
 
     if (bestRank < 1) {
-      for (let i = 0; i < aabbPads.length; i++) {
-        const b = aabbPads[i];
-        if (x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ) {
-          return 'dirt';
+      const cellAabbPads = cell.aabbPads;
+      if (cellAabbPads) {
+        for (let i = 0; i < cellAabbPads.length; i++) {
+          const b = aabbPads[cellAabbPads[i]];
+          if (x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ) {
+            return 'dirt';
+          }
         }
       }
     }

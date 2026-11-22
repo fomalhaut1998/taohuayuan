@@ -1,23 +1,63 @@
+import { getBlockerGrid } from './spatial-grid.js';
+
+let _obsEyeY = 0;
+let _obsTargetY = 0;
+
+function hitBlocker3D(b, ax, az, bx, bz) {
+  const rBound = (b.hw || 0) + (b.hd || 0);
+  if ((ax < b.x - rBound && bx < b.x - rBound) || (ax > b.x + rBound && bx > b.x + rBound) ||
+      (az < b.z - rBound && bz < b.z - rBound) || (az > b.z + rBound && bz > b.z + rBound)) {
+    return false;
+  }
+  const c = Math.cos(b.rot || 0), s = Math.sin(b.rot || 0);
+  const x = (ax - b.x) * c - (az - b.z) * s;
+  const z = (ax - b.x) * s + (az - b.z) * c;
+  const dx = (bx - ax) * c - (bz - az) * s;
+  const dz = (bx - ax) * s + (bz - az) * c;
+  let lo = 0, hi = 1;
+  if (Math.abs(dx) < 1e-9) {
+    if (Math.abs(x) > b.hw) return false;
+  } else {
+    const a0 = (-b.hw - x) / dx, q0 = (b.hw - x) / dx;
+    lo = Math.max(lo, Math.min(a0, q0));
+    hi = Math.min(hi, Math.max(a0, q0));
+  }
+  if (Math.abs(dz) < 1e-9) {
+    if (Math.abs(z) > b.hd) return false;
+  } else {
+    const a1 = (-b.hd - z) / dz, q1 = (b.hd - z) / dz;
+    lo = Math.max(lo, Math.min(a1, q1));
+    hi = Math.min(hi, Math.max(a1, q1));
+  }
+  // 墙盒有高度时，仅线段实际穿过其垂直范围才遮挡；未标高度的岩壁保守处理。
+  if (lo <= hi && lo < 0.98 && hi > 0.01) {
+    const y0 = _obsEyeY + (_obsTargetY - _obsEyeY) * Math.max(lo, 0.01);
+    const y1 = _obsEyeY + (_obsTargetY - _obsEyeY) * Math.min(hi, 0.98);
+    const minY = b.minY === undefined ? -Infinity : b.minY;
+    const maxY = b.maxY === undefined ? Infinity : b.maxY;
+    if (Math.max(y0, y1) >= minY && Math.min(y0, y1) <= maxY) return true;
+  }
+  return false;
+}
+
 // 可见性使用角色视线和碰撞墙盒，地形以短间隔采样；这是近似判定而非逐像素遮挡。
 export function sightBlocked(eye, target, blockers = [], field) {
-  for (const b of blockers) {
-    const c = Math.cos(b.rot || 0), s = Math.sin(b.rot || 0);
-    const x = (eye.x - b.x) * c - (eye.z - b.z) * s;
-    const z = (eye.x - b.x) * s + (eye.z - b.z) * c;
-    const dx = (target.x - eye.x) * c - (target.z - eye.z) * s;
-    const dz = (target.x - eye.x) * s + (target.z - eye.z) * c;
-    let lo = 0, hi = 1;
-    for (const [v, d, half] of [[x, dx, b.hw], [z, dz, b.hd]]) {
-      if (Math.abs(d) < 1e-9) { if (Math.abs(v) > half) { lo = 2; break; } }
-      else { const a = (-half - v) / d, q = (half - v) / d; lo = Math.max(lo, Math.min(a, q)); hi = Math.min(hi, Math.max(a, q)); }
+  _obsEyeY = eye.y;
+  _obsTargetY = target.y;
+  let handled = false;
+  if (blockers.length >= 24 && Number.isFinite(eye.x) && Number.isFinite(eye.z) && Number.isFinite(target.x) && Number.isFinite(target.z)) {
+    const grid = getBlockerGrid(blockers, 8, 2.5);
+    if (grid) {
+      const hit = grid.testSegment(eye.x, eye.z, target.x, target.z, 0, hitBlocker3D);
+      if (hit !== null) {
+        if (hit) return true;
+        handled = true;
+      }
     }
-    // 墙盒有高度时，仅线段实际穿过其垂直范围才遮挡；未标高度的岩壁保守处理。
-    if (lo <= hi && lo < 0.98 && hi > 0.01) {
-      const y0 = eye.y + (target.y - eye.y) * Math.max(lo, 0.01);
-      const y1 = eye.y + (target.y - eye.y) * Math.min(hi, 0.98);
-      const minY = b.minY === undefined ? -Infinity : b.minY;
-      const maxY = b.maxY === undefined ? Infinity : b.maxY;
-      if (Math.max(y0, y1) >= minY && Math.min(y0, y1) <= maxY) return true;
+  }
+  if (!handled) {
+    for (let i = 0; i < blockers.length; i++) {
+      if (hitBlocker3D(blockers[i], eye.x, eye.z, target.x, target.z)) return true;
     }
   }
   if (!field || typeof field.sample !== 'function') return true; // Missing terrain is not evidence of clear sight.

@@ -50,7 +50,14 @@ export function createDiscovery(options = {}) {
     projected.project(camera); projections++;
     if (!Number.isFinite(projected.x) || !Number.isFinite(projected.y) || projected.z < -1 || projected.z > 1 || Math.abs(projected.x) > .94 || Math.abs(projected.y) > .92) { label.hidden = true; return false; }
     const rect = canvas?.getBoundingClientRect?.() || { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-    const x = rect.left + (projected.x * .5 + .5) * rect.width, y = rect.top + (-projected.y * .5 + .5) * rect.height;
+    let x = rect.left + (projected.x * .5 + .5) * rect.width;
+    let y = rect.top + (-projected.y * .5 + .5) * rect.height;
+    if (document.body?.classList?.contains?.('touch-active') && rect.width > 120 && rect.height > 260) {
+      const topPad = rect.height <= 500 ? 96 : 186;
+      const botPad = rect.height <= 500 ? 108 : 162;
+      x = Math.max(rect.left + 54, Math.min(rect.left + rect.width - 54, x));
+      y = Math.max(rect.top + topPad, Math.min(rect.top + rect.height - botPad, y));
+    }
     const nextLeft = x + 'px', nextTop = y + 'px', nextName = catalogueEntry(target.id).name;
     if (label.style) {
       if (nextLeft !== lastLeft) { lastLeft = nextLeft; label.style.left = nextLeft; }

@@ -465,15 +465,7 @@ export function createPeople(cfg, field, houses, road, plots, blockers = []) {
   }
   const _sepPos = { x: 0, z: 0 };
   function clearPath(ax, az, bx, bz) {
-    const steps = Math.max(1, Math.ceil(Math.hypot(bx - ax, bz - az) / 0.15));
-    for (let j = 0; j <= steps; j++) {
-      const x = ax + (bx - ax) * j / steps, z = az + (bz - az) * j / steps;
-      for (const b of blockers) {
-        const dx = x - b.x, dz = z - b.z, c = Math.cos(b.rot), s = Math.sin(b.rot);
-        if (Math.abs(dx * c - dz * s) < b.hw + 0.08 && Math.abs(dx * s + dz * c) < b.hd + 0.08) return false;
-      }
-    }
-    return true;
+    return sightClear(ax, az, bx, bz, blockers, 0.08);
   }
   function findShelter(p) {
     let best = null;

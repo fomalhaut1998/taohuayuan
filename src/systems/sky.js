@@ -63,6 +63,20 @@ float cfbm(vec2 p) {
   }
   return v;
 }
+float cfbm3(vec2 p) {
+  float v = 0.0;
+  mat2 rot = mat2(0.80, -0.60, 0.60, 0.80);
+  v += 0.55 * cnoise(p);
+  p = rot * p * 2.03 + vec2(1.7, 3.1);
+  v += 0.29 * cnoise(p);
+  p = rot * p * 2.03 + vec2(1.7, 3.1);
+  v += 0.16 * cnoise(p);
+  return v;
+}
+float cfbm2(vec2 p) {
+  mat2 rot = mat2(0.80, -0.60, 0.60, 0.80);
+  return 0.65 * cnoise(p) + 0.35 * cnoise(rot * p * 2.03 + vec2(1.7, 3.1));
+}
 float noonNoise2(float x, float y) { return cnoise(vec2(x, y)); }
 // 正午舒卷云团：水平云幕投影 + 域扭曲多阶团云，彻底消解同心圆弧条带，雨雾天收笔
 float noonCloudStroke(float dy, float hx, float hz, float t, vec4 p) {
@@ -90,8 +104,10 @@ float noonCloudStroke(float dy, float hx, float hz, float t, vec4 p) {
 }
 void main() {
   vec3 d = normalize(vDir);
+  vec3 sunN = normalize(uGlowDir);
   vec3 col = mix(uBottom, uTop, pow(clamp(d.y, 0.0, 1.0), 0.62));
-  float g = pow(max(dot(d, normalize(uGlowDir)), 0.0), 9.0) * uGlowAmt;
+  float sunCos = max(dot(d, sunN), 0.0);
+  float g = pow(sunCos, 9.0) * uGlowAmt;
   col += uGlow * g;
 
   // Only dawn/dusk: peach near the light, pink shoulders, blue-lilac opposite it.
@@ -101,8 +117,6 @@ void main() {
   if (uTwilightAmount > 0.0) {
     vec2 dirXZ = normalize(d.xz + vec2(0.00001));
     vec2 solarBearing = normalize(uGlowDir.xz + vec2(0.00001));
-    vec3 sunN = normalize(uGlowDir);
-    float sunCos = max(dot(d, sunN), 0.0);
     float azDot = dot(dirXZ, solarBearing);
     twilightFacing = pow(clamp(azDot * 0.5 + 0.5, 0.0, 1.0), 1.55);
     float forwardFacing = pow(max(azDot, 0.0), 1.35);
@@ -137,23 +151,26 @@ void main() {
 
   // 云是一层水平顶棚：视线越贴地平线，看到的云越远、越淡；双阶域扭曲 + 云头受光鼓起 + 云底氤氲留白
   float vis = uCloudOpacity * smoothstep(0.02, mix(0.28, 0.13, uCloudLow), d.y);
-  float ceilScale = 1.0 / (max(d.y, 0.06) + 0.14);
-  vec2 uv = d.xz * ceilScale + vec2(uCloudTime * 0.36, uCloudTime * 0.15);
-  vec2 warpLo = vec2(cnoise(uv * 0.16 + 3.1), cnoise(uv * 0.16 + 8.7)) - 0.5;
-  uv += warpLo * 2.15;
-  vec2 cp = uv * 0.46;
+  vec2 cp = vec2(0.0);
   float body = 0.0;
   if (vis > 0.001 || uTwilightAmount > 0.0) {
+    float ceilScale = 1.0 / (max(d.y, 0.06) + 0.14);
+    vec2 uv = d.xz * ceilScale + vec2(uCloudTime * 0.36, uCloudTime * 0.15);
+    vec2 warpLo = vec2(cnoise(uv * 0.16 + 3.1), cnoise(uv * 0.16 + 8.7)) - 0.5;
+    uv += warpLo * 2.15;
+    cp = uv * 0.46;
     float thr = mix(0.68, 0.28, clamp(uCloudCover, 0.0, 1.0));
     float soft = max(0.065, uCloudSoft * 1.25);
     vec2 sunStep = normalize(uGlowDir.xz + vec2(0.0001)) * 0.26;
-    float macro = cfbm(cp * 0.62 + vec2(1.4, -0.8));
-    float puff = cfbm(cp * 1.28 + warpLo * 0.9);
+    float macro = cfbm3(cp * 0.62 + vec2(1.4, -0.8));
+    float puff = cfbm3(cp * 1.28 + warpLo * 0.9);
     float n = macro * 0.58 + puff * 0.42;
-    float nSun = cfbm((cp + sunStep) * 0.62 + vec2(1.4, -0.8)) * 0.62 + cfbm((cp + sunStep) * 1.28) * 0.38;
-    body = clamp(smoothstep(thr - soft * 0.8, thr + soft * 1.3, n) * 0.62 + clamp((n - nSun) * 2.4 + 0.48, 0.0, 1.0) * 0.38, 0.0, 1.0);
-    if (vis > 0.001) {
-      float dens = smoothstep(thr - soft * 1.15, thr + soft * 0.95, n);
+    float dens = vis > 0.001 ? smoothstep(thr - soft * 1.15, thr + soft * 0.95, n) : 0.0;
+    if (dens > 0.001 || (uTwilightAmount > 0.0 && d.y > 0.03 && d.y < 0.46)) {
+      float nSun = cfbm2((cp + sunStep) * 0.62 + vec2(1.4, -0.8)) * 0.62 + cfbm2((cp + sunStep) * 1.28) * 0.38;
+      body = clamp(smoothstep(thr - soft * 0.8, thr + soft * 1.3, n) * 0.62 + clamp((n - nSun) * 2.4 + 0.48, 0.0, 1.0) * 0.38, 0.0, 1.0);
+    }
+    if (vis > 0.001 && dens > 0.001) {
       float wispGrain = 0.72 + 0.28 * smoothstep(0.28, 0.76, cnoise(cp * vec2(0.9, 3.2) + vec2(uCloudTime * 0.10, 0.0)));
       float edgeFeather = smoothstep(0.0, 0.55, dens);
       dens *= mix(wispGrain, 1.0, edgeFeather * 0.65);
@@ -162,8 +179,7 @@ void main() {
       vec3 cLow = mix(uCloudColor * (1.0 - uCloudShade * 0.34), skyBounce, 0.22);
       vec3 cHi = min(uCloudColor * 1.04 + uGlow * 0.04, vec3(1.0));
       vec3 cc = mix(cLow, cHi, smoothstep(0.18, 0.86, body));
-      float sunDot = max(dot(d, normalize(uGlowDir)), 0.0);
-      float silverRim = (1.0 - smoothstep(0.45, 0.92, dens)) * smoothstep(0.06, 0.45, dens) * pow(sunDot, 2.5);
+      float silverRim = (1.0 - smoothstep(0.45, 0.92, dens)) * smoothstep(0.06, 0.45, dens) * pow(sunCos, 2.5);
       cc += uGlow * (g * 0.45 * (0.35 + 0.65 * dens) + silverRim * 0.22);
       if (uTwilightAmount > 0.0) {
         float sunSide = pow(max(twilightFacing, 0.0), 1.4);
@@ -197,29 +213,33 @@ void main() {
   if (uTwilightAmount > 0.0) {
     // Soft domain-warped spherical cirrus wisps near horizon (never ruler-straight perspective grid bands)
     float elev = clamp(d.y, 0.0, 1.0);
-    vec3 spDir = vec3(d.x, elev * 2.2, d.z);
-    vec2 spA = vec2(spDir.x * 2.2 + elev * 1.3, spDir.z * 2.2 + elev * 6.0) + vec2(uCloudTime * 0.08, uCloudTime * 0.02);
-    float warp = cfbm(spA * 1.15);
-    float wispMain = cfbm(spA * 1.45 + vec2(warp * 1.15, -warp * 0.65));
-    float twilightCloud = smoothstep(0.46, 0.74, wispMain);
     float cloudElevation = smoothstep(0.03, 0.12, elev) * (1.0 - smoothstep(0.26, 0.46, elev));
-    float warmEdge = smoothstep(0.44, 0.72, wispMain) * (0.20 + 0.80 * twilightFacing);
-    vec3 slateCloud = mix(vec3(0.54, 0.56, 0.72), vec3(0.32, 0.34, 0.50), uTwilightDusk);
-    vec3 fireCloud = mix(vec3(1.0, 0.80, 0.62), vec3(1.0, 0.60, 0.34), uTwilightDusk);
-    vec3 litCloud = mix(slateCloud, fireCloud, warmEdge * 0.88);
-    litCloud += vec3(0.16, 0.09, 0.03) * body * twilightFacing;
-    float wispAlpha = twilightCloud * cloudElevation * uTwilightAmount * (0.22 + 0.34 * twilightFacing);
-    col = mix(col, litCloud, wispAlpha);
+    if (cloudElevation > 0.001) {
+      vec3 spDir = vec3(d.x, elev * 2.2, d.z);
+      vec2 spA = vec2(spDir.x * 2.2 + elev * 1.3, spDir.z * 2.2 + elev * 6.0) + vec2(uCloudTime * 0.08, uCloudTime * 0.02);
+      float warp = cfbm3(spA * 1.15);
+      float wispMain = cfbm3(spA * 1.45 + vec2(warp * 1.15, -warp * 0.65));
+      float twilightCloud = smoothstep(0.46, 0.74, wispMain);
+      float warmEdge = smoothstep(0.44, 0.72, wispMain) * (0.20 + 0.80 * twilightFacing);
+      vec3 slateCloud = mix(vec3(0.54, 0.56, 0.72), vec3(0.32, 0.34, 0.50), uTwilightDusk);
+      vec3 fireCloud = mix(vec3(1.0, 0.80, 0.62), vec3(1.0, 0.60, 0.34), uTwilightDusk);
+      vec3 litCloud = mix(slateCloud, fireCloud, warmEdge * 0.88);
+      litCloud += vec3(0.16, 0.09, 0.03) * body * twilightFacing;
+      float wispAlpha = twilightCloud * cloudElevation * uTwilightAmount * (0.22 + 0.34 * twilightFacing);
+      col = mix(col, litCloud, wispAlpha);
+    }
   }
 
   if (uStarOp > 0.05 && d.y > 0.06) {
     // 晴夜淡墨银汉：斜贯天顶的水墨星河晕带，云厚雨重时自然淡隐
     vec3 mwAxis = normalize(vec3(0.46, 0.56, -0.68));
     float mwBand = exp(-pow(abs(dot(d, mwAxis)) * 5.2, 2.0)) * smoothstep(0.08, 0.34, d.y);
-    float mwFbm = cfbm(vec2(d.x * 4.8 + d.z * 3.1, d.y * 5.2 - d.x * 2.4));
-    float mwMottle = smoothstep(0.30, 0.74, mwFbm) * (0.72 + 0.28 * cnoise(d.xz * 14.0));
-    float mwAlpha = mwBand * mwMottle * smoothstep(0.05, 0.75, uStarOp) * (1.0 - clamp(uCloudCover * 0.70, 0.0, 0.78));
-    col += vec3(0.12, 0.16, 0.22) * mwAlpha;
+    if (mwBand > 0.001) {
+      float mwFbm = cfbm3(vec2(d.x * 4.8 + d.z * 3.1, d.y * 5.2 - d.x * 2.4));
+      float mwMottle = smoothstep(0.30, 0.74, mwFbm) * (0.72 + 0.28 * cnoise(d.xz * 14.0));
+      float mwAlpha = mwBand * mwMottle * smoothstep(0.05, 0.75, uStarOp) * (1.0 - clamp(uCloudCover * 0.70, 0.0, 0.78));
+      col += vec3(0.12, 0.16, 0.22) * mwAlpha;
+    }
   }
 
   gl_FragColor = vec4(col, 1.0);

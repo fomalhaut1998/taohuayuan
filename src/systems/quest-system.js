@@ -693,7 +693,7 @@ export function createQuestSystem(options = {}) {
   let wasLocked = false;
   let suppressCloseRestore = false;
   let activeTab = 'main';
-  let trackerCollapsed = Boolean(win?.innerWidth && win.innerWidth <= 600);
+  let trackerCollapsed = Boolean(win && ((win.innerWidth && win.innerWidth <= 600) || (win.innerHeight && win.innerHeight <= 520)));
   let lastTrackerSig = '';
 
   const pavilionReg = leisureGrove?.layout?.regions?.find?.(r => r?.kind === 'pavilion') || null;

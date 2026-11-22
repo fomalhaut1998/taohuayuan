@@ -13,6 +13,9 @@ function isLeft(code) {
 function isRight(code) {
   return code === 'KeyD' || code === 'ArrowRight';
 }
+function isHeldMoveKey(code) {
+  return isForward(code) || isBack(code) || isLeft(code) || isRight(code) || code === 'ShiftLeft' || code === 'ShiftRight';
+}
 function angleLerp(a, b, k) {
   let d = b - a;
   while (d > Math.PI) d -= Math.PI * 2;
@@ -248,7 +251,7 @@ export function createPlayer(canvas, cfg, field, terrainCfg, hintEl, options) {
       e.preventDefault();
       toggleView();
     }
-    keys.add(e.code);
+    if (isHeldMoveKey(e.code)) keys.add(e.code);
     if (e.code === 'Space') {
       if (!e.repeat && canTriggerJump()) {
         e.preventDefault();

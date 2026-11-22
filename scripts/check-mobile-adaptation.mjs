@@ -302,6 +302,26 @@ try {
   assert.ok(soundSrc.includes("ctx.state === 'interrupted'") && sampleAudioSrc.includes("ctx.state === 'interrupted'"), 'sound & sample-audio recover iOS interrupted AudioContext');
   assert.ok(mainSrc.includes('baseCameraFov') && mainSrc.includes('orientationchange') && mainSrc.includes('visualViewport'), 'main.js adapts portrait FOV and orientation/visualViewport resize');
   assert.equal(/\bconsole\.log\s*\(/.test(touchSrc), false, 'touch-controls.js contains zero console.log');
+  assert.ok(/\.touch-pill\s*\{(?:(?!\n\}).)*touch-action:\s*none;/s.test(touchSrc), 'touch-controls.js sets touch-action: none on .touch-pill');
+  assert.ok(/#touch-actions,\s*#touch-flight-pad\s*\{[^}]*pointer-events:\s*none;/s.test(touchSrc), 'touch-controls.js sets pointer-events: none on #touch-actions and #touch-flight-pad');
+  assert.ok(touchSrc.includes('#hud-top-dock > button span'), 'touch-controls.js hides keycap hints on all #hud-top-dock buttons');
+  for (const cssVar of ['--hud-dock-bottom', '--hud-sky-bottom', '--hud-after-footer', '--hud-after-toggle', '--hud-controls-top']) {
+    assert.ok(touchSrc.includes(cssVar), `touch-controls.js defines dynamic layout variable ${cssVar}`);
+  }
+  assert.equal(/body\.touch-active\s+#journal-open\s*\{/.test(touchSrc), false, 'touch-controls.js removes legacy hardcoded #journal-open left offset');
+  assert.equal(/body\.ui-hidden\s+#touch-controls\b/.test(touchSrc), false, 'ui-hidden does not hide the entire #touch-controls container');
+  for (const hiddenSel of [
+    'body.ui-hidden #touch-pentatonic',
+    'body.ui-hidden #touch-act-o',
+    'body.ui-hidden #touch-act-c',
+    'body.ui-hidden #touch-act-g',
+    'body.ui-hidden #touch-act-m',
+    'body.ui-hidden #touch-actions:not(.is-aboard) #touch-act-e',
+    'body.ui-hidden #touch-actions.is-aboard #touch-act-jump'
+  ]) {
+    assert.ok(touchSrc.includes(hiddenSel), `touch-controls.js hides ${hiddenSel} under ui-hidden`);
+  }
+  assert.ok(/body\.touch-active\.ui-hidden\s+#touch-stick\s*\{[^}]*opacity:\s*0\.[45]/s.test(touchSrc), 'touch-controls.js dims #touch-stick slightly when resting under ui-hidden');
 
   // 2. Player analog touch speed, touch sprint, clickable #view, pointer-lock bypass on coarse
   const env = makeMockEnv({ coarse: true, width: 390, height: 844 });
@@ -390,7 +410,9 @@ try {
     doc: env.doc,
     win: env.win
   });
-  const quiet = createQuiet(player, canvas, [{ x: player.state.x, z: player.state.z, radius: 10, name: '溪声' }], {
+  const startX = player.state.x;
+  const startZ = player.state.z;
+  const quiet = createQuiet(player, canvas, [{ x: startX, z: startZ, radius: 10, name: '溪声' }], {
     doc: env.doc,
     win: env.win
   });
@@ -427,21 +449,119 @@ try {
   stickZone.dispatch('touchend', { changedTouches: [{ identifier: 10, clientX: 60, clientY: 616 }] });
   assert.equal(tc.getStats().sprinting, false, 'releasing stick clears sprint');
 
-  // God flight routing through touch controls
+  // 4B. Multi-touch: hold joystick forward + jump button + camera look + repeated jump after clearInput + ghost-click suppression
+  const jumpBtn = env.doc.getElementById('touch-act-jump');
+  assert.ok(jumpBtn, 'mounts #touch-act-jump');
+  player.state.y = 0;
+  player.state.grounded = true;
+  player.state.airborne = false;
+  player.state.vy = 0;
+  const pressesBeforeMulti = tc.getStats().actionPresses;
+
+  // Finger 1 (id 10): push stick forward
+  stickZone.dispatch('touchstart', { changedTouches: [{ identifier: 10, clientX: 60, clientY: 660 }] });
+  stickZone.dispatch('touchmove', { changedTouches: [{ identifier: 10, clientX: 60, clientY: 618 }] });
+  assert.ok(tc.getStats().stick.z > 0.7, 'finger 10 holds stick forward');
+
+  // Finger 2 (id 11): drag canvas simultaneously to rotate camera
+  const yawBeforeMulti = player.state.targetYaw;
+  canvas.dispatch('touchstart', {
+    changedTouches: [{ identifier: 11, clientX: 240, clientY: 420 }],
+    touches: [{ identifier: 10, clientX: 60, clientY: 618 }, { identifier: 11, clientX: 240, clientY: 420 }]
+  });
+  canvas.dispatch('touchmove', {
+    changedTouches: [{ identifier: 11, clientX: 270, clientY: 410 }],
+    touches: [{ identifier: 10, clientX: 60, clientY: 618 }, { identifier: 11, clientX: 270, clientY: 410 }]
+  });
+  assert.ok(player.state.targetYaw < yawBeforeMulti, '3-finger look drag rotates camera while stick is held');
+
+  // Finger 3 (id 12): tap jump button via touchstart while stick & look remain active
+  jumpBtn.dispatch('touchstart', {
+    changedTouches: [{ identifier: 12, clientX: 310, clientY: 790 }],
+    touches: [
+      { identifier: 10, clientX: 60, clientY: 618 },
+      { identifier: 11, clientX: 270, clientY: 410 },
+      { identifier: 12, clientX: 310, clientY: 790 }
+    ]
+  });
+  // Synthetic ghost click shortly after touchstart must be suppressed
+  jumpBtn.dispatch('click');
+  assert.equal(tc.getStats().actionPresses, pressesBeforeMulti + 1, 'touchstart jump triggers once & suppresses ghost click');
+
+  player.update(0.05, cam);
+  assert.equal(player.state.airborne, true, 'simultaneous touch jump enters airborne state while joystick held forward');
+  assert.ok(player.state.speed > 0.5, 'joystick forward speed remains active during jump');
+
+  // Releasing jump (id 12) and look (id 11) leaves joystick (id 10) intact
+  jumpBtn.dispatch('touchend', {
+    changedTouches: [{ identifier: 12, clientX: 310, clientY: 790 }],
+    touches: [{ identifier: 10, clientX: 60, clientY: 618 }, { identifier: 11, clientX: 270, clientY: 410 }]
+  });
+  canvas.dispatch('touchend', {
+    changedTouches: [{ identifier: 11, clientX: 270, clientY: 410 }],
+    touches: [{ identifier: 10, clientX: 60, clientY: 618 }]
+  });
+  assert.ok(tc.getStats().stick.z > 0.7, 'stick remains active after releasing jump & look fingers');
+
+  // Land, clearInput(), then jump again to ensure Space never locks in suspendedKeys
+  for (let i = 0; i < 30; i++) player.update(0.05, cam);
+  assert.equal(player.state.grounded, true, 'player lands back cleanly');
+  stickZone.dispatch('touchend', { changedTouches: [{ identifier: 10, clientX: 60, clientY: 618 }], touches: [] });
+  assert.equal(tc.getStats().stick.z, 0, 'releasing stick finger zeroes stick');
+  player.clearInput();
+
+  stickZone.dispatch('touchstart', { changedTouches: [{ identifier: 15, clientX: 60, clientY: 660 }] });
+  stickZone.dispatch('touchmove', { changedTouches: [{ identifier: 15, clientX: 60, clientY: 620 }] });
+  jumpBtn.dispatch('touchstart', { changedTouches: [{ identifier: 16, clientX: 310, clientY: 790 }] });
+  jumpBtn.dispatch('touchend', { changedTouches: [{ identifier: 16, clientX: 310, clientY: 790 }] });
+  player.update(0.05, cam);
+  assert.equal(player.state.airborne, true, 'touch jump still works after player.clearInput()');
+  for (let i = 0; i < 30; i++) player.update(0.05, cam);
+  stickZone.dispatch('touchend', { changedTouches: [{ identifier: 15, clientX: 60, clientY: 620 }] });
+  player.clearInput();
+  player.state.x = startX;
+  player.state.z = startZ;
+  player.state.y = 0;
+  player.state.yaw = world.player.spawn.yaw;
+  player.state.targetYaw = world.player.spawn.yaw;
+  player.state.pitch = world.player.spawn.pitch ?? 0;
+  player.state.targetPitch = world.player.spawn.pitch ?? 0;
+
+  // God flight routing & multi-touch through touch controls
   godFlight.enter();
   tc.update(0.2);
   const flyPad = env.doc.getElementById('touch-flight-pad');
   assert.equal(flyPad.hidden, false, 'flight pad appears in god-flight mode');
   const flyBeforeY = godFlight.getState().y;
-  env.doc.getElementById('touch-fly-up').dispatch('touchstart');
-  for (let i = 0; i < 10; i++) godFlight.update(0.05);
-  env.doc.getElementById('touch-fly-up').dispatch('touchend');
-  assert.ok(godFlight.getState().y > flyBeforeY + 4, 'holding touch-fly-up ascends camera in god-flight');
   const flyYawBefore = godFlight.getState().yaw;
-  canvas.dispatch('touchstart', { changedTouches: [{ identifier: 11, clientX: 280, clientY: 400 }] });
-  canvas.dispatch('touchmove', { changedTouches: [{ identifier: 11, clientX: 320, clientY: 380 }] });
-  canvas.dispatch('touchend', { changedTouches: [{ identifier: 11, clientX: 320, clientY: 380 }] });
-  assert.ok(godFlight.getState().yaw < flyYawBefore, 'canvas touch drag rotates god-flight camera');
+  stickZone.dispatch('touchstart', { changedTouches: [{ identifier: 30, clientX: 60, clientY: 660 }] });
+  stickZone.dispatch('touchmove', { changedTouches: [{ identifier: 30, clientX: 60, clientY: 620 }] });
+  env.doc.getElementById('touch-fly-up').dispatch('touchstart', { changedTouches: [{ identifier: 31, clientX: 300, clientY: 720 }] });
+  canvas.dispatch('touchstart', { changedTouches: [{ identifier: 32, clientX: 280, clientY: 400 }] });
+  canvas.dispatch('touchmove', { changedTouches: [{ identifier: 32, clientX: 320, clientY: 380 }] });
+  for (let i = 0; i < 6; i++) godFlight.update(0.05);
+  const yStartDelta = godFlight.getState().y;
+  for (let i = 0; i < 4; i++) godFlight.update(0.05);
+  const yDeltaWhileUp = godFlight.getState().y - yStartDelta;
+  assert.ok(godFlight.getState().y > flyBeforeY + 3 && yDeltaWhileUp > 2, 'holding touch-fly-up ascends camera while stick & look are active');
+  assert.ok(godFlight.getState().yaw < flyYawBefore, 'canvas touch drag rotates god-flight camera during multi-touch');
+  env.doc.getElementById('touch-fly-up').dispatch('touchend', { changedTouches: [{ identifier: 31, clientX: 300, clientY: 720 }] });
+  assert.ok(tc.getStats().stick.z > 0.7, 'god-flight stick remains held after releasing touch-fly-up');
+  const flyAfterReleaseY = godFlight.getState().y;
+  for (let i = 0; i < 4; i++) godFlight.update(0.05);
+  const yDeltaAfterRelease = godFlight.getState().y - flyAfterReleaseY;
+  assert.ok(yDeltaAfterRelease < yDeltaWhileUp * 0.4, `releasing touch-fly-up stops vertical climb (${yDeltaWhileUp.toFixed(2)} -> ${yDeltaAfterRelease.toFixed(2)})`);
+  canvas.dispatch('touchend', { changedTouches: [{ identifier: 32, clientX: 320, clientY: 380 }] });
+  stickZone.dispatch('touchend', { changedTouches: [{ identifier: 30, clientX: 60, clientY: 620 }] });
+  const yAfterStickRelease = godFlight.getState().y;
+  for (let i = 0; i < 4; i++) godFlight.update(0.05);
+  assert.ok(Math.abs(godFlight.getState().y - yAfterStickRelease) < 1e-6, 'god-flight stops cleanly once stick & vertical are released');
+  // Also preserve backward compatibility when synthetic touchstart/touchend omits changedTouches
+  const ySynthBefore = godFlight.getState().y;
+  env.doc.getElementById('touch-fly-up').dispatch('touchstart');
+  for (let i = 0; i < 4; i++) godFlight.update(0.05);
+  env.doc.getElementById('touch-fly-up').dispatch('touchend');
+  assert.ok(godFlight.getState().y > ySynthBefore + 1.5, 'touch-fly-up handles synthetic events without changedTouches');
   env.doc.getElementById('touch-fly-exit').dispatch('click');
   assert.equal(godFlight.active, false, 'touch-fly-exit exits god flight');
   tc.update(0.2);
@@ -515,6 +635,15 @@ try {
   assert.equal(promptEl.classList.contains('show'), true, 'prompt shows when facing NPC');
   promptEl.dispatch('click');
   assert.equal(greeted, 1, 'tapping #prompt triggers NPC interaction');
+  // Also verify multi-touch tap on #prompt while stick is held dispatches KeyE without dropping stick
+  interaction.update(5, 5, cam);
+  stickZone.dispatch('touchstart', { changedTouches: [{ identifier: 40, clientX: 60, clientY: 660 }] });
+  stickZone.dispatch('touchmove', { changedTouches: [{ identifier: 40, clientX: 60, clientY: 625 }] });
+  promptEl.dispatch('touchstart', { changedTouches: [{ identifier: 41, clientX: 195, clientY: 450 }] });
+  assert.equal(greeted, 2, 'multi-touch touchstart on #prompt triggers NPC interaction while stick held');
+  assert.ok(tc.getStats().stick.z > 0.5, 'stick stays active after multi-touch #prompt tap');
+  stickZone.dispatch('touchend', { changedTouches: [{ identifier: 40, clientX: 60, clientY: 625 }] });
+  player.clearInput();
 
   const discovery = createDiscovery({
     world,
@@ -632,6 +761,92 @@ try {
   assert.equal(captureOpened, 1, 'tapping #cruise-capture opens scroll studio capture');
   guide.stopCruise();
   assert.equal(captureBtn.hidden, true, 'cruise-capture hides when cruise stops');
+
+  // 8B. ui-hidden retains essential mobile locomotion & unstuck controls while hiding non-essential buttons
+  env.body.classList.add('ui-hidden');
+  tc.update(0.2);
+  assert.equal(pentEl.hidden, true, 'pentatonic strip stays hidden during ui-hidden even at poetic spot');
+
+  stickZone.dispatch('touchstart', { changedTouches: [{ identifier: 50, clientX: 60, clientY: 660 }] });
+  stickZone.dispatch('touchmove', { changedTouches: [{ identifier: 50, clientX: 60, clientY: 618 }] });
+  assert.ok(tc.getStats().stick.z > 0.7, 'joystick moves character forward during ui-hidden');
+  assert.equal(stickEl.classList.contains('is-active'), true, 'joystick gets is-active while touched under ui-hidden');
+  stickZone.dispatch('touchend', { changedTouches: [{ identifier: 50, clientX: 60, clientY: 618 }], touches: [] });
+  assert.equal(stickEl.classList.contains('is-active'), false, 'joystick clears is-active when released');
+
+  const yawBeforeUiHidden = player.state.targetYaw;
+  canvas.dispatch('touchstart', { changedTouches: [{ identifier: 51, clientX: 240, clientY: 420 }], touches: [{ identifier: 51, clientX: 240, clientY: 420 }] });
+  canvas.dispatch('touchmove', { changedTouches: [{ identifier: 51, clientX: 276, clientY: 410 }], touches: [{ identifier: 51, clientX: 276, clientY: 410 }] });
+  canvas.dispatch('touchend', { changedTouches: [{ identifier: 51, clientX: 276, clientY: 410 }], touches: [] });
+  assert.ok(player.state.targetYaw < yawBeforeUiHidden, 'canvas touch drag rotates camera during ui-hidden');
+
+  player.state.y = 0;
+  player.state.grounded = true;
+  player.state.airborne = false;
+  player.state.vy = 0;
+  jumpBtn.dispatch('touchstart', { changedTouches: [{ identifier: 52, clientX: 310, clientY: 790 }] });
+  jumpBtn.dispatch('touchend', { changedTouches: [{ identifier: 52, clientX: 310, clientY: 790 }] });
+  player.update(0.05, cam);
+  assert.equal(player.state.airborne, true, 'jump button remains functional during ui-hidden');
+  for (let i = 0; i < 30; i++) player.update(0.05, cam);
+  player.clearInput();
+
+  const pressesBeforeIgnored = tc.getStats().actionPresses;
+  for (const ignoredId of ['touch-act-m', 'touch-act-g', 'touch-act-o', 'touch-act-c', 'touch-act-e']) {
+    env.doc.getElementById(ignoredId).dispatch('click');
+  }
+  assert.equal(tc.getStats().actionPresses, pressesBeforeIgnored, 'non-essential action buttons do not trigger during ui-hidden on foot');
+  assert.equal(map.isOpen(), false, 'map button stays ignored during ui-hidden');
+
+  // Aboard skiff in ui-hidden: drift (X) & disembark (E) remain usable
+  assert.equal(skiff.board(true), true, 'boards skiff for ui-hidden skiff control check');
+  tc.update(0.2);
+  const actionsEl = env.doc.getElementById('touch-actions');
+  const driftBtn = env.doc.getElementById('touch-act-drift');
+  assert.equal(actionsEl.classList.contains('is-aboard'), true, '#touch-actions reflects is-aboard');
+  assert.equal(driftBtn.hidden, false, 'drift button shows when aboard during ui-hidden');
+  for (let i = 0; i < 6; i++) skiff.update(0.05, i * 0.05, null, player.state, cam, false);
+  driftBtn.dispatch('click');
+  assert.equal(skiff.isDrifting(), true, 'drift button toggles skiff drift during ui-hidden');
+  env.doc.getElementById('touch-act-e').dispatch('click');
+  assert.equal(skiff.isAboard(), false, 'disembark button still exits skiff during ui-hidden');
+  assert.equal(player.state.aboardSkiff, false, 'player aboardSkiff clears after disembark in ui-hidden');
+  tc.update(0.2);
+  assert.equal(actionsEl.classList.contains('is-aboard'), false, '#touch-actions clears is-aboard after disembark');
+  assert.equal(driftBtn.hidden, true, 'drift button hides after disembark');
+
+  // God-flight in ui-hidden: flight pad & joystick/look remain active
+  godFlight.enter();
+  tc.update(0.2);
+  assert.equal(flyPad.hidden, false, 'flight pad remains visible during ui-hidden');
+  const flyHiddenBeforeY = godFlight.getState().y;
+  const flyHiddenYawBefore = godFlight.getState().yaw;
+  stickZone.dispatch('touchstart', { changedTouches: [{ identifier: 53, clientX: 60, clientY: 660 }] });
+  stickZone.dispatch('touchmove', { changedTouches: [{ identifier: 53, clientX: 60, clientY: 620 }] });
+  env.doc.getElementById('touch-fly-up').dispatch('touchstart', { changedTouches: [{ identifier: 54, clientX: 300, clientY: 720 }] });
+  canvas.dispatch('touchstart', { changedTouches: [{ identifier: 55, clientX: 280, clientY: 400 }] });
+  canvas.dispatch('touchmove', { changedTouches: [{ identifier: 55, clientX: 318, clientY: 382 }] });
+  for (let i = 0; i < 6; i++) godFlight.update(0.05);
+  assert.ok(godFlight.getState().y > flyHiddenBeforeY + 2, 'god-flight ascend works during ui-hidden');
+  assert.ok(godFlight.getState().yaw < flyHiddenYawBefore, 'god-flight look drag works during ui-hidden');
+  env.doc.getElementById('touch-fly-up').dispatch('touchend', { changedTouches: [{ identifier: 54, clientX: 300, clientY: 720 }] });
+  canvas.dispatch('touchend', { changedTouches: [{ identifier: 55, clientX: 318, clientY: 382 }] });
+  stickZone.dispatch('touchend', { changedTouches: [{ identifier: 53, clientX: 60, clientY: 620 }] });
+  env.doc.getElementById('touch-fly-exit').dispatch('click');
+  assert.equal(godFlight.active, false, 'touch-fly-exit exits god-flight during ui-hidden');
+  tc.update(0.2);
+  assert.equal(flyPad.hidden, true, 'flight pad hides after exiting god-flight');
+
+  // Real modal still blocks touch controls even when ui-hidden is set
+  env.body.classList.add('map-open');
+  stickZone.dispatch('touchstart', { changedTouches: [{ identifier: 56, clientX: 60, clientY: 660 }] });
+  stickZone.dispatch('touchmove', { changedTouches: [{ identifier: 56, clientX: 60, clientY: 618 }] });
+  assert.equal(tc.getStats().stick.z, 0, 'real modal still blocks touch joystick while ui-hidden is active');
+  env.body.classList.remove('map-open');
+
+  env.body.classList.remove('ui-hidden');
+  tc.update(0.2);
+  assert.equal(pentEl.hidden, false, 'pentatonic strip restores cleanly when exiting ui-hidden');
 
   // 9. Scroll Studio dynamic dialog title ('宣纸横卷题跋' <-> '宣纸立轴题跋')
   const studio = createScrollStudio({

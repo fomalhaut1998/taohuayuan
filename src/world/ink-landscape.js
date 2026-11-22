@@ -50,6 +50,9 @@ float inkFbm2(vec2 p) {
   v += 0.16 * inkNoise2(p * 4.19 + vec2(7.3, 5.1));
   return v;
 }
+float inkFbm2Lite(vec2 p) {
+  return 0.65 * inkNoise2(p) + 0.35 * inkNoise2(p * 2.07 + vec2(3.7, 1.9));
+}
 `;
 
 export function createMountainHaze(materials, cfg) {
@@ -127,12 +130,12 @@ export function createMountainHaze(materials, cfg) {
           'float inkAz = atan(inkRel.y, inkRel.x);\n' +
           'vec2 horDir = normalize(inkRel + vec2(0.0001));\n' +
           'float sunAlign = pow(clamp(dot(horDir, normalize(uInkMountainSunXZ)) * 0.5 + 0.5, 0.0, 1.0), 2.3);\n' +
-          'vec2 azCircle = vec2(cos(inkAz), sin(inkAz)) * 6.5;\n' +
+          'vec2 azCircle = horDir * 6.5;\n' +
           'float ridgeSpur = clamp(vInkRidgeInfo.x, -1.0, 1.0);\n' +
           'float sunAspect = clamp(vInkRidgeInfo.y, -1.0, 1.0);\n' +
           // 顺山势斜披的宋元披麻皴与折带岩脉（二维值噪声 FBM，彻底告别周期正弦条码纹）
           'vec2 pimaCoord = vec2(inkAz * 13.5 + vInkMountainWorld.y * 0.024 * (sunAspect >= 0.0 ? 1.0 : -1.0), vInkMountainWorld.y * 0.082 - ridgeSpur * 0.65);\n' +
-          'float pimaWarp = inkFbm2(azCircle + vec2(0.0, vInkMountainWorld.y * 0.035)) - 0.5;\n' +
+          'float pimaWarp = inkFbm2Lite(azCircle + vec2(0.0, vInkMountainWorld.y * 0.035)) - 0.5;\n' +
           'float pimaCoarse = inkFbm2(pimaCoord + vec2(pimaWarp * 1.35, -pimaWarp * 0.55));\n' +
           'float pimaFine = inkNoise2(pimaCoord * vec2(2.6, 1.45) + vec2(4.2, pimaWarp * 2.1));\n' +
           'float inkFiber = (pimaCoarse * 0.66 + pimaFine * 0.34) * 2.0 - 1.0;\n' +
@@ -172,14 +175,22 @@ export function createMountainHaze(materials, cfg) {
           '}\n' +
           // 「山无云不活、远山无脚」：风驱双层山腰游云流岚（下层谷间深岚 + 上层肩际飞云丝缕）+ 三远递进薄岚消隐
           'float drift = uInkMountainWindDrift;\n' +
-          'float waistNoise = inkFbm2(vec2(inkAz * 3.4 - drift, vInkMountainWorld.y * 0.065 + uInkMountainWaistY * 0.13));\n' +
-          'float waistCenter = uInkMountainWaistY + (waistNoise - 0.5) * 8.6;\n' +
-          'float waistBand = exp(-pow((vInkMountainWorld.y - waistCenter) * 0.18, 2.0));\n' +
-          'float waistSpan = smoothstep(0.28, 0.68, inkFbm2(azCircle * 0.62 + vec2(drift * 1.65, uInkMountainWaistY * 0.2)));\n' +
-          'float upperNoise = inkFbm2(vec2(inkAz * 4.8 - drift * 1.65 + 4.1, vInkMountainWorld.y * 0.08 + uInkMountainWaistY * 0.27));\n' +
-          'float upperCenter = uInkMountainWaistY + 11.5 + (upperNoise - 0.5) * 6.4;\n' +
-          'float upperBand = exp(-pow((vInkMountainWorld.y - upperCenter) * 0.28, 2.0));\n' +
-          'float upperSpan = smoothstep(0.38, 0.76, inkFbm2(azCircle * 0.88 - vec2(drift * 2.2, uInkMountainWaistY * 0.35 + 2.7)));\n' +
+          'float waistBand = 0.0;\n' +
+          'float waistSpan = 0.0;\n' +
+          'if (abs(vInkMountainWorld.y - uInkMountainWaistY) < 19.0) {\n' +
+          '  float waistNoise = inkFbm2Lite(vec2(inkAz * 3.4 - drift, vInkMountainWorld.y * 0.065 + uInkMountainWaistY * 0.13));\n' +
+          '  float waistCenter = uInkMountainWaistY + (waistNoise - 0.5) * 8.6;\n' +
+          '  waistBand = exp(-pow((vInkMountainWorld.y - waistCenter) * 0.18, 2.0));\n' +
+          '  if (waistBand > 0.003) waistSpan = smoothstep(0.28, 0.68, inkFbm2Lite(azCircle * 0.62 + vec2(drift * 1.65, uInkMountainWaistY * 0.2)));\n' +
+          '}\n' +
+          'float upperBand = 0.0;\n' +
+          'float upperSpan = 0.0;\n' +
+          'if (abs(vInkMountainWorld.y - (uInkMountainWaistY + 11.5)) < 14.0) {\n' +
+          '  float upperNoise = inkFbm2Lite(vec2(inkAz * 4.8 - drift * 1.65 + 4.1, vInkMountainWorld.y * 0.08 + uInkMountainWaistY * 0.27));\n' +
+          '  float upperCenter = uInkMountainWaistY + 11.5 + (upperNoise - 0.5) * 6.4;\n' +
+          '  upperBand = exp(-pow((vInkMountainWorld.y - upperCenter) * 0.28, 2.0));\n' +
+          '  if (upperBand > 0.003) upperSpan = smoothstep(0.38, 0.76, inkFbm2Lite(azCircle * 0.88 - vec2(drift * 2.2, uInkMountainWaistY * 0.35 + 2.7)));\n' +
+          '}\n' +
           'float upperSilk = upperBand * upperSpan * (0.20 + 0.42 * uInkMountainCloudMood) * (1.0 - inkCrest * 0.38);\n' +
           'float gullyMist = max(0.0, -ridgeSpur) * (1.0 - inkCrest) * (0.22 + 0.14 * uInkMountainCloudMood);\n' +
           'float waistVeil = (waistBand * waistSpan * (0.42 + 0.32 * uInkMountainCloudMood + 0.18 * uInkMountainRain + 0.18 * uInkMountainSnow) + upperSilk + gullyMist) * (1.0 - inkFar * 0.24);\n' +

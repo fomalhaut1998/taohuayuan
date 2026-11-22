@@ -1,5 +1,7 @@
 // Fresh four-season storybook illustration cover, click-to-enter loading progress bar,
 // gentle post-entry guide, valley emergence bloom, and Act 3 transition/epilogue scroll.
+import { PROJECT_META } from './project-meta.js';
+
 const SEASON_ORDER = ['spring', 'summer', 'autumn', 'winter'];
 
 const COVER_SEASONS = Object.freeze({
@@ -143,6 +145,8 @@ export function createOpeningCurtain(options = {}) {
   const epilogueEl = veilEl?.querySelector?.('.ink-epilogue-scroll') || null;
   const lingerBtn = veilEl?.querySelector?.('#epilogue-linger') || (hasDom ? document.getElementById('epilogue-linger') : null);
   const replayBtn = veilEl?.querySelector?.('#epilogue-replay') || (hasDom ? document.getElementById('epilogue-replay') : null);
+  const versionEls = veilEl?.querySelectorAll?.('[data-app-version]') || [];
+  for (const el of versionEls) el.textContent = PROJECT_META.versionLabel;
 
   // Ambient floating seasonal particles & gentle mouse parallax state (active only while cover is visible)
   let petalsCtx = null;
@@ -454,7 +458,7 @@ export function createOpeningCurtain(options = {}) {
   function onVeilBackdropClick(event) {
     if (open || disposed || !event) return;
     const target = event.target;
-    if (target && typeof target.closest === 'function' && target.closest('#cover-enter-btn, .cover-season-bar')) {
+    if (target && typeof target.closest === 'function' && target.closest('#cover-enter-btn, .cover-season-bar, .cover-open-source')) {
       return;
     }
     if (petalsCtx && !reducedMotion && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
@@ -769,7 +773,7 @@ export function createOpeningCurtain(options = {}) {
     }
     if (event.key === 'Enter' || event.key === ' ' || event.code === 'Space') {
       const activeEl = hasDom ? document.activeElement : null;
-      if (activeEl && activeEl.classList?.contains?.('cover-season-btn')) return;
+      if (activeEl && (activeEl.classList?.contains?.('cover-season-btn') || activeEl.closest?.('.cover-open-source') || activeEl.tagName === 'A')) return;
       event.preventDefault?.();
       startEntry();
     }

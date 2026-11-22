@@ -83,23 +83,104 @@ function smoothstep(a, b, x) {
   return t * t * (3 - 2 * t);
 }
 
-// 到折线（河道中轴）的最短距离
+// 到折线（河道中轴）的最短距离：16 段 AABB 分块下界剪枝，结果逐位一致
 export function createRiverDistance(points) {
-  const pts = points.map(function (p) { return [p[0], p[1]]; });
+  const segCount = Math.max(0, (points?.length || 0) - 1);
+  if (segCount === 0) {
+    return function distanceToRiver() { return Infinity; };
+  }
+  const axArr = new Float64Array(segCount);
+  const azArr = new Float64Array(segCount);
+  const dxArr = new Float64Array(segCount);
+  const dzArr = new Float64Array(segCount);
+  const len2Arr = new Float64Array(segCount);
+  for (let i = 0; i < segCount; i++) {
+    const ax = points[i][0], az = points[i][1];
+    const bx = points[i + 1][0], bz = points[i + 1][1];
+    const dx = bx - ax, dz = bz - az;
+    axArr[i] = ax;
+    azArr[i] = az;
+    dxArr[i] = dx;
+    dzArr[i] = dz;
+    len2Arr[i] = dx * dx + dz * dz;
+  }
+
+  if (segCount < 24) {
+    return function distanceToRiver(x, z) {
+      let best = Infinity;
+      for (let i = 0; i < segCount; i++) {
+        const ax = axArr[i], az = azArr[i], dx = dxArr[i], dz = dzArr[i], len2 = len2Arr[i];
+        let t = len2 > 0 ? ((x - ax) * dx + (z - az) * dz) / len2 : 0;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        const px = ax + dx * t - x;
+        const pz = az + dz * t - z;
+        const d2 = px * px + pz * pz;
+        if (d2 < best) best = d2;
+      }
+      return Math.sqrt(best);
+    };
+  }
+
+  const CHUNK_SIZE = 16;
+  const numChunks = Math.ceil(segCount / CHUNK_SIZE);
+  const cMinX = new Float64Array(numChunks);
+  const cMaxX = new Float64Array(numChunks);
+  const cMinZ = new Float64Array(numChunks);
+  const cMaxZ = new Float64Array(numChunks);
+  const cStart = new Int32Array(numChunks);
+  const cEnd = new Int32Array(numChunks);
+  const chunkD2 = new Float64Array(numChunks);
+  for (let c = 0; c < numChunks; c++) {
+    const s0 = c * CHUNK_SIZE;
+    const s1 = Math.min(segCount, s0 + CHUNK_SIZE);
+    cStart[c] = s0;
+    cEnd[c] = s1;
+    let mnX = Infinity, mxX = -Infinity, mnZ = Infinity, mxZ = -Infinity;
+    for (let i = s0; i < s1; i++) {
+      const x0 = axArr[i], z0 = azArr[i];
+      const x1 = x0 + dxArr[i], z1 = z0 + dzArr[i];
+      if (x0 < mnX) mnX = x0; if (x0 > mxX) mxX = x0;
+      if (x1 < mnX) mnX = x1; if (x1 > mxX) mxX = x1;
+      if (z0 < mnZ) mnZ = z0; if (z0 > mxZ) mxZ = z0;
+      if (z1 < mnZ) mnZ = z1; if (z1 > mxZ) mxZ = z1;
+    }
+    cMinX[c] = mnX; cMaxX[c] = mxX;
+    cMinZ[c] = mnZ; cMaxZ[c] = mxZ;
+  }
+
   return function distanceToRiver(x, z) {
+    let bestChunk = 0;
+    let minChunkD2 = Infinity;
+    for (let c = 0; c < numChunks; c++) {
+      const cdx = x < cMinX[c] ? cMinX[c] - x : (x > cMaxX[c] ? x - cMaxX[c] : 0);
+      const cdz = z < cMinZ[c] ? cMinZ[c] - z : (z > cMaxZ[c] ? z - cMaxZ[c] : 0);
+      const cd2 = cdx * cdx + cdz * cdz;
+      chunkD2[c] = cd2;
+      if (cd2 < minChunkD2) { minChunkD2 = cd2; bestChunk = c; }
+    }
+
     let best = Infinity;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const ax = pts[i][0];
-      const az = pts[i][1];
-      const dx = pts[i + 1][0] - ax;
-      const dz = pts[i + 1][1] - az;
-      const len2 = dx * dx + dz * dz;
+    for (let i = cStart[bestChunk], end = cEnd[bestChunk]; i < end; i++) {
+      const ax = axArr[i], az = azArr[i], dx = dxArr[i], dz = dzArr[i], len2 = len2Arr[i];
       let t = len2 > 0 ? ((x - ax) * dx + (z - az) * dz) / len2 : 0;
       t = t < 0 ? 0 : t > 1 ? 1 : t;
       const px = ax + dx * t - x;
       const pz = az + dz * t - z;
       const d2 = px * px + pz * pz;
       if (d2 < best) best = d2;
+    }
+
+    for (let c = 0; c < numChunks; c++) {
+      if (c === bestChunk || chunkD2[c] >= best) continue;
+      for (let i = cStart[c], end = cEnd[c]; i < end; i++) {
+        const ax = axArr[i], az = azArr[i], dx = dxArr[i], dz = dzArr[i], len2 = len2Arr[i];
+        let t = len2 > 0 ? ((x - ax) * dx + (z - az) * dz) / len2 : 0;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        const px = ax + dx * t - x;
+        const pz = az + dz * t - z;
+        const d2 = px * px + pz * pz;
+        if (d2 < best) best = d2;
+      }
     }
     return Math.sqrt(best);
   };

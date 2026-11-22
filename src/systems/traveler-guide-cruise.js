@@ -1,6 +1,7 @@
 // 桃源小笺（? 宣纸风物折页）与「入画巡游」（L 键一键自动山水巡航）
 import * as THREE from 'three';
 import { isModalBusy as sharedIsModalBusy } from './modal-state.js';
+import { PROJECT_META } from './project-meta.js';
 
 const SERIF = '"Songti SC", "STSong", "SimSun", "Noto Serif SC", serif';
 const STYLE_ID = 'traveler-guide-cruise-styles';
@@ -113,6 +114,72 @@ body:has(#veil.ink-epilogue) #guide-open {
 }
 .tguide__col ul { list-style: none; padding: 0; margin: 0; font-size: 13px; line-height: 1.85; color: #3d362e; }
 .tguide__col b { font-weight: 600; color: #241f1a; }
+.tguide__about {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(249, 243, 229, .72);
+  border: 1px solid rgba(154, 138, 114, .36);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tguide__about-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.tguide__about-tag {
+  flex: none;
+  padding: 2px 7px;
+  border: 1px solid rgba(164, 58, 46, .72);
+  color: #a43a2e;
+  font-size: 11px;
+  letter-spacing: .16em;
+  line-height: 1.5;
+  background: rgba(255, 250, 240, .85);
+}
+.tguide__about-desc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: #463e34;
+}
+.tguide__ver {
+  color: #241f1a;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.tguide__about-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.tguide__repo-link,
+.tguide__meta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  color: #2f2a24;
+  text-decoration: none;
+  background: rgba(252, 247, 236, .88);
+  border: 1px solid rgba(154, 138, 114, .48);
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+.tguide__repo-link:hover,
+.tguide__meta-link:hover {
+  color: #a43a2e;
+  border-color: rgba(164, 58, 46, .56);
+  background: rgba(255, 251, 242, .98);
+}
+.tguide__repo-link:focus-visible,
+.tguide__meta-link:focus-visible {
+  outline: 2px solid #a44f40;
+  outline-offset: 2px;
+}
 .tguide__foot {
   margin-top: 16px;
   padding-top: 12px;
@@ -214,7 +281,7 @@ body.touch-active .tguide__col--touch { display: block; }
     left: 50%;
     right: auto;
     transform: translateX(-50%);
-    bottom: max(68px, env(safe-area-inset-bottom, 0px) + 64px);
+    bottom: max(76px, env(safe-area-inset-bottom, 0px) + 72px);
     min-height: 40px;
     padding: 8px 18px;
   }
@@ -229,6 +296,8 @@ body.touch-active .tguide__col--touch { display: block; }
   }
   .tguide__head h2 { font-size: 20px; }
   .tguide__grid { grid-template-columns: 1fr; gap: 10px; }
+  .tguide__about-main { flex-direction: column; gap: 6px; }
+  .tguide__repo-link, .tguide__meta-link { min-height: 34px; padding: 6px 10px; }
   .tguide__foot {
     position: sticky;
     bottom: -12px;
@@ -777,6 +846,20 @@ export function createTravelerGuideAndCruise({
             '<li><b>临琴与静听</b>：落座或临琴畔出现「宫·商·角·徵·羽」轻触奏音；点「静」或提示条驻足静听</li>' +
           '</ul></section>' +
         '</div>' +
+        '<section class="tguide__about" aria-label="开源与版本信息">' +
+          '<div class="tguide__about-main">' +
+            '<span class="tguide__about-tag">开源志</span>' +
+            '<p class="tguide__about-desc">本项目基于 ' + PROJECT_META.license + ' 协议开源（当前版本 <b class="tguide__ver" data-app-version>' + PROJECT_META.versionLabel + '</b>），纯静态原生 WebGL 构建、无后端与运行时外部请求，欢迎查阅源码、反馈建议或共绘桃源。</p>' +
+          '</div>' +
+          '<div class="tguide__about-links">' +
+            '<a class="tguide__repo-link" id="tguide-repo-link" href="' + PROJECT_META.repoUrl + '" target="_blank" rel="noopener noreferrer">' +
+              '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>' +
+              '<span>GitHub · ' + PROJECT_META.repoSlug + '</span>' +
+            '</a>' +
+            '<a class="tguide__meta-link" id="tguide-releases-link" href="' + PROJECT_META.releasesUrl + '" target="_blank" rel="noopener noreferrer">' + PROJECT_META.versionLabel + ' 版本日志</a>' +
+            '<a class="tguide__meta-link" id="tguide-license-link" href="' + PROJECT_META.licenseUrl + '" target="_blank" rel="noopener noreferrer">' + PROJECT_META.license + ' 许可</a>' +
+          '</div>' +
+        '</section>' +
         '<footer class="tguide__foot">' +
           '<span>桃源无催促，任君行止。</span>' +
           '<div class="tguide__foot-actions">' +

@@ -1784,7 +1784,7 @@ export function createOuterWilds(options = {}) {
   mountainActorGroup.name = 'outer-wilds-actors';
   mountainActorGroup.userData.dynamic = true;
   interiorGroup.add(mountainActorGroup);
-  const mountainRig = createCommunityActors(mountainActorGroup, 7);
+  const mountainRig = options.actorRig ? options.actorRig.createChannel(mountainActorGroup, 7) : createCommunityActors(mountainActorGroup, 7);
 
   const lkCfg = cfg.sanctuaries.lankeCrag;
   const woodcutterWaypoints = [

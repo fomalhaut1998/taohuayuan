@@ -2887,7 +2887,7 @@ export function createWulingOutskirts(options = {}) {
 
   // ---- 5. 洞外与村口鲜活人物（分属 exteriorGroup 与 interiorGroup，严格服从门洞裁剪）----
   const exteriorRig = createCommunityActors(exteriorGroup, 4);
-  const interiorRig = createCommunityActors(interiorGroup, 4);
+  const interiorRig = options.actorRig ? options.actorRig.createChannel(interiorGroup, 4) : createCommunityActors(interiorGroup, 4);
   const liveActors = [];
 
   for (let idx = 0; idx < (config.actors || []).length; idx++) {

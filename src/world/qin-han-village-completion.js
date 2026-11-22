@@ -880,7 +880,7 @@ export function createQinHanCompletion(options = {}) {
   const nightActorGroup = new THREE.Group();
   nightActorGroup.name = 'qin-han-night-feast-actors';
   nightFeastGroup.add(nightActorGroup);
-  const nightActorRig = createCommunityActors(nightActorGroup, 3);
+  const nightActorRig = options.actorRig ? options.actorRig.createChannel(nightActorGroup, 3) : createCommunityActors(nightActorGroup, 3);
 
   const nightSk = createSink();
   const nightVillagers = [];

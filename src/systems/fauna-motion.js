@@ -18,12 +18,18 @@ export function faunaPartAngle(motion, state, options = FAUNA_MOTION_DEFAULTS) {
   const wave = Math.sin(phase + offset);
   let angle = 0;
   if (channel === 1) {
-    angle = wave * options.headIdle * awake + sleep * 0.22;
+    const headSleep = kind === FAUNA_KIND.dog ? 1.44 : kind === FAUNA_KIND.ox ? 0.30 : 0.22;
+    angle = wave * options.headIdle * awake + sleep * headSleep;
     if (kind === FAUNA_KIND.chicken) angle += Math.pow(Math.max(0, Math.sin(phase * 0.7)), 6) * options.peck * (1 - gait) * (1 - reaction) * awake;
     if (kind === FAUNA_KIND.ox) angle += reaction;
-  } else if (channel === 2) angle = wave * options.tailIdle * awake + (kind === FAUNA_KIND.dog ? reaction : 0);
-  else if (channel === 3) angle = wave * gait + sleep * 4.6;
-  else if (channel === 4) angle = Math.sin(phase * options.wingFrequency + offset) * (options.wingIdle * awake + reaction * options.wingFlight);
+  } else if (channel === 2) {
+    angle = wave * options.tailIdle * awake;
+    if (kind === FAUNA_KIND.dog) angle += reaction + sleep * 4.7;
+    else if (kind === FAUNA_KIND.ox) angle += sleep * 2.1;
+  } else if (channel === 3) {
+    const legSleep = kind === FAUNA_KIND.dog ? -3.47 : kind === FAUNA_KIND.ox ? 6.9 : 4.6;
+    angle = wave * gait + sleep * legSleep;
+  } else if (channel === 4) angle = Math.sin(phase * options.wingFrequency + offset) * (options.wingIdle * awake + reaction * options.wingFlight);
   else if (channel === 5) angle = wave * options.paddle * (0.25 * awake + gait) + sleep * 2.6;
   return angle * amplitude;
 }
@@ -33,7 +39,7 @@ export function createFaunaMaterial(config = {}) {
   const material = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
   material.name = 'fauna-faceted-articulation';
   material.userData.motion = options;
-  chainProgramCacheKey(material, 'fauna-rigid-parts-v1');
+  chainProgramCacheKey(material, 'fauna-rigid-parts-v2');
   material.onBeforeCompile = shader => {
     shader.uniforms.faunaHeadIdle = { value: options.headIdle };
     shader.uniforms.faunaPeck = { value: options.peck };
@@ -61,14 +67,22 @@ float faunaAngle() {
   float wave = sin(phase + faunaMotion.z);
   float angle = 0.0;
   if (channel > 0.5 && channel < 1.5) {
-    angle = wave * faunaHeadIdle * awake + sleep * 0.22;
+    float headSleep = 0.22;
+    if (kind > 0.5 && kind < 1.5) headSleep = 1.44;
+    else if (kind > 2.5 && kind < 3.5) headSleep = 0.30;
+    angle = wave * faunaHeadIdle * awake + sleep * headSleep;
     if (kind < 0.5) angle += pow(max(0.0, sin(phase * 0.7)), 6.0) * faunaPeck * (1.0 - gait) * (1.0 - reaction) * awake;
     if (kind > 2.5 && kind < 3.5) angle += reaction;
   } else if (channel > 1.5 && channel < 2.5) {
     angle = wave * faunaTailIdle * awake;
-    if (kind > 0.5 && kind < 1.5) angle += reaction;
-  } else if (channel > 2.5 && channel < 3.5) angle = wave * gait + sleep * 4.6;
-  else if (channel > 3.5 && channel < 4.5) angle = sin(phase * faunaWingFrequency + faunaMotion.z) * (faunaWingIdle * awake + reaction * faunaWingFlight);
+    if (kind > 0.5 && kind < 1.5) angle += reaction + sleep * 4.7;
+    else if (kind > 2.5 && kind < 3.5) angle += sleep * 2.1;
+  } else if (channel > 2.5 && channel < 3.5) {
+    float legSleep = 4.6;
+    if (kind > 0.5 && kind < 1.5) legSleep = -3.47;
+    else if (kind > 2.5 && kind < 3.5) legSleep = 6.9;
+    angle = wave * gait + sleep * legSleep;
+  } else if (channel > 3.5 && channel < 4.5) angle = sin(phase * faunaWingFrequency + faunaMotion.z) * (faunaWingIdle * awake + reaction * faunaWingFlight);
   else if (channel > 4.5) angle = wave * faunaPaddle * (0.25 * awake + gait) + sleep * 2.6;
   return angle * faunaMotion.y;
 }

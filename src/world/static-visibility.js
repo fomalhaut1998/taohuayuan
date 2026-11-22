@@ -4,7 +4,7 @@ import { isSkyAppearanceMaterial } from '../systems/scene-appearance.js';
 const STATIC_ROOTS = new Set(['flora', 'scatter', 'village', 'hinterland', 'cliff', 'fallen-petals', 'exterior-exploration', 'habitat-details', 'pond-life', 'waterworks', 'leisure-grove', 'valley-borderlands', 'qianmo-paths', 'outer-wilds', 'deep-hollows']);
 const managedSources = new WeakSet();
 // Only audited, fully baked, opaque single-material batches; never arbitrary meshes.
-const STATIC_MESH_NAME = /^(terrain|ground-patch|village-props|village-scenes-(solid|botanical|ground)|village-life-(solid|botanical|ground)|exterior-exploration-(solid|botanical|ground)|habitat-details-(solid|botanical|ground)|pond-life-(surface|underwater|shore)|waterworks-(static|water|stone-v-weir|mortar-grain|axle-frames)|leisure-grove-(solid|foliage)|valley-borderlands-(solid|ground|water)|qianmo-paths-(ground|solid)|qin-han-completion-static|outer-wilds-static|outer-wilds-exterior-static|deep-hollows-static|wuling-outskirts-(ext|int)-foliage)$/;
+const STATIC_MESH_NAME = /^(terrain|ground-patch|houses-tiles|village-props|village-scenes-(solid|botanical|ground)|village-life-(solid|botanical|ground)|exterior-exploration-(solid|botanical|ground)|habitat-details-(solid|botanical|ground)|pond-life-(surface|underwater|shore)|waterworks-(static|water|stone-v-weir|mortar-grain|axle-frames)|leisure-grove-(solid|foliage)|valley-borderlands-(solid|ground|water)|qianmo-paths-(ground|solid)|qin-han-static|qin-han-completion-static|easter-eggs-static|outer-wilds-static|outer-wilds-exterior-static|deep-hollows-static|wuling-outskirts-(ext|int)-(solid|foliage)|seasonal-road-(ext-)?(spring|summer|autumn|winter)|phenology-(spring|summer|autumn)-vignette)$/;
 const DYNAMIC_NAME = /^(people|person|fauna|fish|boats?|petals|rain|interaction|mysteries|player)(-|$)/;
 
 /**
@@ -47,6 +47,7 @@ export function optimizeStaticVisibility(scene, options = {}) {
   const excluded = new Set(options.exclude || []);
   const margin = options.margin ?? 0.0001;
   const cellSize = options.cellSize ?? 24;
+  const getCellSize = typeof options.getCellSize === 'function' ? options.getCellSize : null;
   const getMaxDistance = typeof options.getMaxDistance === 'function' ? options.getMaxDistance : null;
   const getLod = typeof options.getLod === 'function' ? options.getLod : null;
   const cliffPortal = options.cliffPortal || null;
@@ -71,8 +72,19 @@ export function optimizeStaticVisibility(scene, options = {}) {
   const point = new THREE.Vector3();
   const entries = [];
   const stats = { batches: 0, instances: 0, visibleInstances: 0, culledInstances: 0, trianglesBefore: 0, trianglesAfter: 0, staticMeshes: 0, pages: 0, visiblePages: 0 };
+  const prevProj = new Float64Array(16);
+  let hasCache = false;
+  let prevCamX = 0, prevCamY = 0, prevCamZ = 0, prevMaxDistSq = -1;
+  let prevPortalMode = 999, prevPortalCx = 0, prevPortalCz = 0, prevPortalRInSq = 0, prevPortalROutSq = 0, prevPortalFlankZ = 0;
   let disposed = false;
   let rendering = false;
+
+  function isTreeVisible(obj) {
+    for (let p = obj; p; p = p.parent) {
+      if (!p.visible) return false;
+    }
+    return true;
+  }
 
   function eligible(mesh) {
     if (managedSources.has(mesh) || !mesh.isMesh || mesh.isSkinnedMesh || mesh.castShadow || mesh.morphTexture) return false;
@@ -92,7 +104,7 @@ export function optimizeStaticVisibility(scene, options = {}) {
     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const material of materials) {
       if (!material || material.isShaderMaterial || material.isRawShaderMaterial || material.transparent || material.displacementMap) return false;
-      if (material.onBeforeCompile !== THREE.Material.prototype.onBeforeCompile && !isSkyAppearanceMaterial(material) && (paged || !options.allowShader?.(mesh))) return false;
+      if (material.onBeforeCompile !== THREE.Material.prototype.onBeforeCompile && !isSkyAppearanceMaterial(material) && !options.allowShader?.(mesh)) return false;
     }
     return !mesh.instanceColor || (mesh.instanceColor.itemSize === 3 && !mesh.instanceColor.isInterleavedBufferAttribute);
   }
@@ -100,13 +112,14 @@ export function optimizeStaticVisibility(scene, options = {}) {
   function createPages(source) {
     const geometry = source.geometry, position = geometry.attributes.position, index = geometry.index;
     const capacity = index ? index.count : position.count;
+    const pageCell = getCellSize ? Math.max(0.1, Number(getCellSize(source)) || cellSize) : cellSize;
     const buckets = new Map();
     // Every triangle belongs to exactly one page, but its WHOLE bounds are kept.
     // Grouping is camera-independent. Crossing a cell edge never clips a triangle.
     for (let t = 0; t + 2 < capacity; t += 3) {
       const a = index ? index.getX(t) : t, b = index ? index.getX(t + 1) : t + 1, c = index ? index.getX(t + 2) : t + 2;
-      const x = Math.floor((position.getX(a) + position.getX(b) + position.getX(c)) / (3 * cellSize));
-      const z = Math.floor((position.getZ(a) + position.getZ(b) + position.getZ(c)) / (3 * cellSize));
+      const x = Math.floor((position.getX(a) + position.getX(b) + position.getX(c)) / (3 * pageCell));
+      const z = Math.floor((position.getZ(a) + position.getZ(b) + position.getZ(c)) / (3 * pageCell));
       const key = x + ':' + z;
       let bucket = buckets.get(key);
       if (!bucket) { bucket = []; buckets.set(key, bucket); }
@@ -120,88 +133,140 @@ export function optimizeStaticVisibility(scene, options = {}) {
     const proxy = new THREE.Mesh(renderGeometry, source.material);
     return { kind: 'pages', source, proxy, geometry, originalIndex: index, indexVersion: index?.version ?? -1, capacity,
       pages, bounds: new Float64Array(pages.length * 6), indices: new Uint32Array(pages.length), visiblePages: -1, indexCount: 0,
-      world: new THREE.Matrix4(), positionVersion: -1, material: source.material, raycast: source.raycast };
+      world: new THREE.Matrix4(), positionVersion: -1, material: source.material, raycast: source.raycast, chunks: null, wasHidden: false };
   }
 
-  // Traverse before attaching proxies; never accidentally include our own children.
-  scene.traverse(source => {
-    if (!eligible(source)) return;
-    const capacity = source.instanceMatrix?.count;
-    const entry = source.isInstancedMesh ? {
-      kind: 'instances', source, capacity, bounds: new Float64Array(capacity * 6), indices: new Uint32Array(capacity),
-      world: new THREE.Matrix4(), matrixVersion: -1, colorVersion: -1, positionVersion: -1, count: -1,
-      material: source.material, raycast: source.raycast, triangleCount: 0, dirty: true,
-      proxy: new THREE.InstancedMesh(source.geometry, source.material, capacity)
-    } : createPages(source);
-    entry.extraMargin = options.extraMargin ? (Number(options.extraMargin(source)) || 0) : 0;
-    let keepHorizon = source.name === 'terrain';
-    for (let p = source; p && !keepHorizon; p = p.parent) if (p.name === 'cliff') keepHorizon = true;
-    entry.keepHorizon = keepHorizon;
-    const proxy = entry.proxy;
-    proxy.name = 'static-visibility:' + source.name;
-    proxy.matrixAutoUpdate = false;
-    proxy.frustumCulled = false; // Full transformed instance boxes are tested below.
-    proxy.visible = false;
-    proxy.raycast = function () {};
-    if (proxy.isInstancedMesh) {
-      proxy.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      if (source.instanceColor) proxy.instanceColor = new THREE.InstancedBufferAttribute(new source.instanceColor.array.constructor(source.instanceColor.array.length), 3, source.instanceColor.normalized).setUsage(THREE.DynamicDrawUsage);
-      if (getLod) {
-        const lodSpec = getLod(source);
-        if (lodSpec && lodSpec.geometry && Number.isFinite(lodSpec.distance) && lodSpec.distance > 0) {
-          const lodGeo = lodSpec.geometry;
-          const lodProxy = new THREE.InstancedMesh(lodGeo, source.material, capacity);
-          lodProxy.name = 'static-visibility-lod:' + source.name;
-          lodProxy.matrixAutoUpdate = false;
-          lodProxy.frustumCulled = false;
-          lodProxy.visible = false;
-          lodProxy.raycast = function () {};
-          lodProxy.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-          if (source.instanceColor) {
-            lodProxy.instanceColor = new THREE.InstancedBufferAttribute(
-              new source.instanceColor.array.constructor(source.instanceColor.array.length),
-              3,
-              source.instanceColor.normalized
-            ).setUsage(THREE.DynamicDrawUsage);
+  function attachEntries(rootObj) {
+    if (!rootObj || typeof rootObj.traverse !== 'function') return 0;
+    const added = [];
+    // Traverse before attaching proxies; never accidentally include our own children.
+    rootObj.traverse(source => {
+      if (!eligible(source)) return;
+      const capacity = source.instanceMatrix?.count;
+      const entry = source.isInstancedMesh ? {
+        kind: 'instances', source, capacity, bounds: new Float64Array(capacity * 6), indices: new Uint32Array(capacity),
+        world: new THREE.Matrix4(), matrixVersion: -1, colorVersion: -1, positionVersion: -1, count: -1,
+        material: source.material, raycast: source.raycast,
+        triangleCount: (source.geometry.index ? source.geometry.index.count : source.geometry.attributes.position.count) / 3,
+        dirty: true, chunks: null, wasHidden: false,
+        proxy: new THREE.InstancedMesh(source.geometry, source.material, capacity)
+      } : createPages(source);
+      entry.extraMargin = options.extraMargin ? (Number(options.extraMargin(source)) || 0) : 0;
+      let keepHorizon = source.name === 'terrain';
+      for (let p = source; p && !keepHorizon; p = p.parent) if (p.name === 'cliff') keepHorizon = true;
+      entry.keepHorizon = keepHorizon;
+      const proxy = entry.proxy;
+      proxy.name = 'static-visibility:' + source.name;
+      proxy.matrixAutoUpdate = false;
+      proxy.frustumCulled = false; // Full transformed instance boxes are tested below.
+      proxy.visible = false;
+      proxy.raycast = function () {};
+      if (proxy.isInstancedMesh) {
+        proxy.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        if (source.instanceColor) proxy.instanceColor = new THREE.InstancedBufferAttribute(new source.instanceColor.array.constructor(source.instanceColor.array.length), 3, source.instanceColor.normalized).setUsage(THREE.DynamicDrawUsage);
+        if (getLod) {
+          const lodSpec = getLod(source);
+          if (lodSpec && lodSpec.geometry && Number.isFinite(lodSpec.distance) && lodSpec.distance > 0) {
+            const lodGeo = lodSpec.geometry;
+            const lodProxy = new THREE.InstancedMesh(lodGeo, source.material, capacity);
+            lodProxy.name = 'static-visibility-lod:' + source.name;
+            lodProxy.matrixAutoUpdate = false;
+            lodProxy.frustumCulled = false;
+            lodProxy.visible = false;
+            lodProxy.raycast = function () {};
+            lodProxy.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            if (source.instanceColor) {
+              lodProxy.instanceColor = new THREE.InstancedBufferAttribute(
+                new source.instanceColor.array.constructor(source.instanceColor.array.length),
+                3,
+                source.instanceColor.normalized
+              ).setUsage(THREE.DynamicDrawUsage);
+            }
+            const hys = Math.max(0, Number(lodSpec.hysteresis ?? 8));
+            const dNear = lodSpec.distance + hys;
+            const dFar = Math.max(0, lodSpec.distance - hys);
+            entry.lod = {
+              geometry: lodGeo,
+              proxy: lodProxy,
+              indices: new Uint32Array(capacity),
+              prevLod: null,
+              stayNearSq: dNear * dNear,
+              stayFarSq: dFar * dFar,
+              triangleCount: (lodGeo.index ? lodGeo.index.count : lodGeo.attributes.position.count) / 3,
+              syncGeometry: typeof lodSpec.syncGeometry === 'function' ? lodSpec.syncGeometry : null,
+              colorAttrVersion: source.geometry.attributes.color?.version ?? -1,
+              colorVersion: -1,
+              dirty: true
+            };
           }
-          const hys = Math.max(0, Number(lodSpec.hysteresis ?? 8));
-          const dNear = lodSpec.distance + hys;
-          const dFar = Math.max(0, lodSpec.distance - hys);
-          entry.lod = {
-            geometry: lodGeo,
-            proxy: lodProxy,
-            indices: new Uint32Array(capacity),
-            prevLod: null,
-            stayNearSq: dNear * dNear,
-            stayFarSq: dFar * dFar,
-            triangleCount: (lodGeo.index ? lodGeo.index.count : lodGeo.attributes.position.count) / 3,
-            syncGeometry: typeof lodSpec.syncGeometry === 'function' ? lodSpec.syncGeometry : null,
-            colorAttrVersion: source.geometry.attributes.color?.version ?? -1,
-            colorVersion: -1,
-            dirty: true
-          };
         }
       }
+      // Raycaster intentionally ignores Object3D.visible. Keep source hits/IDs even
+      // during the render transaction, with the ORIGINAL material side semantics.
+      entry.raycastWrapper = function (raycaster, hits) {
+        const material = this.material;
+        if (rendering) this.material = entry.material;
+        try { return entry.raycast.call(this, raycaster, hits); }
+        finally { this.material = material; }
+      };
+      added.push(entry);
+      entries.push(entry);
+    });
+    for (let i = 0; i < added.length; i++) {
+      const entry = added[i];
+      managedSources.add(entry.source);
+      entry.source.add(entry.proxy);
+      if (entry.lod) entry.source.add(entry.lod.proxy);
+      entry.source.raycast = entry.raycastWrapper;
     }
-    // Raycaster intentionally ignores Object3D.visible. Keep source hits/IDs even
-    // during the render transaction, with the ORIGINAL material side semantics.
-    entry.raycastWrapper = function (raycaster, hits) {
-      const material = this.material;
-      if (rendering) this.material = entry.material;
-      try { return entry.raycast.call(this, raycaster, hits); }
-      finally { this.material = material; }
-    };
-    entries.push(entry);
-  });
-  for (const entry of entries) {
-    managedSources.add(entry.source);
-    entry.source.add(entry.proxy);
-    if (entry.lod) entry.source.add(entry.lod.proxy);
-    entry.source.raycast = entry.raycastWrapper;
+    if (added.length > 0 || stats.batches !== entries.length) {
+      stats.batches = entries.length;
+      stats.staticMeshes = entries.filter(entry => entry.kind === 'pages').length;
+      stats.pages = entries.reduce((sum, entry) => sum + (entry.pages?.length || 0), 0);
+      hasCache = false;
+    }
+    return added.length;
   }
-  stats.batches = entries.length;
-  stats.staticMeshes = entries.filter(entry => entry.kind === 'pages').length;
-  stats.pages = entries.reduce((sum, entry) => sum + (entry.pages?.length || 0), 0);
+
+  attachEntries(scene);
+
+  function rebuildChunks(entry, count) {
+    if (count < 64) {
+      entry.chunks = null;
+      return;
+    }
+    const b = entry.bounds;
+    const buckets = new Map();
+    for (let i = 0; i < count; i++) {
+      const o = i * 6;
+      const cx = (b[o] + b[o + 3]) * 0.5;
+      const cz = (b[o + 2] + b[o + 5]) * 0.5;
+      const gx = Math.floor(cx / 36);
+      const gz = Math.floor(cz / 36);
+      const key = (gx + 32768) * 65536 + (gz + 32768);
+      let list = buckets.get(key);
+      if (!list) { list = []; buckets.set(key, list); }
+      list.push(i);
+    }
+    const chunks = [];
+    for (const list of buckets.values()) {
+      const cb = new Float64Array(6);
+      cb[0] = cb[1] = cb[2] = Infinity;
+      cb[3] = cb[4] = cb[5] = -Infinity;
+      const items = new Uint32Array(list);
+      for (let k = 0; k < items.length; k++) {
+        const o = items[k] * 6;
+        if (b[o] < cb[0]) cb[0] = b[o];
+        if (b[o + 1] < cb[1]) cb[1] = b[o + 1];
+        if (b[o + 2] < cb[2]) cb[2] = b[o + 2];
+        if (b[o + 3] > cb[3]) cb[3] = b[o + 3];
+        if (b[o + 4] > cb[4]) cb[4] = b[o + 4];
+        if (b[o + 5] > cb[5]) cb[5] = b[o + 5];
+      }
+      chunks.push({ b: cb, items, wasActive: true });
+    }
+    entry.chunks = chunks;
+  }
 
   function rebuildBounds(entry) {
     const source = entry.source;
@@ -218,12 +283,52 @@ export function optimizeStaticVisibility(scene, options = {}) {
       b[offset] = worldBox.min.x; b[offset + 1] = worldBox.min.y; b[offset + 2] = worldBox.min.z;
       b[offset + 3] = worldBox.max.x; b[offset + 4] = worldBox.max.y; b[offset + 5] = worldBox.max.z;
     }
+    rebuildChunks(entry, count);
     entry.world.copy(source.matrixWorld);
     entry.matrixVersion = source.instanceMatrix.version;
     entry.positionVersion = geometry.attributes.position.version;
     entry.count = count;
     entry.triangleCount = (geometry.index ? geometry.index.count : geometry.attributes.position.count) / 3;
     entry.dirty = true;
+  }
+
+  function classifyChunkFrustum(b) {
+    let allIn = true;
+    let dMax = p0x * b[p0ox] + p0y * b[p0oy] + p0z * b[p0oz] + p0w;
+    if (dMax < 0) return 0;
+    if (allIn && p0x * b[3 - p0ox] + p0y * b[5 - p0oy] + p0z * b[7 - p0oz] + p0w < 0) allIn = false;
+    dMax = p1x * b[p1ox] + p1y * b[p1oy] + p1z * b[p1oz] + p1w;
+    if (dMax < 0) return 0;
+    if (allIn && p1x * b[3 - p1ox] + p1y * b[5 - p1oy] + p1z * b[7 - p1oz] + p1w < 0) allIn = false;
+    dMax = p2x * b[p2ox] + p2y * b[p2oy] + p2z * b[p2oz] + p2w;
+    if (dMax < 0) return 0;
+    if (allIn && p2x * b[3 - p2ox] + p2y * b[5 - p2oy] + p2z * b[7 - p2oz] + p2w < 0) allIn = false;
+    dMax = p3x * b[p3ox] + p3y * b[p3oy] + p3z * b[p3oz] + p3w;
+    if (dMax < 0) return 0;
+    if (allIn && p3x * b[3 - p3ox] + p3y * b[5 - p3oy] + p3z * b[7 - p3oz] + p3w < 0) allIn = false;
+    dMax = p4x * b[p4ox] + p4y * b[p4oy] + p4z * b[p4oz] + p4w;
+    if (dMax < 0) return 0;
+    if (allIn && p4x * b[3 - p4ox] + p4y * b[5 - p4oy] + p4z * b[7 - p4oz] + p4w < 0) allIn = false;
+    dMax = p5x * b[p5ox] + p5y * b[p5oy] + p5z * b[p5oz] + p5w;
+    if (dMax < 0) return 0;
+    if (allIn && p5x * b[3 - p5ox] + p5y * b[5 - p5oy] + p5z * b[7 - p5oz] + p5w < 0) allIn = false;
+    return allIn ? 2 : 1;
+  }
+
+  function chunkPortalAcceptsAll(cb) {
+    if (cullPortalMode === 0 || cb[1] >= 24) return true;
+    if (cullPortalMode < 0) {
+      if (cb[5] <= cullPortalFlankZ + 8) return true;
+      const adx0 = cullPortalCx - cb[0], adx1 = cullPortalCx - cb[3];
+      const adz0 = cullPortalCz - cb[2], adz1 = cullPortalCz - cb[5];
+      const rx = Math.abs(adx0) > Math.abs(adx1) ? adx0 : adx1;
+      const rz = Math.abs(adz0) > Math.abs(adz1) ? adz0 : adz1;
+      return rx * rx + rz * rz <= cullPortalROutSq;
+    }
+    if (cb[2] < cullPortalFlankZ - 12) return false;
+    const rdx = cullPortalCx < cb[0] ? cb[0] - cullPortalCx : (cullPortalCx > cb[3] ? cullPortalCx - cb[3] : 0);
+    const rdz = cullPortalCz < cb[2] ? cb[2] - cullPortalCz : (cullPortalCz > cb[5] ? cullPortalCz - cb[5] : 0);
+    return rdx * rdx + rdz * rdz >= cullPortalRInSq;
   }
 
   function intersectsBounds(bounds, offset) {
@@ -265,11 +370,18 @@ export function optimizeStaticVisibility(scene, options = {}) {
     return true;
   }
 
-  function updatePages(entry) {
+  function updatePages(entry, camUnchanged, sameDist, wasHidden) {
     const source = entry.source, geometry = source.geometry, position = geometry.attributes.position;
     if (Array.isArray(source.material) || geometry.groups.length || geometry !== entry.geometry || geometry.index !== entry.originalIndex || (geometry.index?.version ?? -1) !== entry.indexVersion || position !== entry.proxy.geometry.attributes.position || (geometry.index?.count ?? position.count) !== entry.capacity || geometry.drawRange.start !== 0 || geometry.drawRange.count < entry.capacity) throw new Error('Static visibility topology changed; recreate helper');
     const positionChanged = entry.positionVersion !== position.version;
-    if (positionChanged || !entry.world.equals(source.matrixWorld)) {
+    const worldChanged = !entry.world.equals(source.matrixWorld);
+    if (!positionChanged && !worldChanged && camUnchanged && sameDist && !wasHidden && entry.visiblePages >= 0) {
+      stats.visiblePages += entry.visiblePages;
+      stats.trianglesBefore += entry.capacity / 3;
+      stats.trianglesAfter += entry.indexCount / 3;
+      return;
+    }
+    if (positionChanged || worldChanged) {
       const expand = margin + (entry.extraMargin || 0);
       for (let i = 0; i < entry.pages.length; i++) {
         const page = entry.pages[i];
@@ -282,18 +394,87 @@ export function optimizeStaticVisibility(scene, options = {}) {
         b[offset] = worldBox.min.x; b[offset + 1] = worldBox.min.y; b[offset + 2] = worldBox.min.z;
         b[offset + 3] = worldBox.max.x; b[offset + 4] = worldBox.max.y; b[offset + 5] = worldBox.max.z;
       }
+      rebuildChunks(entry, entry.pages.length);
       entry.positionVersion = position.version;
       entry.world.copy(source.matrixWorld);
     }
     if (!entry.prevPages || entry.prevPages.length !== entry.pages.length) entry.prevPages = new Uint8Array(entry.pages.length);
     let visible = 0, changed = false;
-    for (let i = 0; i < entry.pages.length; i++) {
-      const offset = i * 6;
-      const lim = entry.prevPages[i] ? entry.keepDistSq : entry.maxDistSq;
-      if (!intersectsBounds(entry.bounds, offset) || !passesExtraCulling(entry.bounds, offset, entry.keepHorizon, lim)) { entry.prevPages[i] = 0; continue; }
-      entry.prevPages[i] = 1;
-      if (entry.indices[visible] !== i) changed = true;
-      entry.indices[visible++] = i;
+    const chunks = entry.chunks;
+    const b = entry.bounds;
+    const prevPages = entry.prevPages;
+    if (chunks) {
+      for (let c = 0; c < chunks.length; c++) {
+        const chunk = chunks[c];
+        const cb = chunk.b;
+        const items = chunk.items;
+        const fr = classifyChunkFrustum(cb);
+        let rejected = fr === 0;
+        let dMinSq = 0;
+        if (!rejected && !entry.keepHorizon) {
+          const dxMin = cullCamX < cb[0] ? cb[0] - cullCamX : (cullCamX > cb[3] ? cullCamX - cb[3] : 0);
+          const dyMin = cullCamY < cb[1] ? cb[1] - cullCamY : (cullCamY > cb[4] ? cullCamY - cb[4] : 0);
+          const dzMin = cullCamZ < cb[2] ? cb[2] - cullCamZ : (cullCamZ > cb[5] ? cullCamZ - cb[5] : 0);
+          dMinSq = dxMin * dxMin + dyMin * dyMin + dzMin * dzMin;
+          if (dMinSq > entry.keepDistSq) rejected = true;
+          else if (cullPortalMode !== 0 && cb[4] < 24 && !passesExtraCulling(cb, 0, false, Infinity)) rejected = true;
+        }
+        if (rejected) {
+          if (chunk.wasActive) {
+            for (let k = 0; k < items.length; k++) prevPages[items[k]] = 0;
+            chunk.wasActive = false;
+          }
+          continue;
+        }
+        let acceptAll = false;
+        if (fr === 2) {
+          if (entry.keepHorizon) acceptAll = true;
+          else {
+            const adx0 = cullCamX - cb[0], adx1 = cullCamX - cb[3];
+            const ady0 = cullCamY - cb[1], ady1 = cullCamY - cb[4];
+            const adz0 = cullCamZ - cb[2], adz1 = cullCamZ - cb[5];
+            const dxMax = Math.abs(adx0) > Math.abs(adx1) ? adx0 : adx1;
+            const dyMax = Math.abs(ady0) > Math.abs(ady1) ? ady0 : ady1;
+            const dzMax = Math.abs(adz0) > Math.abs(adz1) ? adz0 : adz1;
+            const dMaxSq = dxMax * dxMax + dyMax * dyMax + dzMax * dzMax;
+            if (dMaxSq <= entry.maxDistSq && chunkPortalAcceptsAll(cb)) acceptAll = true;
+          }
+        }
+        if (acceptAll) {
+          chunk.wasActive = true;
+          for (let k = 0; k < items.length; k++) {
+            const idx = items[k];
+            prevPages[idx] = 1;
+            if (entry.indices[visible] !== idx) changed = true;
+            entry.indices[visible++] = idx;
+          }
+        } else {
+          let any = false;
+          for (let k = 0; k < items.length; k++) {
+            const idx = items[k];
+            const offset = idx * 6;
+            const lim = prevPages[idx] ? entry.keepDistSq : entry.maxDistSq;
+            if ((fr !== 2 && !intersectsBounds(b, offset)) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) {
+              prevPages[idx] = 0;
+              continue;
+            }
+            prevPages[idx] = 1;
+            any = true;
+            if (entry.indices[visible] !== idx) changed = true;
+            entry.indices[visible++] = idx;
+          }
+          chunk.wasActive = any;
+        }
+      }
+    } else {
+      for (let i = 0; i < entry.pages.length; i++) {
+        const offset = i * 6;
+        const lim = prevPages[i] ? entry.keepDistSq : entry.maxDistSq;
+        if (!intersectsBounds(b, offset) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) { prevPages[i] = 0; continue; }
+        prevPages[i] = 1;
+        if (entry.indices[visible] !== i) changed = true;
+        entry.indices[visible++] = i;
+      }
     }
     if (visible !== entry.visiblePages) changed = true;
     if (changed) {
@@ -325,28 +506,6 @@ export function optimizeStaticVisibility(scene, options = {}) {
     scene.updateMatrixWorld(true);
     camera.updateWorldMatrix(true, false);
     projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    frustum.setFromProjectionMatrix(projection, camera.coordinateSystem);
-    {
-      const planes = frustum.planes;
-      let pl = planes[0], n = pl.normal;
-      p0x = n.x; p0y = n.y; p0z = n.z; p0w = pl.constant;
-      p0ox = n.x >= 0 ? 3 : 0; p0oy = n.y >= 0 ? 4 : 1; p0oz = n.z >= 0 ? 5 : 2;
-      pl = planes[1]; n = pl.normal;
-      p1x = n.x; p1y = n.y; p1z = n.z; p1w = pl.constant;
-      p1ox = n.x >= 0 ? 3 : 0; p1oy = n.y >= 0 ? 4 : 1; p1oz = n.z >= 0 ? 5 : 2;
-      pl = planes[2]; n = pl.normal;
-      p2x = n.x; p2y = n.y; p2z = n.z; p2w = pl.constant;
-      p2ox = n.x >= 0 ? 3 : 0; p2oy = n.y >= 0 ? 4 : 1; p2oz = n.z >= 0 ? 5 : 2;
-      pl = planes[3]; n = pl.normal;
-      p3x = n.x; p3y = n.y; p3z = n.z; p3w = pl.constant;
-      p3ox = n.x >= 0 ? 3 : 0; p3oy = n.y >= 0 ? 4 : 1; p3oz = n.z >= 0 ? 5 : 2;
-      pl = planes[4]; n = pl.normal;
-      p4x = n.x; p4y = n.y; p4z = n.z; p4w = pl.constant;
-      p4ox = n.x >= 0 ? 3 : 0; p4oy = n.y >= 0 ? 4 : 1; p4oz = n.z >= 0 ? 5 : 2;
-      pl = planes[5]; n = pl.normal;
-      p5x = n.x; p5y = n.y; p5z = n.z; p5w = pl.constant;
-      p5ox = n.x >= 0 ? 3 : 0; p5oy = n.y >= 0 ? 4 : 1; p5oz = n.z >= 0 ? 5 : 2;
-    }
     const camElements = camera.matrixWorld.elements;
     cullCamX = camElements[12]; cullCamY = camElements[13]; cullCamZ = camElements[14];
     const maxDist = getMaxDistance ? Number(getMaxDistance(camera)) : Infinity;
@@ -370,6 +529,50 @@ export function optimizeStaticVisibility(scene, options = {}) {
         }
       }
     }
+    const pe = projection.elements;
+    let camUnchanged = hasCache &&
+      cullCamX === prevCamX && cullCamY === prevCamY && cullCamZ === prevCamZ &&
+      cullMaxDistSq === prevMaxDistSq && cullPortalMode === prevPortalMode &&
+      (cullPortalMode === 0 || (
+        cullPortalCx === prevPortalCx && cullPortalCz === prevPortalCz &&
+        cullPortalRInSq === prevPortalRInSq && cullPortalROutSq === prevPortalROutSq &&
+        cullPortalFlankZ === prevPortalFlankZ
+      ));
+    if (camUnchanged) {
+      for (let i = 0; i < 16; i++) {
+        if (pe[i] !== prevProj[i]) { camUnchanged = false; break; }
+      }
+    }
+    if (!camUnchanged) {
+      for (let i = 0; i < 16; i++) prevProj[i] = pe[i];
+      prevCamX = cullCamX; prevCamY = cullCamY; prevCamZ = cullCamZ;
+      prevMaxDistSq = cullMaxDistSq;
+      prevPortalMode = cullPortalMode;
+      prevPortalCx = cullPortalCx; prevPortalCz = cullPortalCz;
+      prevPortalRInSq = cullPortalRInSq; prevPortalROutSq = cullPortalROutSq;
+      prevPortalFlankZ = cullPortalFlankZ;
+      hasCache = true;
+      frustum.setFromProjectionMatrix(projection, camera.coordinateSystem);
+      const planes = frustum.planes;
+      let pl = planes[0], n = pl.normal;
+      p0x = n.x; p0y = n.y; p0z = n.z; p0w = pl.constant;
+      p0ox = n.x >= 0 ? 3 : 0; p0oy = n.y >= 0 ? 4 : 1; p0oz = n.z >= 0 ? 5 : 2;
+      pl = planes[1]; n = pl.normal;
+      p1x = n.x; p1y = n.y; p1z = n.z; p1w = pl.constant;
+      p1ox = n.x >= 0 ? 3 : 0; p1oy = n.y >= 0 ? 4 : 1; p1oz = n.z >= 0 ? 5 : 2;
+      pl = planes[2]; n = pl.normal;
+      p2x = n.x; p2y = n.y; p2z = n.z; p2w = pl.constant;
+      p2ox = n.x >= 0 ? 3 : 0; p2oy = n.y >= 0 ? 4 : 1; p2oz = n.z >= 0 ? 5 : 2;
+      pl = planes[3]; n = pl.normal;
+      p3x = n.x; p3y = n.y; p3z = n.z; p3w = pl.constant;
+      p3ox = n.x >= 0 ? 3 : 0; p3oy = n.y >= 0 ? 4 : 1; p3oz = n.z >= 0 ? 5 : 2;
+      pl = planes[4]; n = pl.normal;
+      p4x = n.x; p4y = n.y; p4z = n.z; p4w = pl.constant;
+      p4ox = n.x >= 0 ? 3 : 0; p4oy = n.y >= 0 ? 4 : 1; p4oz = n.z >= 0 ? 5 : 2;
+      pl = planes[5]; n = pl.normal;
+      p5x = n.x; p5y = n.y; p5z = n.z; p5w = pl.constant;
+      p5ox = n.x >= 0 ? 3 : 0; p5oy = n.y >= 0 ? 4 : 1; p5oz = n.z >= 0 ? 5 : 2;
+    }
     stats.instances = stats.visibleInstances = stats.trianglesBefore = stats.trianglesAfter = stats.visiblePages = 0;
     for (let e = 0; e < entries.length; e++) {
       const entry = entries[e], source = entry.source, proxy = entry.proxy;
@@ -379,25 +582,72 @@ export function optimizeStaticVisibility(scene, options = {}) {
       proxy.receiveShadow = source.receiveShadow;
       // Per-source distance cap: getMaxDistance(camera, mesh) may tighten the fog tail
       // for sub-pixel ground cover; undefined mesh keeps the global fog-tail value.
+      let entryMaxDistSq;
       if (getMaxDistance) {
         const md = Number(getMaxDistance(camera, source));
-        entry.maxDistSq = Number.isFinite(md) && md > 0 ? md * md : Infinity;
-      } else entry.maxDistSq = cullMaxDistSq;
+        entryMaxDistSq = Number.isFinite(md) && md > 0 ? md * md : Infinity;
+      } else entryMaxDistSq = cullMaxDistSq;
+      const sameDist = entryMaxDistSq === entry.maxDistSq;
+      entry.maxDistSq = entryMaxDistSq;
       // 6-unit dead band: already-visible instances/pages stay until cap+6 so idle
       // camera sway at a distance boundary cannot churn full-prefix GPU uploads.
-      if (entry.maxDistSq < Infinity) {
-        const r = Math.sqrt(entry.maxDistSq) + 6;
-        entry.keepDistSq = r * r;
-      } else entry.keepDistSq = Infinity;
-      if (entry.kind === 'pages') { updatePages(entry); continue; }
+      if (!sameDist || entry.keepDistSq === undefined) {
+        if (entryMaxDistSq < Infinity) {
+          const r = Math.sqrt(entryMaxDistSq) + 6;
+          entry.keepDistSq = r * r;
+        } else entry.keepDistSq = Infinity;
+      }
+      if (entry.kind === 'pages') {
+        if (!isTreeVisible(source)) {
+          const geometry = source.geometry, position = geometry.attributes.position;
+          if (Array.isArray(source.material) || geometry.groups.length || geometry !== entry.geometry || geometry.index !== entry.originalIndex || (geometry.index?.version ?? -1) !== entry.indexVersion || position !== entry.proxy.geometry.attributes.position || (geometry.index?.count ?? position.count) !== entry.capacity || geometry.drawRange.start !== 0 || geometry.drawRange.count < entry.capacity) throw new Error('Static visibility topology changed; recreate helper');
+          entry.wasHidden = true;
+          stats.trianglesBefore += entry.capacity / 3;
+          continue;
+        }
+        const wasHidden = entry.wasHidden;
+        entry.wasHidden = false;
+        updatePages(entry, camUnchanged, sameDist, wasHidden);
+        continue;
+      }
       if (source.count > entry.capacity || source.geometry !== proxy.geometry || !!source.instanceColor !== !!proxy.instanceColor) throw new Error('Static visibility topology/capacity changed; recreate helper');
-      if (entry.count !== source.count || entry.matrixVersion !== source.instanceMatrix.version || entry.positionVersion !== source.geometry.attributes.position.version || !entry.world.equals(source.matrixWorld)) {
+      if (!isTreeVisible(source)) {
+        entry.wasHidden = true;
+        stats.instances += source.count;
+        stats.trianglesBefore += source.count * entry.triangleCount;
+        continue;
+      }
+      const wasHidden = entry.wasHidden;
+      entry.wasHidden = false;
+      const boundsDirty = entry.count !== source.count || entry.matrixVersion !== source.instanceMatrix.version || entry.positionVersion !== source.geometry.attributes.position.version || !entry.world.equals(source.matrixWorld);
+      const colorChanged = source.instanceColor && entry.colorVersion !== source.instanceColor.version;
+      const lod = entry.lod;
+      const lodColorDirty = lod && lod.syncGeometry && source.geometry.attributes.color && source.geometry.attributes.color.version !== lod.colorAttrVersion;
+      const lodInstanceColorChanged = lod && source.instanceColor && lod.colorVersion !== source.instanceColor.version;
+      if (camUnchanged && sameDist && !wasHidden && !entry.dirty && !boundsDirty && !colorChanged && !lodColorDirty && !lodInstanceColorChanged && proxy.count >= 0 && (!lod || (!lod.dirty && lod.proxy.count >= 0))) {
+        stats.instances += source.count;
+        stats.trianglesBefore += source.count * entry.triangleCount;
+        if (lod) {
+          lod.proxy.material = source.material;
+          lod.proxy.layers.mask = source.layers.mask;
+          lod.proxy.renderOrder = source.renderOrder;
+          lod.proxy.receiveShadow = source.receiveShadow;
+          stats.visibleInstances += proxy.count + lod.proxy.count;
+          stats.trianglesAfter += proxy.count * entry.triangleCount + lod.proxy.count * lod.triangleCount;
+        } else {
+          stats.visibleInstances += proxy.count;
+          stats.trianglesAfter += proxy.count * entry.triangleCount;
+        }
+        continue;
+      }
+      if (boundsDirty) {
         rebuildBounds(entry);
-        if (entry.lod) entry.lod.dirty = true;
+        if (lod) lod.dirty = true;
       }
       if (!entry.prev || entry.prev.length !== source.count) entry.prev = new Uint8Array(source.count);
       const b = entry.bounds;
-      const lod = entry.lod;
+      const chunks = entry.chunks;
+      const prev = entry.prev;
       if (lod) {
         const lp = lod.proxy;
         lp.material = source.material;
@@ -412,36 +662,120 @@ export function optimizeStaticVisibility(scene, options = {}) {
           }
         }
         if (!lod.prevLod || lod.prevLod.length !== source.count) lod.prevLod = new Uint8Array(source.count);
+        const prevLod = lod.prevLod;
         let visible = 0, lodVisible = 0;
         let changed = entry.dirty, lodChanged = lod.dirty;
-        for (let i = 0; i < source.count; i++) {
-          const offset = i * 6;
-          const lim = entry.prev[i] ? entry.keepDistSq : entry.maxDistSq;
-          if (!intersectsBounds(b, offset) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) {
-            entry.prev[i] = 0;
-            continue;
+        if (chunks) {
+          for (let c = 0; c < chunks.length; c++) {
+            const chunk = chunks[c];
+            const cb = chunk.b;
+            const items = chunk.items;
+            const fr = classifyChunkFrustum(cb);
+            let rejected = fr === 0;
+            let dMinSq = 0;
+            const dxMin = cullCamX < cb[0] ? cb[0] - cullCamX : (cullCamX > cb[3] ? cullCamX - cb[3] : 0);
+            const dyMin = cullCamY < cb[1] ? cb[1] - cullCamY : (cullCamY > cb[4] ? cullCamY - cb[4] : 0);
+            const dzMin = cullCamZ < cb[2] ? cb[2] - cullCamZ : (cullCamZ > cb[5] ? cullCamZ - cb[5] : 0);
+            dMinSq = dxMin * dxMin + dyMin * dyMin + dzMin * dzMin;
+            if (!rejected && !entry.keepHorizon) {
+              if (dMinSq > entry.keepDistSq) rejected = true;
+              else if (cullPortalMode !== 0 && cb[4] < 24 && !passesExtraCulling(cb, 0, false, Infinity)) rejected = true;
+            }
+            if (rejected) {
+              if (chunk.wasActive) {
+                for (let k = 0; k < items.length; k++) prev[items[k]] = 0;
+                chunk.wasActive = false;
+              }
+              continue;
+            }
+            const adx0 = cullCamX - cb[0], adx1 = cullCamX - cb[3];
+            const ady0 = cullCamY - cb[1], ady1 = cullCamY - cb[4];
+            const adz0 = cullCamZ - cb[2], adz1 = cullCamZ - cb[5];
+            const dxMax = Math.abs(adx0) > Math.abs(adx1) ? adx0 : adx1;
+            const dyMax = Math.abs(ady0) > Math.abs(ady1) ? ady0 : ady1;
+            const dzMax = Math.abs(adz0) > Math.abs(adz1) ? adz0 : adz1;
+            const dMaxSq = dxMax * dxMax + dyMax * dyMax + dzMax * dzMax;
+            if (fr === 2 && (entry.keepHorizon || (dMaxSq <= entry.maxDistSq && chunkPortalAcceptsAll(cb)))) {
+              if (dMaxSq <= lod.stayFarSq) {
+                chunk.wasActive = true;
+                for (let k = 0; k < items.length; k++) {
+                  const idx = items[k];
+                  prev[idx] = 1;
+                  prevLod[idx] = 0;
+                  if (entry.indices[visible] !== idx) changed = true;
+                  entry.indices[visible++] = idx;
+                }
+                continue;
+              }
+              if (dMinSq > lod.stayNearSq) {
+                chunk.wasActive = true;
+                for (let k = 0; k < items.length; k++) {
+                  const idx = items[k];
+                  prev[idx] = 1;
+                  prevLod[idx] = 1;
+                  if (lod.indices[lodVisible] !== idx) lodChanged = true;
+                  lod.indices[lodVisible++] = idx;
+                }
+                continue;
+              }
+            }
+            let any = false;
+            for (let k = 0; k < items.length; k++) {
+              const idx = items[k];
+              const offset = idx * 6;
+              const lim = prev[idx] ? entry.keepDistSq : entry.maxDistSq;
+              if ((fr !== 2 && !intersectsBounds(b, offset)) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) {
+                prev[idx] = 0;
+                continue;
+              }
+              prev[idx] = 1;
+              any = true;
+              const minX = b[offset], minY = b[offset + 1], minZ = b[offset + 2];
+              const maxX = b[offset + 3], maxY = b[offset + 4], maxZ = b[offset + 5];
+              const dx = cullCamX < minX ? minX - cullCamX : (cullCamX > maxX ? cullCamX - maxX : 0);
+              const dy = cullCamY < minY ? minY - cullCamY : (cullCamY > maxY ? cullCamY - maxY : 0);
+              const dz = cullCamZ < minZ ? minZ - cullCamZ : (cullCamZ > maxZ ? cullCamZ - maxZ : 0);
+              const d2 = dx * dx + dy * dy + dz * dz;
+              const useFar = prevLod[idx] ? (d2 > lod.stayFarSq) : (d2 > lod.stayNearSq);
+              prevLod[idx] = useFar ? 1 : 0;
+              if (useFar) {
+                if (lod.indices[lodVisible] !== idx) lodChanged = true;
+                lod.indices[lodVisible++] = idx;
+              } else {
+                if (entry.indices[visible] !== idx) changed = true;
+                entry.indices[visible++] = idx;
+              }
+            }
+            chunk.wasActive = any;
           }
-          entry.prev[i] = 1;
-          const minX = b[offset], minY = b[offset + 1], minZ = b[offset + 2];
-          const maxX = b[offset + 3], maxY = b[offset + 4], maxZ = b[offset + 5];
-          const dx = cullCamX < minX ? minX - cullCamX : (cullCamX > maxX ? cullCamX - maxX : 0);
-          const dy = cullCamY < minY ? minY - cullCamY : (cullCamY > maxY ? cullCamY - maxY : 0);
-          const dz = cullCamZ < minZ ? minZ - cullCamZ : (cullCamZ > maxZ ? cullCamZ - maxZ : 0);
-          const d2 = dx * dx + dy * dy + dz * dz;
-          const useFar = lod.prevLod[i] ? (d2 > lod.stayFarSq) : (d2 > lod.stayNearSq);
-          lod.prevLod[i] = useFar ? 1 : 0;
-          if (useFar) {
-            if (lod.indices[lodVisible] !== i) lodChanged = true;
-            lod.indices[lodVisible++] = i;
-          } else {
-            if (entry.indices[visible] !== i) changed = true;
-            entry.indices[visible++] = i;
+        } else {
+          for (let i = 0; i < source.count; i++) {
+            const offset = i * 6;
+            const lim = prev[i] ? entry.keepDistSq : entry.maxDistSq;
+            if (!intersectsBounds(b, offset) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) {
+              prev[i] = 0;
+              continue;
+            }
+            prev[i] = 1;
+            const minX = b[offset], minY = b[offset + 1], minZ = b[offset + 2];
+            const maxX = b[offset + 3], maxY = b[offset + 4], maxZ = b[offset + 5];
+            const dx = cullCamX < minX ? minX - cullCamX : (cullCamX > maxX ? cullCamX - maxX : 0);
+            const dy = cullCamY < minY ? minY - cullCamY : (cullCamY > maxY ? cullCamY - maxY : 0);
+            const dz = cullCamZ < minZ ? minZ - cullCamZ : (cullCamZ > maxZ ? cullCamZ - maxZ : 0);
+            const d2 = dx * dx + dy * dy + dz * dz;
+            const useFar = prevLod[i] ? (d2 > lod.stayFarSq) : (d2 > lod.stayNearSq);
+            prevLod[i] = useFar ? 1 : 0;
+            if (useFar) {
+              if (lod.indices[lodVisible] !== i) lodChanged = true;
+              lod.indices[lodVisible++] = i;
+            } else {
+              if (entry.indices[visible] !== i) changed = true;
+              entry.indices[visible++] = i;
+            }
           }
         }
         if (visible !== proxy.count) changed = true;
         if (lodVisible !== lp.count) lodChanged = true;
-        const colorChanged = source.instanceColor && entry.colorVersion !== source.instanceColor.version;
-        const lodColorChanged = source.instanceColor && lod.colorVersion !== source.instanceColor.version;
         const sourceMatrices = source.instanceMatrix.array;
         const sourceColors = source.instanceColor?.array;
         if ((changed || colorChanged) && visible > 0) {
@@ -468,7 +802,7 @@ export function optimizeStaticVisibility(scene, options = {}) {
             proxy.instanceColor.needsUpdate = true;
           }
         }
-        if ((lodChanged || lodColorChanged) && lodVisible > 0) {
+        if ((lodChanged || lodInstanceColorChanged) && lodVisible > 0) {
           if (lodChanged) {
             const matrices = lp.instanceMatrix.array;
             for (let i = 0; i < lodVisible; i++) {
@@ -505,16 +839,77 @@ export function optimizeStaticVisibility(scene, options = {}) {
         continue;
       }
       let visible = 0, changed = entry.dirty;
-      for (let i = 0; i < source.count; i++) {
-        const offset = i * 6;
-        const lim = entry.prev[i] ? entry.keepDistSq : entry.maxDistSq;
-        if (!intersectsBounds(b, offset) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) { entry.prev[i] = 0; continue; }
-        entry.prev[i] = 1;
-        if (entry.indices[visible] !== i) changed = true;
-        entry.indices[visible++] = i;
+      if (chunks) {
+        for (let c = 0; c < chunks.length; c++) {
+          const chunk = chunks[c];
+          const cb = chunk.b;
+          const items = chunk.items;
+          const fr = classifyChunkFrustum(cb);
+          let rejected = fr === 0;
+          if (!rejected && !entry.keepHorizon) {
+            const dxMin = cullCamX < cb[0] ? cb[0] - cullCamX : (cullCamX > cb[3] ? cullCamX - cb[3] : 0);
+            const dyMin = cullCamY < cb[1] ? cb[1] - cullCamY : (cullCamY > cb[4] ? cullCamY - cb[4] : 0);
+            const dzMin = cullCamZ < cb[2] ? cb[2] - cullCamZ : (cullCamZ > cb[5] ? cullCamZ - cb[5] : 0);
+            if (dxMin * dxMin + dyMin * dyMin + dzMin * dzMin > entry.keepDistSq) rejected = true;
+            else if (cullPortalMode !== 0 && cb[4] < 24 && !passesExtraCulling(cb, 0, false, Infinity)) rejected = true;
+          }
+          if (rejected) {
+            if (chunk.wasActive) {
+              for (let k = 0; k < items.length; k++) prev[items[k]] = 0;
+              chunk.wasActive = false;
+            }
+            continue;
+          }
+          let acceptAll = false;
+          if (fr === 2) {
+            if (entry.keepHorizon) acceptAll = true;
+            else {
+              const adx0 = cullCamX - cb[0], adx1 = cullCamX - cb[3];
+              const ady0 = cullCamY - cb[1], ady1 = cullCamY - cb[4];
+              const adz0 = cullCamZ - cb[2], adz1 = cullCamZ - cb[5];
+              const dxMax = Math.abs(adx0) > Math.abs(adx1) ? adx0 : adx1;
+              const dyMax = Math.abs(ady0) > Math.abs(ady1) ? ady0 : ady1;
+              const dzMax = Math.abs(adz0) > Math.abs(adz1) ? adz0 : adz1;
+              if (dxMax * dxMax + dyMax * dyMax + dzMax * dzMax <= entry.maxDistSq && chunkPortalAcceptsAll(cb)) acceptAll = true;
+            }
+          }
+          if (acceptAll) {
+            chunk.wasActive = true;
+            for (let k = 0; k < items.length; k++) {
+              const idx = items[k];
+              prev[idx] = 1;
+              if (entry.indices[visible] !== idx) changed = true;
+              entry.indices[visible++] = idx;
+            }
+          } else {
+            let any = false;
+            for (let k = 0; k < items.length; k++) {
+              const idx = items[k];
+              const offset = idx * 6;
+              const lim = prev[idx] ? entry.keepDistSq : entry.maxDistSq;
+              if ((fr !== 2 && !intersectsBounds(b, offset)) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) {
+                prev[idx] = 0;
+                continue;
+              }
+              prev[idx] = 1;
+              any = true;
+              if (entry.indices[visible] !== idx) changed = true;
+              entry.indices[visible++] = idx;
+            }
+            chunk.wasActive = any;
+          }
+        }
+      } else {
+        for (let i = 0; i < source.count; i++) {
+          const offset = i * 6;
+          const lim = prev[i] ? entry.keepDistSq : entry.maxDistSq;
+          if (!intersectsBounds(b, offset) || !passesExtraCulling(b, offset, entry.keepHorizon, lim)) { prev[i] = 0; continue; }
+          prev[i] = 1;
+          if (entry.indices[visible] !== i) changed = true;
+          entry.indices[visible++] = i;
+        }
       }
       if (visible !== proxy.count) changed = true;
-      const colorChanged = source.instanceColor && entry.colorVersion !== source.instanceColor.version;
       if ((changed || colorChanged) && visible > 0) {
         if (changed) {
           const matrices = proxy.instanceMatrix.array, sourceMatrices = source.instanceMatrix.array;
@@ -589,6 +984,11 @@ export function optimizeStaticVisibility(scene, options = {}) {
       for (let i = 0; i < entries.length; i++) {
         const entry = entries[i];
         entry.source.material = hiddenMaterial;
+        if (entry.wasHidden) {
+          entry.proxy.visible = false;
+          if (entry.lod) entry.lod.proxy.visible = false;
+          continue;
+        }
         const inFrustum = !entry.source.frustumCulled || frustum.intersectsObject(entry.source);
         entry.proxy.visible = (entry.kind === 'pages' ? entry.indexCount : entry.proxy.count) > 0 && inFrustum;
         if (entry.lod) entry.lod.proxy.visible = entry.lod.proxy.count > 0 && inFrustum;
@@ -599,6 +999,12 @@ export function optimizeStaticVisibility(scene, options = {}) {
       scene.matrixWorldAutoUpdate = prevAutoUpdate;
       restore();
     }
+  }
+
+  function scan(rootObj) {
+    if (disposed) throw new Error('Static visibility helper is disposed');
+    if (rendering) throw new Error('Static visibility does not support nested rendering');
+    return attachEntries(rootObj);
   }
 
   function dispose() {
@@ -625,5 +1031,5 @@ export function optimizeStaticVisibility(scene, options = {}) {
     disposed = true;
   }
 
-  return { update, render, dispose, entries, getStats: () => stats };
+  return { update, render, scan, dispose, entries, getStats: () => stats };
 }

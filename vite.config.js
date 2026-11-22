@@ -1,6 +1,53 @@
+import { readFileSync } from 'node:fs';
+
+const FALLBACK_REPO = 'https://github.com/fomalhaut1998/taohuayuan';
+
+function readProjectMeta() {
+  const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
+  const version = String(pkg?.version || '1.0.0').trim();
+  const rawRepo = typeof pkg?.repository === 'string' ? pkg.repository : pkg?.repository?.url;
+  const repoUrl = String(rawRepo || FALLBACK_REPO)
+    .trim()
+    .replace(/^git\+/, '')
+    .replace(/\.git$/i, '')
+    .replace(/\/+$/, '') || FALLBACK_REPO;
+  let repoSlug = 'fomalhaut1998/taohuayuan';
+  try {
+    repoSlug = new URL(repoUrl).pathname.replace(/^\/+|\/+$/g, '') || repoSlug;
+  } catch {}
+  const license = String(pkg?.license || 'MIT').trim();
+  return {
+    version,
+    versionLabel: `v${version}`,
+    repoUrl,
+    repoSlug,
+    releasesUrl: `${repoUrl}/releases`,
+    license,
+    licenseUrl: `${repoUrl}/blob/main/LICENSE`
+  };
+}
+
+function projectMetaPlugin() {
+  return {
+    name: 'taohuayuan-project-meta',
+    load(id) {
+      const cleanId = id.split('?')[0].replace(/\\/g, '/');
+      if (cleanId.endsWith('/src/systems/project-meta.js')) {
+        return `export const PROJECT_META = Object.freeze(${JSON.stringify(readProjectMeta())});\n`;
+      }
+      return null;
+    },
+    transformIndexHtml(html) {
+      const meta = readProjectMeta();
+      return html.replace(/(<[^>]*\bdata-app-version\b[^>]*>)([^<]*)(<\/[^>]+>)/g, `$1${meta.versionLabel}$3`);
+    }
+  };
+}
+
 export default ({ command }) => ({
   // GitHub Pages 走 /taohuayuan/ 子路径；Vercel 走根域名（其构建环境自带 VERCEL=1）；开发保持根路径
   base: process.env.VERCEL ? '/' : command === 'build' ? '/taohuayuan/' : '/',
+  plugins: [projectMetaPlugin()],
   build: {
     chunkSizeWarningLimit: 550,
     rollupOptions: {
@@ -109,6 +156,7 @@ export default ({ command }) => ({
             normalized.endsWith('/src/player/controller.js') ||
             normalized.endsWith('/src/player/touch-controls-lazy.js') ||
             normalized.endsWith('/src/systems/opening-curtain.js') ||
+            normalized.endsWith('/src/systems/project-meta.js') ||
             normalized.endsWith('/src/systems/footstep-fx.js') ||
             normalized.endsWith('/src/systems/world-clock.js') ||
             normalized.endsWith('/src/systems/tactile-props.js') ||

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { interactionAllowed, mysteryUiPaused } from './mysteries.js';
+import { getBlockerGrid } from './spatial-grid.js';
 
 // 近观：走近人或动物，按 E，她会回头应你一句。
 // 目标选择、圆环、提示、台词、镜头轻推都在这里，人物/动物的具体动作交给它们自己。
@@ -86,36 +87,47 @@ export function createInteraction(cfg, script, people, fauna, field, player, sou
   function keyOfAnimal(a) { return 'a' + a.kind + a.index; }
 
   // Intersect the player-target segment with the same rotated wall boxes used by movement (zero per-frame allocations).
+  function hitTallBlocker(b, ax, az, bx, bz) {
+    if (Number.isFinite(b.maxY) && Number.isFinite(b.minY) && b.maxY - b.minY < 1.0) return false;
+    const rBound = (b.hw || 0) + (b.hd || 0);
+    if ((ax < b.x - rBound && bx < b.x - rBound) || (ax > b.x + rBound && bx > b.x + rBound) ||
+        (az < b.z - rBound && bz < b.z - rBound) || (az > b.z + rBound && bz > b.z + rBound)) {
+      return false;
+    }
+    const c = Math.cos(b.rot || 0), s = Math.sin(b.rot || 0);
+    const x = (ax - b.x) * c - (az - b.z) * s;
+    const z = (ax - b.x) * s + (az - b.z) * c;
+    const dx = (bx - ax) * c - (bz - az) * s;
+    const dz = (bx - ax) * s + (bz - az) * c;
+    let lo = 0, hi = 1;
+    if (Math.abs(dx) < 1e-9) {
+      if (Math.abs(x) > b.hw) return false;
+    } else {
+      const a0 = (-b.hw - x) / dx, q0 = (b.hw - x) / dx;
+      lo = Math.max(lo, Math.min(a0, q0));
+      hi = Math.min(hi, Math.max(a0, q0));
+    }
+    if (Math.abs(dz) < 1e-9) {
+      if (Math.abs(z) > b.hd) return false;
+    } else {
+      const a1 = (-b.hd - z) / dz, q1 = (b.hd - z) / dz;
+      lo = Math.max(lo, Math.min(a1, q1));
+      hi = Math.min(hi, Math.max(a1, q1));
+    }
+    return lo <= hi && lo <= 1 && hi >= 0;
+  }
+
   function blocked(ax, az, bx, bz) {
+    if (!Number.isFinite(ax) || !Number.isFinite(az) || !Number.isFinite(bx) || !Number.isFinite(bz)) return false;
+    if (blockers.length >= 24) {
+      const grid = getBlockerGrid(blockers, 8, 2.5);
+      if (grid) {
+        const hit = grid.testSegment(ax, az, bx, bz, 0, hitTallBlocker);
+        if (hit !== null) return hit;
+      }
+    }
     for (let i = 0; i < blockers.length; i++) {
-      const b = blockers[i];
-      if (Number.isFinite(b.maxY) && Number.isFinite(b.minY) && b.maxY - b.minY < 1.0) continue;
-      const rBound = (b.hw || 0) + (b.hd || 0);
-      if ((ax < b.x - rBound && bx < b.x - rBound) || (ax > b.x + rBound && bx > b.x + rBound) ||
-          (az < b.z - rBound && bz < b.z - rBound) || (az > b.z + rBound && bz > b.z + rBound)) {
-        continue;
-      }
-      const c = Math.cos(b.rot || 0), s = Math.sin(b.rot || 0);
-      const x = (ax - b.x) * c - (az - b.z) * s;
-      const z = (ax - b.x) * s + (az - b.z) * c;
-      const dx = (bx - ax) * c - (bz - az) * s;
-      const dz = (bx - ax) * s + (bz - az) * c;
-      let lo = 0, hi = 1;
-      if (Math.abs(dx) < 1e-9) {
-        if (Math.abs(x) > b.hw) continue;
-      } else {
-        const a0 = (-b.hw - x) / dx, q0 = (b.hw - x) / dx;
-        lo = Math.max(lo, Math.min(a0, q0));
-        hi = Math.min(hi, Math.max(a0, q0));
-      }
-      if (Math.abs(dz) < 1e-9) {
-        if (Math.abs(z) > b.hd) continue;
-      } else {
-        const a1 = (-b.hd - z) / dz, q1 = (b.hd - z) / dz;
-        lo = Math.max(lo, Math.min(a1, q1));
-        hi = Math.min(hi, Math.max(a1, q1));
-      }
-      if (lo <= hi && lo <= 1 && hi >= 0) return true;
+      if (hitTallBlocker(blockers[i], ax, az, bx, bz)) return true;
     }
     return false;
   }

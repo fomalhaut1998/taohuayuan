@@ -82,7 +82,7 @@ export function createQinHanHomestead(options = {}) {
   const actorGroup = new THREE.Group();
   actorGroup.name = 'qin-han-actors';
   group.add(actorGroup);
-  const actorRig = createCommunityActors(actorGroup, 4);
+  const actorRig = options.actorRig ? options.actorRig.createChannel(actorGroup, 4) : createCommunityActors(actorGroup, 4);
 
   const villagers = [];
   const registerVillager = (id, role, voiceRole, pos, facing, kind, activeFlag = true) => {
@@ -1041,7 +1041,7 @@ export function createQinHanHomestead(options = {}) {
       const isWalking = (Math.abs(targetU - u) > 0.02 || wantMode === 'dusk-return') && restFold < 0.5;
       const strideBob = isWalking ? Math.abs(Math.sin(simTime * 3.8)) * 0.028 : (1 + Math.sin(simTime * 1.15)) * 0.006;
       const groundY = surface(bx, bz);
-      const wy = lerp(buffaloLive.pondY, groundY + lerp(0.35, 0.17, restFold), landT);
+      const wy = lerp(buffaloLive.pondY, groundY + lerp(0.35, 0.21, restFold), landT);
 
       buffaloLive.x = bx;
       buffaloLive.y = wy;
@@ -1085,7 +1085,8 @@ export function createQinHanHomestead(options = {}) {
         const swingWave = isWalking ? gaitSign * Math.sin(simTime * 3.8) : 0;
         const stepLift = isWalking ? Math.max(0, gaitSign * Math.cos(simTime * 3.8)) * 0.038 * landT : 0;
         const lwy = wy + stepLift - restFold * 0.05;
-        const lrx = lerp(swingWave * 0.30, -1.34, restFold);
+        const foldAngle = li < 2 ? 1.34 : -1.34;
+        const lrx = lerp(swingWave * 0.30, foldAngle, restFold);
         faunaBatch.writePart(buffaloLegBaseSlot + li, lwx, lwy, lwz, lrx, byaw, 0, 1, lerp(1, 0.86, restFold), 1);
       }
 
@@ -1474,7 +1475,9 @@ export function createQinHanHomestead(options = {}) {
       const tailWag = dogAlert
         ? Math.sin(simTime * 10.5) * 0.65
         : (dogDeepSleep ? 0 : Math.sin(simTime * 1.8) * 0.12);
-      faunaBatch.writePart(10, dx - ds * 0.24, dy + bodyLift + 0.04, dz - dc * 0.24, dogAlert ? 0.12 : -0.22, dyaw + tailWag, 0);
+      const tailRx = dogAlert ? 0.12 : (dogDeepSleep ? -0.45 : (standing ? -0.10 : -0.36));
+      const tailRz = standing ? 0 : (dogDeepSleep ? 1.85 : 1.35);
+      faunaBatch.writePart(10, dx - ds * 0.24, dy + bodyLift + 0.04, dz - dc * 0.24, tailRx, dyaw + tailWag, tailRz);
 
       const legSpecs = [
         [-0.075, 0.16, 1],

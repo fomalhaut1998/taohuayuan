@@ -31,7 +31,7 @@ const EVENTS={wash:['strike',.78,'washImpact'],trap:['check',.45,'trapCheck'],el
  * wash.{cloth,workSurface,gripLocal,strikeLocal} links the real cloth, WORLD surface and bat-local grip/blade.
  * All borrowed transforms are restored by dispose; borrowed geometry/material/parentage is never owned here.
  */
-export function createCommunityLife({world={},field,stations=[],sound,blockers=[]}={}) {
+export function createCommunityLife({world={},field,stations=[],sound,blockers=[],actorRig=null}={}) {
   const group=new THREE.Group();group.name='community-life';
   const actors=[],rejected=[];let pathsRejected=0,clock=0,disposed=false;
   const kinds=Object.fromEntries(KINDS.map(k=>[k,0])),completed={...kinds};
@@ -91,7 +91,7 @@ export function createCommunityLife({world={},field,stations=[],sound,blockers=[
     a.role=role;a.voiceRole=voiceRole;
     a.interactable={id:a.id,key:'c_'+a.id,x:a.root.x,y:a.root.y,z:a.root.z,role:a.role,voiceRole:a.voiceRole,female:a.female,mode:a.kind==='liubo'?'sit':'work',s:a.scale};
   }
-  const rig=createCommunityActors(group,actors.length);
+  const rig=actorRig?actorRig.createChannel(group,actors.length):createCommunityActors(group,actors.length);
   const trapPos=new THREE.Vector3(),trapMat=new THREE.Matrix4(),trapV=new THREE.Vector3();
   function at(a,t){
     if(!a.length||t>=1)return a.station;

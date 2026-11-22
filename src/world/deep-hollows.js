@@ -972,7 +972,7 @@ export function createDeepHollows(options = {}) {
   actorGroup.name = 'deep-hollows-actors';
   actorGroup.userData.dynamic = true;
   group.add(actorGroup);
-  const rig = createCommunityActors(actorGroup, 3);
+  const rig = options.actorRig ? options.actorRig.createChannel(actorGroup, 3) : createCommunityActors(actorGroup, 3);
 
   const altarKeeperX = altar.x + 1.55;
   const altarKeeperZ = altar.z + 1.15;

@@ -2649,7 +2649,7 @@ export function createValleyBorderlands(options = {}) {
   actorGroup.name = 'valley-borderlands-actors';
   actorGroup.userData.dynamic = true;
   dynamicGroup.add(actorGroup);
-  const actorRig = createCommunityActors(actorGroup, 2);
+  const actorRig = options.actorRig ? options.actorRig.createChannel(actorGroup, 2) : createCommunityActors(actorGroup, 2);
 
   const herbalistX = tsCfg.x - 1.05;
   const herbalistZ = tsCfg.z + 0.92;

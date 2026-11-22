@@ -104,7 +104,8 @@ export function createArchitecturalCraft({
   avatar,
   boats,
   sky,
-  phenology
+  phenology,
+  sharedCommunityActors
 } = {}) {
   const group = new THREE.Group();
   group.name = 'architectural-craft';
@@ -638,7 +639,8 @@ if (uWarmRimStrength > 0.001) {
       communityLife?.group,
       hospitalityFeast?.group,
       neighborTheaters?.group,
-      qinHanCompletion?.group
+      qinHanCompletion?.group?.getObjectByName?.('qin-han-night-feast-actors'),
+      sharedCommunityActors
     ];
     for (let r = 0; r < actorRoots.length; r++) {
       const root = actorRoots[r];

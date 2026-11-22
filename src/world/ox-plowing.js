@@ -708,7 +708,7 @@ export function createOxPlowing(ctx) {
   group.add(batch.mesh);
 
   // ---- 扶犁农夫（人物 rig）----
-  const rig = createCommunityActors(group, 2);
+  const rig = ctx?.actorRig ? ctx.actorRig.createChannel(group, 2) : createCommunityActors(group, 2);
 
   // ---- 歇息点（田头阡陌）与障碍/识物/交谈状态 ----
   const restSpot = { x: x0 + pw * 0.5, z: z0 + 1.0 };
@@ -970,7 +970,7 @@ export function createOxPlowing(ctx) {
 
     // 4. 牛尾（自然垂弧甩虻）
     const tailSway = Math.sin(simTime * 1.65) * 0.24 + Math.sin(gaitPhase) * 0.10 * walkAmt;
-    batch.writePart(12, bx - bs * 0.66, bodyY + 0.15, bz - bc * 0.66, 0.06, byaw + tailSway, 0);
+    batch.writePart(12, bx - bs * 0.66, bodyY + 0.15, bz - bc * 0.66, 0.06, byaw + tailSway * (1 - restBlend * 0.7), restBlend * 0.85);
 
     // 5. 曲木牛轭（稳架肩峰前颈脊，随步伐微倾）
     const yx = bx + bs * 0.48, yz = bz + bc * 0.48, yy = bodyY + 0.29 - restBlend * 0.02;

@@ -163,6 +163,45 @@ for (let i = 0; i < 260; i++) {
 }
 const sleepDog = fauna.animals.find(a => a.kind === 'dog' && a.mode === 'sleep');
 assert.ok(sleepDog, 'village dogs curl up to sleep at their doorway at night');
+const sleepOx = fauna.animals.find(a => a.kind === 'ox' && a.mode === 'sleep');
+assert.ok(sleepOx, 'village oxen lie down to sleep at night');
+
+const measureSleepBounds = (animal) => {
+  const g = animal.mesh.geometry;
+  const sc = world.fauna.scales?.[animal.kind] ?? 1;
+  const state = [animal.phase, animal.gait, 0, FAUNA_KIND[animal.kind]];
+  const bodyQ = new THREE.Quaternion().setFromEuler(new THREE.Euler(animal.kind === 'ox' ? 0 : animal.pitch, 0, animal.rock));
+  const stats = { globalMinY: Infinity, torsoMinY: Infinity, headMinY: Infinity, tailMinY: Infinity, tailMaxY: -Infinity, frontMinZ: Infinity, frontMaxZ: -Infinity, hindMinZ: Infinity, hindMaxZ: -Infinity };
+  const mot = g.attributes.faunaMotion;
+  const piv = g.attributes.faunaPivot;
+  for (let i = 0; i < g.attributes.position.count; i++) {
+    const ch = mot.getX(i);
+    const sv = sampleFaunaVertex(g, i, state);
+    const p = sv.position.applyQuaternion(bodyQ).multiplyScalar(sc);
+    p.y += animal.lift;
+    if (p.y < stats.globalMinY) stats.globalMinY = p.y;
+    if (ch === 0) stats.torsoMinY = Math.min(stats.torsoMinY, p.y);
+    else if (ch === 1) stats.headMinY = Math.min(stats.headMinY, p.y);
+    else if (ch === 2) { stats.tailMinY = Math.min(stats.tailMinY, p.y); stats.tailMaxY = Math.max(stats.tailMaxY, p.y); }
+    else if (ch === 3) {
+      if (piv.getZ(i) > 0) { stats.frontMinZ = Math.min(stats.frontMinZ, p.z); stats.frontMaxZ = Math.max(stats.frontMaxZ, p.z); }
+      else { stats.hindMinZ = Math.min(stats.hindMinZ, p.z); stats.hindMaxZ = Math.max(stats.hindMaxZ, p.z); }
+    }
+  }
+  return stats;
+};
+const dogSleepB = measureSleepBounds(sleepDog);
+assert.ok(dogSleepB.globalMinY >= -0.004, `sleeping dog rests cleanly without dipping underground (minY=${dogSleepB.globalMinY.toFixed(4)})`);
+assert.ok(dogSleepB.torsoMinY <= 0.06, `sleeping dog belly rests on ground (torsoMinY=${dogSleepB.torsoMinY.toFixed(4)})`);
+assert.ok(dogSleepB.hindMaxZ > 0 && dogSleepB.frontMaxZ > 0.45, `sleeping dog tucks hindlegs forward and extends forelegs forward (hindMaxZ=${dogSleepB.hindMaxZ.toFixed(3)}, frontMaxZ=${dogSleepB.frontMaxZ.toFixed(3)})`);
+assert.ok(dogSleepB.headMinY < 0.10 && dogSleepB.tailMaxY < 0.35, `sleeping dog lowers head & tail (headMinY=${dogSleepB.headMinY.toFixed(3)}, tailMaxY=${dogSleepB.tailMaxY.toFixed(3)})`);
+
+const oxSleepB = measureSleepBounds(sleepOx);
+assert.ok(oxSleepB.globalMinY >= -0.004, `sleeping ox rests cleanly without dipping underground (minY=${oxSleepB.globalMinY.toFixed(4)})`);
+assert.ok(oxSleepB.torsoMinY <= 0.06, `sleeping ox belly rests on ground (torsoMinY=${oxSleepB.torsoMinY.toFixed(4)})`);
+assert.ok(oxSleepB.frontMinZ < 0 && oxSleepB.hindMaxZ > 0, `sleeping ox folds forelegs backward & hindlegs forward under belly (frontMinZ=${oxSleepB.frontMinZ.toFixed(3)}, hindMaxZ=${oxSleepB.hindMaxZ.toFixed(3)})`);
+assert.ok(oxSleepB.tailMinY >= -0.004, `sleeping ox tail stays above ground (tailMinY=${oxSleepB.tailMinY.toFixed(4)})`);
+
 fauna.update(0.05, 29.0, sleepDog.x + 1.5, sleepDog.z + 1.5, { timeId: 'night', rainIntensity: 0, blockers: [] });
 assert.equal(sleepDog.mode, 'watch', 'sleeping watchdog wakes to watch closely approaching night visitor');
 

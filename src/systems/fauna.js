@@ -30,6 +30,7 @@ export function createFauna(cfg, field, sound, context = {}) {
 
   // 由 world.fauna.species 数据驱动，新增种类不必再改硬编码调用。
   function addGroup(list, geo, kind, speed, radius) {
+    const speciesIdx = group.children.length;
     const mesh = new THREE.InstancedMesh(geo, mat, list.count);
     mesh.name = 'fauna-' + kind;
     attachFaunaState(geo, list.count);
@@ -38,6 +39,7 @@ export function createFauna(cfg, field, sound, context = {}) {
       animals.push({
         kind: kind,
         mesh: mesh,
+        speciesIdx: speciesIdx,
         index: i,
         x: home[0] + (rand() - 0.5) * 4,
         z: home[1] + (rand() - 0.5) * 4,
@@ -78,6 +80,12 @@ export function createFauna(cfg, field, sound, context = {}) {
   const _stepRes = { moved: false, dirX: 0, dirZ: 1 };
   const _movingFlags = new Uint8Array(animals.length);
   const _prevYaws = new Float64Array(animals.length);
+  const _preX = new Float64Array(animals.length);
+  const _preZ = new Float64Array(animals.length);
+  const _preLift = new Float64Array(animals.length);
+  const _sampledX = new Float64Array(animals.length).fill(NaN);
+  const _sampledZ = new Float64Array(animals.length).fill(NaN);
+  const _speciesDirty = new Uint8Array(group.children.length);
   const _mergedHabitat = {};
 
   for (let i = 0; i < animals.length; i++) {
@@ -94,6 +102,14 @@ export function createFauna(cfg, field, sound, context = {}) {
 
   function isAirborne(a) {
     return a.kind === 'bird' && (a.mode === 'flush' || a.lift > 0.28);
+  }
+
+  function sleepLiftFor(a) {
+    return a.kind === 'ox' ? -0.495
+      : a.kind === 'dog' ? -0.262
+        : a.kind === 'chicken' ? -0.11
+          : a.kind === 'bird' ? -0.042
+            : a.inWater ? 0 : -0.042;
   }
 
   function tryDisplaceAnimal(a, dx, dz, hab) {
@@ -168,8 +184,11 @@ export function createFauna(cfg, field, sound, context = {}) {
   }
 
   resolveInitialOverlaps();
-  for (const a of animals) {
+  for (let i = 0; i < animals.length; i++) {
+    const a = animals[i];
     a.y = sampleAnimalGround(a, habitat);
+    _sampledX[i] = a.x;
+    _sampledZ[i] = a.z;
     writePose(a);
   }
   for (const mesh of group.children) mesh.computeBoundingSphere();
@@ -444,6 +463,9 @@ export function createFauna(cfg, field, sound, context = {}) {
     for (let i = 0; i < animals.length; i++) {
       const a = animals[i];
       _prevYaws[i] = a.yaw;
+      _preX[i] = a.x;
+      _preZ[i] = a.z;
+      _preLift[i] = a.lift;
       let moving = false;
       const rainShelter = !isNight && rainAmt > 0.28 && (a.kind === 'chicken' || a.kind === 'bird');
       const nightDogWatch = isNight && a.kind === 'dog' && Number.isFinite(px) && Number.isFinite(pz) &&
@@ -469,9 +491,6 @@ export function createFauna(cfg, field, sound, context = {}) {
         }
       } else if (!wantsRest && a.mode === 'sleep') {
         a.mode = 'idle';
-        a.lift = 0;
-        a.pitch = 0;
-        if (a.gait < 0) a.gait = 0;
         a.timer = 0.4 + lifeRand() * 1.4;
       }
       if (visualClock >= a.nextThink) {
@@ -711,6 +730,7 @@ export function createFauna(cfg, field, sound, context = {}) {
     const maxCorr = Math.max(0.09, 4.2 * dt);
     const extraAnimals = habitat.extraAnimals;
     for (let pass = 0; pass < 2; pass++) {
+      let hadOverlap = false;
       // 2a. Grounded sparrows lightly hop aside for approaching cattle, dogs, or people
       for (let i = 0; i < animals.length; i++) {
         const a = animals[i];
@@ -722,6 +742,7 @@ export function createFauna(cfg, field, sound, context = {}) {
           if (Math.abs(b.x - a.x) > 2.4 || Math.abs(b.z - a.z) > 2.4) continue;
           capsuleGap(a.x, a.z, a.yaw, 0, 0, a.capRadius + 0.14, b.x, b.z, b.yaw, b.capRear, b.capFront, b.capRadius, _gap);
           if (_gap.overlap > 1e-4) {
+            hadOverlap = true;
             const push = Math.min(_gap.overlap, Math.max(0.06, 3.2 * dt));
             if (tryDisplaceAnimal(a, _gap.nx * push, _gap.nz * push, habitat) && a.mode === 'idle') {
               a.quirkDur = 0.34; a.quirkT = Math.max(a.quirkT, 0.22);
@@ -739,6 +760,7 @@ export function createFauna(cfg, field, sound, context = {}) {
             const rP = (p.basket ? 0.34 : 0.30) * (p.s || p.scale || 1);
             capsuleGap(a.x, a.z, a.yaw, 0, 0, a.capRadius + 0.12, p.x, p.z, 0, 0, 0, rP, _gap);
             if (_gap.overlap > 1e-4) {
+              hadOverlap = true;
               const push = Math.min(_gap.overlap, Math.max(0.06, 3.2 * dt));
               if (tryDisplaceAnimal(a, _gap.nx * push, _gap.nz * push, habitat) && a.mode === 'idle') {
                 a.quirkDur = 0.34; a.quirkT = Math.max(a.quirkT, 0.22);
@@ -758,6 +780,7 @@ export function createFauna(cfg, field, sound, context = {}) {
           if (Math.abs(a.x - b.x) > 3.2 || Math.abs(a.z - b.z) > 3.2) continue;
           capsuleGap(a.x, a.z, a.yaw, a.capRear, a.capFront, a.capRadius + 0.015, b.x, b.z, b.yaw, b.capRear, b.capFront, b.capRadius + 0.015, _gap);
           if (_gap.overlap <= 1e-4) continue;
+          hadOverlap = true;
           const invA = (a.mode === 'sleep' ? 0.25 : 1) / a.capMass;
           const invB = (b.mode === 'sleep' ? 0.25 : 1) / b.capMass;
           const sum = invA + invB;
@@ -785,6 +808,7 @@ export function createFauna(cfg, field, sound, context = {}) {
             const bRad = b.radius ?? b.capRadius ?? 0.35;
             capsuleGap(a.x, a.z, a.yaw, a.capRear, a.capFront, a.capRadius + 0.015, b.x, b.z, b.yaw || 0, bRear, bFront, bRad + 0.015, _gap);
             if (_gap.overlap <= 1e-4) continue;
+            hadOverlap = true;
             const corr = Math.min(_gap.overlap, maxCorr);
             tryDisplaceAnimal(a, _gap.nx * corr, _gap.nz * corr, habitat);
           }
@@ -806,6 +830,7 @@ export function createFauna(cfg, field, sound, context = {}) {
             const rP = (p.basket ? 0.34 : 0.30) * (p.s || p.scale || 1);
             capsuleGap(a.x, a.z, a.yaw, a.capRear, a.capFront, a.capRadius + 0.015, p.x, p.z, 0, 0, 0, rP, _gap);
             if (_gap.overlap <= 1e-4) continue;
+            hadOverlap = true;
             const anchored = isExtra || p.greetT > 0 || p.mode === 'sit' || p.mode === 'talk' || p.mode === 'work' || Boolean(p.shelter && p.shelter.phase === 'out');
             const share = a.kind === 'ox' ? (anchored ? 1.0 : 0.45) : 1.0;
             const corr = Math.min(_gap.overlap * share, maxCorr);
@@ -818,14 +843,20 @@ export function createFauna(cfg, field, sound, context = {}) {
           }
         }
       }
+      if (!hadOverlap) break;
     }
 
     // Pass 3: Terrain sampling, procedural micro-motion, pose write & spatial audio
+    _speciesDirty.fill(0);
     for (let i = 0; i < animals.length; i++) {
       const a = animals[i];
       const moving = _movingFlags[i] === 1;
       a.phase += dt * (a.mode === 'sleep' ? 0.35 : moving ? 9 : 1.7);
-      a.y = sampleAnimalGround(a, habitat);
+      if (a.x !== _sampledX[i] || a.z !== _sampledZ[i]) {
+        a.y = sampleAnimalGround(a, habitat);
+        _sampledX[i] = a.x;
+        _sampledZ[i] = a.z;
+      }
       let bob = moving
         ? Math.abs(Math.sin(a.phase)) * 0.032
         : (a.inWater ? Math.sin(a.phase * 0.8) * 0.008 : (1 + Math.sin(a.phase * 0.7)) * 0.0035);
@@ -873,9 +904,10 @@ export function createFauna(cfg, field, sound, context = {}) {
 
       if (a.mode === 'sleep') {
         a.gait += (-1 - a.gait) * Math.min(1, dt * 6);
+      } else if (a.gait < 0) {
+        a.gait = Math.min(0, a.gait + dt * 5.0);
       } else {
-        const baseGait = Math.max(0, a.gait);
-        a.gait = baseGait + ((moving ? 1 : 0) - baseGait) * Math.min(1, dt * 12);
+        a.gait = a.gait + ((moving ? 1 : 0) - a.gait) * Math.min(1, dt * 12);
       }
       let reaction = 0;
       if (a.kind === 'ox') reaction = a.pitch;
@@ -884,21 +916,25 @@ export function createFauna(cfg, field, sound, context = {}) {
       else if (a.kind === 'chicken') reaction = a.hopT > 0 ? 1 : 0;
       else if (a.kind === 'duck') reaction = a.mode === 'paddle' ? 1 : 0;
       a.activity = a.mode === 'sleep' ? 'rest' : a.mode === 'watch' ? 'watch' : a.mode === 'follow' ? 'curious' : a.mode === 'flee' || a.mode === 'flush' || a.mode === 'paddle' ? 'startled' : moving ? 'wander' : 'forage';
-      if (a.mode === 'sleep') {
+      if (a.mode === 'sleep' || a.gait < 0) {
         const sleepK = Math.max(0, -a.gait);
-        bob = (1 + Math.sin(visualClock * 1.1 + a.phase)) * 0.0025;
-        a.lift = sleepK * (
-          a.kind === 'ox' ? -0.21
-            : a.kind === 'dog' ? -0.21
-              : a.kind === 'chicken' ? -0.11
-                : a.kind === 'bird' ? -0.042
-                  : a.inWater ? 0 : -0.042
-        );
-        a.pitch = 0.08 * sleepK;
-        a.rock = 0;
-        reaction = 0;
+        const liftK = sleepK * sleepK;
+        if (a.mode !== 'flush') a.lift = liftK * sleepLiftFor(a);
+        if (a.mode === 'sleep') {
+          bob = (1 + Math.sin(visualClock * 1.1 + a.phase)) * 0.0025;
+          a.pitch = a.kind === 'dog' ? -0.045 * liftK : a.kind === 'ox' ? 0 : 0.08 * sleepK;
+          a.rock = 0;
+          reaction = 0;
+        } else {
+          bob *= (1 - sleepK);
+          if (a.kind === 'dog') a.pitch = -0.045 * liftK;
+          else if (a.kind !== 'ox') a.pitch *= (1 - sleepK);
+        }
       }
       if (visualClock >= a.recoverUntil && a.mode === 'idle') a.attention = 'none';
+      if (a.x !== _preX[i] || a.z !== _preZ[i] || Math.abs(a.lift - _preLift[i]) > 1e-4) {
+        _speciesDirty[a.speciesIdx] = 1;
+      }
       writePose(a, bob, reaction);
 
       // 靠近才叫（睡眠安静不喧闹）：按 kind 分派声音函数，去掉 chicken/dog 硬编码分支。
@@ -916,9 +952,9 @@ export function createFauna(cfg, field, sound, context = {}) {
       const mesh = group.children[m];
       mesh.instanceMatrix.needsUpdate = true;
       mesh.geometry.attributes.faunaState.needsUpdate = true;
-      // InstancedMesh caches its world-space sphere; invalidate each moving pose.
+      // InstancedMesh caches its world-space sphere; only recompute when an instance moved or lifted.
       // Geometry's sphere already encloses every articulated local pose.
-      mesh.computeBoundingSphere();
+      if (_speciesDirty[m]) mesh.computeBoundingSphere();
     }
   }
 

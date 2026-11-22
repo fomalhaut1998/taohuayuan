@@ -177,15 +177,17 @@ diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.86, 0.93, 0.91), inkShoalFoam * 
 vec3 inkToEye = cameraPosition - vTwilightWaterPosition;
 float inkHoriz2 = inkToEye.x * inkToEye.x + inkToEye.z * inkToEye.z;
 if (inkHoriz2 > 0.0001 && inkToEye.y > 0.02) {
-  float inkHoriz = sqrt(inkHoriz2);
-  vec3 inkV = inkToEye / sqrt(inkHoriz2 + inkToEye.y * inkToEye.y);
+  float inkInvHoriz = inversesqrt(inkHoriz2);
+  float inkHoriz = inkHoriz2 * inkInvHoriz;
+  vec2 inkViewXZ = -inkToEye.xz * inkInvHoriz;
+  vec3 inkV = inkToEye * inversesqrt(inkHoriz2 + inkToEye.y * inkToEye.y);
   float rw1 = sin(vTwilightWaterPosition.x * 2.15 + vTwilightWaterPosition.z * 1.65 - uInkWaterClock * 1.18);
   float rw2 = cos(vTwilightWaterPosition.x * 1.45 - vTwilightWaterPosition.z * 2.35 + uInkWaterClock * 0.86);
   float calmMirror = 1.0 - 0.58 * uInkWaterKind;
   float fresnel = (0.30 + 0.70 * pow(1.0 - clamp(inkV.y, 0.0, 1.0), 2.3)) * calmMirror;
   float reflElev = clamp(inkV.y + rw1 * uInkReflParams.w * 0.5, 0.02, 0.95);
   vec3 skyMirror = mix(uInkSkyHorizon, uInkSkyTop, smoothstep(0.03, 0.48, reflElev));
-  vec2 cloudUV = vTwilightWaterPosition.xz * 0.042 + (-inkToEye.xz / inkHoriz) * (0.45 / (reflElev + 0.22)) + vec2(uInkWaterClock * 0.018, -uInkWaterClock * 0.011);
+  vec2 cloudUV = vTwilightWaterPosition.xz * 0.042 + inkViewXZ * (0.45 / (reflElev + 0.22)) + vec2(uInkWaterClock * 0.018, -uInkWaterClock * 0.011);
   float cloudWave = 0.5 + 0.32 * sin(cloudUV.x * 2.3 + sin(cloudUV.y * 1.7)) + 0.18 * cos(cloudUV.y * 3.1 - cloudUV.x * 1.4);
   float cloudVeil = smoothstep(0.50, 0.84, cloudWave) * (1.0 - smoothstep(0.52, 0.92, reflElev));
   diffuseColor.rgb = mix(diffuseColor.rgb, skyMirror, clamp(uInkReflParams.x * fresnel, 0.0, 0.45));
@@ -193,7 +195,7 @@ if (inkHoriz2 > 0.0001 && inkToEye.y > 0.02) {
   if (uInkMoonSheen.w > 0.005) {
     // 晴夜月色碎银：基于二维值噪声 FBM 的横向拉丝水纹银光（绝无周期棋盘格），白昼/晨暮严格归零
     vec3 mDir = normalize(uInkMoonSheen.xyz);
-    vec2 viewXZ = -inkToEye.xz / inkHoriz;
+    vec2 viewXZ = inkViewXZ;
     vec2 acrossXZ = vec2(-viewXZ.y, viewXZ.x);
     vec2 moonXZ = normalize(mDir.xz + vec2(0.0001));
     float mCorridor = smoothstep(0.24, 0.94, dot(viewXZ, moonXZ));
@@ -208,7 +210,7 @@ if (inkHoriz2 > 0.0001 && inkToEye.y > 0.02) {
     diffuseColor.rgb += vec3(0.58, 0.73, 0.87) * clamp(mPath, 0.0, 0.34);
   }
   if (uInkReflectCount > 0 && uInkWaterKind < 0.5) {
-    vec2 rawRay = -inkToEye.xz / inkHoriz;
+    vec2 rawRay = inkViewXZ;
     vec2 perpRay = vec2(-rawRay.y, rawRay.x);
     vec2 hDir = normalize(rawRay + perpRay * (rw1 * 0.65 + rw2 * 0.35) * uInkReflParams.w);
     float viewSlope = inkToEye.y / max(inkHoriz, 0.5);

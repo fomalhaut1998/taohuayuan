@@ -111,7 +111,7 @@ const scalarJS=angleBody.replace(/\bfloat\b/g,'let').replace(/\b(sin|pow|max)\(/
 const names=Object.keys(shader.uniforms), values=names.map(n=>shader.uniforms[n].value);
 const gpuAngle=new Function('motion','state',...names,scalarJS);
 let angleCases=0;
-for(const kind of Object.values(FAUNA_KIND)) for(let channel=0;channel<=5;channel++) for(const phase of [-2,0,0.4,2,7]) for(const gait of [0,0.5,1]) for(const reaction of [-0.08,0,0.14,1]) {
+for(const kind of Object.values(FAUNA_KIND)) for(let channel=0;channel<=5;channel++) for(const phase of [-2,0,0.4,2,7]) for(const gait of [-1,-0.5,0,0.5,1]) for(const reaction of [-0.08,0,0.14,1]) {
   const motion=[channel,0.7,0.43], state=[phase,gait,reaction,kind];
   near(gpuAngle(motion,state,...values),faunaPartAngle(motion,state), 'CPU/GLSL parity'); angleCases++;
 }

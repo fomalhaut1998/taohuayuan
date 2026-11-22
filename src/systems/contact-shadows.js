@@ -5,10 +5,18 @@ const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const finite = Number.isFinite;
 const noopRaycast = () => {};
 function number(value, fallback, lo, hi) { return finite(value) ? clamp(value, lo, hi) : fallback; }
-function hash(text) {
+function hashRaw(text) {
   let h = 2166136261;
   for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619) >>> 0;
+  return h;
+}
+function hashSupport(baseHash, supportIdx) {
+  let h = Math.imul(baseHash ^ 58, 16777619) >>> 0;
+  h = Math.imul(h ^ (48 + supportIdx), 16777619) >>> 0;
   return h / 4294967296;
+}
+function hash(text) {
+  return hashRaw(text) / 4294967296;
 }
 function visible(owner) {
   for (let node = owner; node; node = node.parent) if (node.visible === false) return false;
@@ -209,9 +217,18 @@ export function createContactShadows(ctx = {}) {
   const hoofSupports = [-.30, -.52, .30, -.52, -.30, .52, .30, .52, 0, 0];
   const rootSupport = [0, 0];
   const sortCandidates = (a, b) => (a.kind === 'house' ? 0 : 1) - (b.kind === 'house' ? 0 : 1) || a.distance - b.distance || a.i - b.i;
+  const labelHashCache = new Map();
+  const baseHashOf = (label) => {
+    let h = labelHashCache.get(label);
+    if (h === undefined) {
+      h = hashRaw(label);
+      labelHashCache.set(label, h);
+    }
+    return h;
+  };
   const register = (data, kind, owner, label) => {
     if (!data || staticTargets.length >= cfg.maxStaticTargets) return;
-    staticTargets.push({ source: data, data: Array.isArray(data) ? { x: data[0], y: data[1], z: data[2] } : data, kind, owner, label, i: staticTargets.length, distance: 0 });
+    staticTargets.push({ source: data, data: Array.isArray(data) ? { x: data[0], y: data[1], z: data[2] } : data, kind, owner, label, baseHash: hashRaw(label), i: staticTargets.length, distance: 0 });
   };
   // Houses first so dense peach groves cannot exhaust registration before architecture.
   for (const [i, h] of (ctx.village?.houseInfo || []).entries()) {
@@ -226,6 +243,41 @@ export function createContactShadows(ctx = {}) {
     if (staticTargets.length >= cfg.maxStaticTargets) break;
     register(t, t.kind || 'tree', t.owner, t.id || 'static-' + i);
   }
+  const STATIC_CELL = 16;
+  const staticGrid = new Map();
+  const staticUnbound = [];
+  const staticOwners = [];
+  const staticOwnerSet = new Set();
+  const useStaticCache = staticTargets.length > 32;
+  if (useStaticCache) {
+    for (let i = 0; i < staticTargets.length; i++) {
+      const target = staticTargets[i], data = target.data;
+      if (target.owner && !staticOwnerSet.has(target.owner)) {
+        staticOwnerSet.add(target.owner);
+        staticOwners.push(target.owner);
+      }
+      if (data.owner && !staticOwnerSet.has(data.owner)) {
+        staticOwnerSet.add(data.owner);
+        staticOwners.push(data.owner);
+      }
+      if (data.mesh && !staticOwnerSet.has(data.mesh)) {
+        staticOwnerSet.add(data.mesh);
+        staticOwners.push(data.mesh);
+      }
+      if (finite(data.x) && finite(data.z)) {
+        const gx = Math.floor(data.x / STATIC_CELL);
+        const gz = Math.floor(data.z / STATIC_CELL);
+        const key = (gx + 32768) * 65536 + (gz + 32768);
+        let bucket = staticGrid.get(key);
+        if (!bucket) { bucket = []; staticGrid.set(key, bucket); }
+        bucket.push(target);
+      } else {
+        staticUnbound.push(target);
+      }
+    }
+  }
+  let lastStaticCamX = NaN, lastStaticCamZ = NaN, lastStaticEnabled = null;
+  const lastOwnerVis = staticOwners.map(() => null);
   const waterAt = (x, z) => {
     if (ctx.waterAt) { const y = ctx.waterAt(x, z); return finite(y) ? y : -Infinity; }
     const terrain = ctx.world?.terrain, pond = terrain?.pond;
@@ -248,7 +300,7 @@ export function createContactShadows(ctx = {}) {
     if (!finite(y) || !finite(data.lift ?? 0) || Math.abs(y + (data.lift || 0) - ground) > cfg.maxGroundGap) return null;
     return ground;
   }
-  function patch(mesh, capacity, data, kind, cx, cz, yaw, scale, opacity, label, cameraPosition, distance) {
+  function patch(mesh, capacity, data, kind, cx, cz, yaw, scale, opacity, seedVal, cameraPosition, distance) {
     if (mesh.count >= capacity) return;
     const dy = floor(cx, cz);
     if (dy === null || wet(cx, cz, dy)) return;
@@ -271,10 +323,10 @@ export function createContactShadows(ctx = {}) {
     mesh.setMatrixAt(i, matrix);
     const fade = 1 - clamp((dist / distance - cfg.fadeStart) / (1 - cfg.fadeStart), 0, 1);
     mesh.geometry.attributes.inkWeight.setX(i, clamp(opacity, 0, 0.4) * fade);
-    mesh.geometry.attributes.inkSeed.setX(i, hash(label));
+    mesh.geometry.attributes.inkSeed.setX(i, seedVal);
     mesh.geometry.attributes.inkCorners.setXYZW(i, corners[0], corners[1], corners[2], corners[3]);
   }
-  function supports(mesh, capacity, data, kind, label, cameraPosition, distance) {
+  function supports(mesh, capacity, data, kind, baseHash, cameraPosition, distance) {
     const heading = finite(data.yaw) ? data.yaw : finite(data.rot) ? data.rot : null;
     const yaw = number(heading, 0, -1e6, 1e6);
     const scale = number(data.s ?? data.scale, 1, 0.35, 1.8);
@@ -289,7 +341,7 @@ export function createContactShadows(ctx = {}) {
     for (let i = 0; i < points.length / 2; i++) {
       const x = points[i * 2] * sx, z = points[i * 2 + 1] * sz;
       const markKind = kind === 'person' && heading === null ? 'person-root' : kind;
-      patch(mesh, capacity, data, markKind, data.x + c * x + s * z, data.z - s * x + c * z, yaw, scale, opacity, label + ':' + i, cameraPosition, distance);
+      patch(mesh, capacity, data, markKind, data.x + c * x + s * z, data.z - s * x + c * z, yaw, scale, opacity, hashSupport(baseHash, i), cameraPosition, distance);
     }
   }
   function upload(mesh) {
@@ -306,23 +358,86 @@ export function createContactShadows(ctx = {}) {
     const base = time === 'night' ? cfg.nightStrength : time === 'dusk' ? cfg.duskStrength : time === 'dawn' ? cfg.dawnStrength : cfg.dayStrength;
     strength = clamp(base, 0, 1) * (1 - clamp(sky?.rainIntensity || 0, 0, 1) * clamp(cfg.rainAttenuation, 0, 1));
     material.uniforms.uStrength.value = strength;
-    staticBatch.count = actorsBatch.count = 0; actorTargets = 0; candidates.length = 0; seenActors.clear();
-    if (cfg.enabled !== false) {
-      for (let i = 0; i < staticTargets.length; i++) {
-        const target = staticTargets[i], data = target.data;
-        if (Array.isArray(target.source)) {
-          data.x = target.source[0]; data.y = target.source[1]; data.z = target.source[2];
+
+    const enabled = cfg.enabled !== false;
+    let rebuildStatic = !useStaticCache || !finite(lastStaticCamX) || !finite(lastStaticCamZ) || lastStaticEnabled !== enabled;
+    if (!rebuildStatic) {
+      const cdx = cameraPosition.x - lastStaticCamX;
+      const cdz = cameraPosition.z - lastStaticCamZ;
+      if (cdx * cdx + cdz * cdz > 0.0625) rebuildStatic = true;
+      else {
+        for (let i = 0; i < staticOwners.length; i++) {
+          if (visible(staticOwners[i]) !== lastOwnerVis[i]) { rebuildStatic = true; break; }
         }
-        target.distance = Math.hypot(data.x - cameraPosition.x, data.z - cameraPosition.z);
-        if (target.distance >= cfg.staticDistance + 10 || eligible(data, target.owner) === null) continue;
-        candidates.push(target);
       }
-      candidates.sort(sortCandidates);
-      for (const target of candidates) {
-        const data = target.data;
-        if (staticBatch.count >= cfg.maxStaticInstances) break;
-        supports(staticBatch, cfg.maxStaticInstances, data, target.kind, target.label, cameraPosition, cfg.staticDistance);
+    }
+
+    if (rebuildStatic) {
+      staticBatch.count = 0;
+      candidates.length = 0;
+      if (useStaticCache) {
+        lastStaticCamX = cameraPosition.x;
+        lastStaticCamZ = cameraPosition.z;
+        lastStaticEnabled = enabled;
+        for (let i = 0; i < staticOwners.length; i++) lastOwnerVis[i] = visible(staticOwners[i]);
+        if (enabled) {
+          const maxR = cfg.staticDistance + 10;
+          const gx0 = Math.floor((cameraPosition.x - maxR) / STATIC_CELL);
+          const gx1 = Math.floor((cameraPosition.x + maxR) / STATIC_CELL);
+          const gz0 = Math.floor((cameraPosition.z - maxR) / STATIC_CELL);
+          const gz1 = Math.floor((cameraPosition.z + maxR) / STATIC_CELL);
+          for (let gx = gx0; gx <= gx1; gx++) {
+            for (let gz = gz0; gz <= gz1; gz++) {
+              const bucket = staticGrid.get((gx + 32768) * 65536 + (gz + 32768));
+              if (!bucket) continue;
+              for (let k = 0; k < bucket.length; k++) {
+                const target = bucket[k], data = target.data;
+                target.distance = Math.hypot(data.x - cameraPosition.x, data.z - cameraPosition.z);
+                if (target.distance >= maxR || eligible(data, target.owner) === null) continue;
+                candidates.push(target);
+              }
+            }
+          }
+          for (let i = 0; i < staticUnbound.length; i++) {
+            const target = staticUnbound[i], data = target.data;
+            if (Array.isArray(target.source)) {
+              data.x = target.source[0]; data.y = target.source[1]; data.z = target.source[2];
+            }
+            target.distance = Math.hypot(data.x - cameraPosition.x, data.z - cameraPosition.z);
+            if (target.distance >= maxR || eligible(data, target.owner) === null) continue;
+            candidates.push(target);
+          }
+          candidates.sort(sortCandidates);
+          for (let i = 0; i < candidates.length; i++) {
+            const target = candidates[i];
+            if (staticBatch.count >= cfg.maxStaticInstances) break;
+            supports(staticBatch, cfg.maxStaticInstances, target.data, target.kind, target.baseHash, cameraPosition, cfg.staticDistance);
+          }
+        }
+      } else if (enabled) {
+        for (let i = 0; i < staticTargets.length; i++) {
+          const target = staticTargets[i], data = target.data;
+          if (Array.isArray(target.source)) {
+            data.x = target.source[0]; data.y = target.source[1]; data.z = target.source[2];
+          }
+          target.distance = Math.hypot(data.x - cameraPosition.x, data.z - cameraPosition.z);
+          if (target.distance >= cfg.staticDistance + 10 || eligible(data, target.owner) === null) continue;
+          candidates.push(target);
+        }
+        candidates.sort(sortCandidates);
+        for (const target of candidates) {
+          const data = target.data;
+          if (staticBatch.count >= cfg.maxStaticInstances) break;
+          supports(staticBatch, cfg.maxStaticInstances, data, target.kind, target.baseHash, cameraPosition, cfg.staticDistance);
+        }
       }
+      upload(staticBatch);
+    } else {
+      staticBatch.visible = staticBatch.count > 0 && strength > 0 && enabled;
+    }
+
+    actorsBatch.count = 0; actorTargets = 0; seenActors.clear();
+    if (enabled) {
       const addActor = (data, kind, owner, label, missingY = false) => {
         if (actorTargets >= cfg.maxActorTargets) return;
         actorTargets++;
@@ -334,7 +449,7 @@ export function createContactShadows(ctx = {}) {
         // Houses have arbitrary support dimensions and cannot use this actor broad phase.
         if (kind !== 'house' && Math.hypot(data.x - cameraPosition.x, data.z - cameraPosition.z) >= cfg.actorDistance + 2) return;
         if (eligible(data, owner, missingY) === null) return;
-        supports(actorsBatch, cfg.maxActorInstances, data, kind, label, cameraPosition, cfg.actorDistance);
+        supports(actorsBatch, cfg.maxActorInstances, data, kind, baseHashOf(label), cameraPosition, cfg.actorDistance);
       };
       for (let i = 0; i < (ctx.people?.list?.length || 0) && actorTargets < cfg.maxActorTargets; i++) addActor(ctx.people.list[i], 'person', ctx.people.group, 'person-' + i, true);
       for (let i = 0; i < (ctx.fauna?.animals?.length || 0) && actorTargets < cfg.maxActorTargets; i++) { const a = ctx.fauna.animals[i]; addActor(a, a.kind || 'animal', ctx.fauna.group, 'fauna-' + i); }
@@ -346,7 +461,7 @@ export function createContactShadows(ctx = {}) {
       const list = typeof ctx.actors === 'function' ? ctx.actors() : ctx.actors || [];
       for (let i = 0; i < list.length && actorTargets < cfg.maxActorTargets; i++) addActor(list[i], list[i]?.kind || 'person', list[i]?.owner, list[i]?.id || 'actor-' + i, list[i]?.y === undefined);
     }
-    upload(staticBatch); upload(actorsBatch);
+    upload(actorsBatch);
   }
   function getStats() {
     const staticInstances = disposed ? 0 : staticBatch.count, actorInstances = disposed ? 0 : actorsBatch.count;
@@ -364,6 +479,7 @@ export function createContactShadows(ctx = {}) {
     for (const mesh of [staticBatch, actorsBatch]) { mesh.count = 0; mesh.visible = false; mesh.dispose(); mesh.geometry.dispose(); }
     material.dispose(); heights.dispose(); group.clear(); group.removeFromParent();
     candidates.length = 0; seenActors.clear();
+    staticGrid.clear(); staticUnbound.length = 0; labelHashCache.clear();
   }
   return { group, update, getStats, dispose };
 }

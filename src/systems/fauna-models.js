@@ -5,6 +5,8 @@ import * as THREE from 'three';
 // deliberate silhouette without either subdivided spheres or stacked boxes.
 const INK = '#262626';
 const X = [1, 0, 0], Y = [0, 1, 0], Z = [0, 0, 1];
+const DOG_TAIL_AXIS = [0, 0.25, Math.sqrt(1 - 0.25 * 0.25)];
+const OX_TAIL_AXIS = [-0.62, 0, Math.sqrt(1 - 0.62 * 0.62)];
 const still = { channel: 0, pivot: [0, 0, 0], axis: X, amplitude: 0, offset: 0 };
 const joint = (channel, pivot, axis, amplitude = 1, offset = 0) => ({ channel, pivot, axis, amplitude, offset });
 
@@ -131,8 +133,8 @@ function chicken(cfg) {
 function dog(cfg) {
   const { add, finish } = builder('dog');
   add(loft([[-0.34,0.46,0.065,0.1],[-0.23,0.46,0.145,0.16],[-0.01,0.48,0.12,0.13],[0.2,0.46,0.17,0.2],[0.31,0.5,0.09,0.14]]),cfg.body);
-  add(sweep([[0,0.48,0.22,0.115],[0,0.63,0.32,0.105],[0,0.67,0.36,0.085]]),cfg.body);
-  const head=joint(1,[0,0.57,0.29],X,0.5);
+  const head=joint(1,[0,0.50,0.24],X,0.5);
+  add(sweep([[0,0.48,0.22,0.115],[0,0.63,0.32,0.105],[0,0.67,0.36,0.085]]),cfg.body,head);
   add(loft([[0.27,0.67,0.07,0.07],[0.35,0.67,0.12,0.12],[0.46,0.65,0.1,0.09],[0.51,0.62,0.06,0.055]]),cfg.body,head);
   add(loft([[0.46,0.615,0.075,0.055],[0.6,0.6,0.062,0.04],[0.65,0.605,0.042,0.03]],6),cfg.belly,head);
   add(ellipsoid([0,0.615,0.65],[0.045,0.028,0.022]),INK,head);
@@ -146,7 +148,7 @@ function dog(cfg) {
       add(ellipsoid([s*0.13,0.052,z+0.038],[0.044,0.034,0.068]),cfg.belly,leg);
     }
   }
-  add(sweep([[0,0.53,-0.28,0.047],[0,0.66,-0.43,0.042],[0,0.77,-0.44,0.03],[0,0.8,-0.33,0.009]],6),cfg.body,joint(2,[0,0.53,-0.28],Y,0.5));
+  add(sweep([[0,0.53,-0.28,0.047],[0,0.66,-0.43,0.042],[0,0.77,-0.44,0.03],[0,0.8,-0.33,0.009]],6),cfg.body,joint(2,[0,0.53,-0.28],DOG_TAIL_AXIS,0.5));
   return finish();
 }
 
@@ -245,7 +247,7 @@ function ox(cfg) {
     for (const t of [-1, 1]) {
       const z = t > 0 ? 0.36 : -0.39;
       const lx = s * (t > 0 ? 0.205 : 0.215);
-      const leg = joint(3, [lx, 0.58, z], X, 0.20, s * t > 0 ? Math.PI : 0);
+      const leg = joint(3, [lx, 0.58, z], X, t > 0 ? 0.21 : -0.19, s > 0 ? Math.PI : 0);
       const midZ = t > 0 ? z + 0.018 : z - 0.068;
       const footZ = t > 0 ? z + 0.012 : z - 0.015;
       add(sweep([
@@ -262,7 +264,7 @@ function ox(cfg) {
       }
     }
   }
-  const tail = joint(2, [0, 0.79, -0.54], Y, 0.5);
+  const tail = joint(2, [0, 0.79, -0.54], OX_TAIL_AXIS, 0.5);
   add(sweep([[0, 0.79, -0.54, 0.032], [0.03, 0.56, -0.66, 0.023], [0.05, 0.31, -0.67, 0.016]], 5), cfg.body, tail);
   add(ellipsoid([0.05, 0.25, -0.67], [0.046, 0.095, 0.042]), cfg.hoof, tail);
   return finish();

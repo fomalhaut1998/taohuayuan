@@ -325,7 +325,7 @@ export function createHospitalityFeast(options = {}) {
   actorGroup.name = 'hospitality-feast-actors';
   actorGroup.userData.dynamic = true;
   group.add(actorGroup);
-  const rig = createCommunityActors(actorGroup, 3);
+  const rig = options.actorRig ? options.actorRig.createChannel(actorGroup, 3) : createCommunityActors(actorGroup, 3);
   for (const child of actorGroup.children) child.userData.dynamic = true;
 
   const villagers = [

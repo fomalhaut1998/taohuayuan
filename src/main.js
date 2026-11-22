@@ -57,13 +57,27 @@ import { createSeasonalCycle } from './systems/seasonal-cycle.js';
 import { createPoeticInteractions } from './systems/poetic-interactions.js';
 import { createTravelerGuideAndCruise } from './systems/traveler-guide-cruise.js';
 import { createLazyTouchControls } from './player/touch-controls-lazy.js';
-import { createFarBambooGeometry, createFarPineGeometry, createFarHillBambooGeometry, syncLodVertexColors } from './world/lod-geometries.js';
+import {
+  createFarBambooGeometry,
+  createFarPineGeometry,
+  createFarHillBambooGeometry,
+  createFarBlossomTreeGeometry,
+  createFarMapleGeometry,
+  createFarCragGeometry,
+  createFarShrubGeometry,
+  createFarPeachTreeGeometry,
+  createFarGrassGeometry,
+  createFarMilletGeometry,
+  syncLodVertexColors
+} from './world/lod-geometries.js';
 import { attachGroundSurface } from './world/ground-surface.js';
 import { createFootstepFx } from './systems/footstep-fx.js';
 import { createQuestSystem } from './systems/quest-system.js';
 import { createPortalVisibility } from './bootstrap/portal-visibility.js';
 import { registerExtraRegions } from './bootstrap/world-registry.js';
 import { isModalBusy, isControlTarget } from './systems/modal-state.js';
+import { PROJECT_META } from './systems/project-meta.js';
+import { createCommunityActorPool } from './systems/community-actors.js';
 // Round 6: imports end
 import { createVillageScenes } from './world/village-scenes.js';
 import { createVillageLife } from './world/village-life.js';
@@ -318,8 +332,13 @@ const habitatDetails = createHabitatDetails({ world, field: terrain.field, dista
 scene.add(habitatDetails.group);
 // Round 6: scene begin
 const groundSurface = attachGroundSurface(terrain.field, { world, village, props, exterior });
+const interiorCommunityActorsGroup = new THREE.Group();
+interiorCommunityActorsGroup.name = 'shared-community-actors-interior';
+scene.add(interiorCommunityActorsGroup);
+const interiorCommunityRig = createCommunityActorPool(interiorCommunityActorsGroup, 64);
 const communityOptions = { world, field: terrain.field, distanceToRiver, riverCurve, stream, flora,
-  village, props, hinterland, villageScenes, villageLife, mysteryWorld, boats, cliff, exterior, habitatDetails };
+  village, props, hinterland, villageScenes, villageLife, mysteryWorld, boats, cliff, exterior, habitatDetails,
+  actorRig: interiorCommunityRig };
 const caveGleam = createCaveGleam({ world, cliff, field: terrain.field, emergenceAlong: -23.0, outerMouthAlong: 15.5 });
 scene.add(caveGleam.group);
 const cavePassage = createCavePassage({ world, cliff, field: terrain.field, scatter });
@@ -344,10 +363,11 @@ scene.add(riverSkiff.group);
 leisureGrove.targets.push({ id: 'fishing-skiff', ...riverSkiff.getAnchor(), range: 6.5, resolve: () => riverSkiff.getAnchor() });
 const qinHanCompletion = createQinHanCompletion({
   world, field: terrain.field, village, props, leisureGrove, qinHanHomestead,
+  actorRig: interiorCommunityRig,
   blockers: cliff.blockers.concat(village.blockers, qinHanHomestead.blockers, leisureGrove.blockers)
 });
 scene.add(qinHanCompletion.group);
-const oxPlowing = createOxPlowing({ world, field: terrain.field, homestead: qinHanHomestead });
+const oxPlowing = createOxPlowing({ world, field: terrain.field, homestead: qinHanHomestead, actorRig: interiorCommunityRig });
 scene.add(oxPlowing.group);
 registerExtraRegions(leisureGrove, [qinHanHomestead, { targets: qinHanCompletion.targets }, oxPlowing]);
 const nightMeteors = createNightMeteors({ scene });
@@ -538,7 +558,7 @@ waterworks.setSound({
   wood: (x, z) => (typeof sound.mortarThud === 'function' ? sound.mortarThud(x, z) : sound.wood(x, z))
 });
 const communityLife = createCommunityLife({ world, field: terrain.field, sound, blockers: colliders,
-  stations: [...pondLife.stations, ...waterworks.stations, ...leisureGrove.stations] });
+  stations: [...pondLife.stations, ...waterworks.stations, ...leisureGrove.stations], actorRig: interiorCommunityRig });
 scene.add(communityLife.group);
 const neighborTheaters = createNeighborTheaters({
   world,
@@ -546,9 +566,11 @@ const neighborTheaters = createNeighborTheaters({
   village,
   props,
   qinHanHomestead,
-  blockers: colliders
+  blockers: colliders,
+  actorRig: interiorCommunityRig
 });
 scene.add(neighborTheaters.group);
+interiorCommunityRig.flush();
 const tactileProps = createTactileProps({
   leisureGrove,
   waterworks
@@ -781,6 +803,7 @@ function ensureRound6Runtime() {
     sky.registerMaterials(phenology.group);
     portalVisibility?.addInterior?.(phenology.interiorGroup);
     portalVisibility?.addExterior?.(phenology.exteriorGroup);
+    if (typeof staticVisibility !== 'undefined') staticVisibility.scan(phenology.group);
   }
   if (!villagerDialogue && typeof sky !== 'undefined' && typeof interaction !== 'undefined' && typeof people !== 'undefined' && typeof player !== 'undefined') {
     villagerDialogue = createVillagerDialogue({
@@ -827,7 +850,8 @@ function ensureRound6Runtime() {
       avatar,
       boats,
       sky,
-      phenology
+      phenology,
+      sharedCommunityActors: interiorCommunityActorsGroup
     });
     scene.add(architecturalCraft.group);
     architecturalCraft.registerSky(sky);
@@ -989,6 +1013,7 @@ function ensureRound6Runtime() {
         neighborTheaters.group, tactileProps.group, smoothHinterlandPaths, inkAtmosphere.interiorGroup,
         valleyBorderlands.group, qianmoPaths.group, oxPlowing.group,
         outerWilds.interiorGroup, deepHollows.group, wildsEasterEggs.group, wulingOutskirts.interiorGroup,
+        interiorCommunityActorsGroup,
         architecturalCraft?.interiorGroup, phenology?.interiorGroup, seasonalCycle?.group, poeticInteractions?.interiorGroup
       ],
       exteriorGroups: [
@@ -1650,26 +1675,41 @@ function finishBench() {
 const staticVisibility = optimizeStaticVisibility(scene, {
   extraRoots: ['reeds-group', 'qin-han-completion'],
   allowShader: function (mesh) {
-    return mesh.name === 'reeds' || mesh.name === 'mulberry-leaves' || mesh.name === 'grass-near';
+    const n = mesh.name;
+    return (
+      n === 'reeds' ||
+      n === 'mulberry-leaves' ||
+      n === 'grass-near' ||
+      n === 'qin-han-millet-crops' ||
+      n === 'leisure-grove-solid' ||
+      n === 'qianmo-paths-solid' ||
+      n === 'wuling-outskirts-ext-solid' ||
+      n === 'wuling-outskirts-int-solid' ||
+      n === 'houses-tiles'
+    );
   },
   extraMargin: function (mesh) {
-    return mesh.name === 'reeds' || mesh.name === 'mulberry-leaves' ? 0.35 : mesh.name === 'grass-near' ? 0.2 : 0;
+    const n = mesh.name;
+    if (n === 'reeds' || n === 'mulberry-leaves' || n === 'qin-han-millet-crops') return 0.35;
+    if (n === 'grass-near') return 0.2;
+    return 0;
   },
   cellSize: 12,
+  getCellSize: (mesh) => (mesh && mesh.name === 'terrain' ? 24 : 12),
   getMaxDistance: function (camera, mesh) {
     const base = scene.fog && scene.fog.far ? scene.fog.far + 6 : Infinity;
     if (!mesh) return base;
     const n = mesh.name;
     const mobileScale = cachedMobileViewport ? 0.8 : 1;
-    // 远草/野花在半像素以下，170 外收掉；近草、细叶与远坡零星草簇按屏幕投影阈值收边
+    // 远草/野花与微末植被在雾尾收边，建筑、地形、路径与茶田等大场景地物直达 fog.far+6 绝不突兀冒出
     if (n === 'grass') return Math.min(base, 170 * mobileScale);
-    if (n === 'flower-stems' || n === 'flower-heads' || n === 'stones') return Math.min(base, 115 * mobileScale);
-    if (n === 'grass-near') return Math.min(base, 72 * mobileScale);
-    if (n === 'grass-approach') return Math.min(base, 80 * mobileScale);
-    if (n === 'mulberry-leaves') return Math.min(base, 96 * mobileScale);
-    if (n === 'qin-han-millet-crops') return Math.min(base, 118 * mobileScale);
+    if (n === 'flower-stems' || n === 'flower-heads' || n === 'stones') return Math.min(base, 165 * mobileScale);
+    if (n === 'grass-near') return Math.min(base, 125 * mobileScale);
+    if (n === 'grass-approach') return Math.min(base, 135 * mobileScale);
+    if (n === 'mulberry-leaves') return Math.min(base, 240 * mobileScale);
+    if (n === 'qin-han-millet-crops') return Math.min(base, 250 * mobileScale);
+    if (n === 'village-props') return Math.min(base, 240 * mobileScale);
     if (
-      n === 'village-props' ||
       n === 'village-scenes-botanical' ||
       n === 'village-scenes-ground' ||
       n === 'village-life-botanical' ||
@@ -1677,26 +1717,15 @@ const staticVisibility = optimizeStaticVisibility(scene, {
       n === 'habitat-details-botanical' ||
       n === 'habitat-details-ground' ||
       n === 'pond-life-underwater'
-    ) return Math.min(base, 112 * mobileScale);
-    if (
-      n === 'qin-han-completion-static' ||
-      n === 'village-scenes-solid' ||
-      n === 'village-life-solid' ||
-      n === 'habitat-details-solid'
-    ) return Math.min(base, 132 * mobileScale);
-    if (
-      n === 'valley-borderlands-ground' ||
-      n === 'qianmo-paths-ground' ||
-      n === 'qianmo-paths-solid'
-    ) return Math.min(base, 185 * mobileScale);
+    ) return Math.min(base, 210 * mobileScale);
+    if (n === 'valley-borderlands-shrubs') return Math.min(base, 220 * mobileScale);
     if (
       n === 'outer-wilds-tufts' ||
       n === 'deep-hollows-tufts' ||
       n === 'valley-borderlands-tufts' ||
-      n === 'valley-borderlands-shrubs' ||
       n === 'outer-wilds-wildflowers' ||
       n === 'valley-borderlands-wildflowers'
-    ) return Math.min(base, 96 * mobileScale);
+    ) return Math.min(base, 155 * mobileScale);
     if (n === 'deep-hollows-tea') return Math.min(base, 125 * mobileScale);
     return base;
   },
@@ -1706,25 +1735,89 @@ const staticVisibility = optimizeStaticVisibility(scene, {
     if (n === 'bamboo') {
       return {
         geometry: createFarBambooGeometry(mesh),
-        distance: 56,
-        hysteresis: 8,
+        distance: 74,
+        hysteresis: 10,
         syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 2.3)
       };
     }
     if (n === 'outer-wilds-pines' || n === 'valley-borderlands-pines') {
       return {
         geometry: createFarPineGeometry(mesh),
-        distance: 78,
-        hysteresis: 10,
+        distance: 102,
+        hysteresis: 12,
         syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 1.85)
       };
     }
     if (n === 'outer-wilds-bamboo' || n === 'valley-borderlands-bamboo') {
       return {
         geometry: createFarHillBambooGeometry(mesh),
-        distance: 68,
-        hysteresis: 8,
+        distance: 90,
+        hysteresis: 10,
         syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 1.8)
+      };
+    }
+    if (n === 'outer-wilds-blossoms' || n === 'valley-borderlands-blossoms') {
+      return {
+        geometry: createFarBlossomTreeGeometry(mesh),
+        distance: 106,
+        hysteresis: 12,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 1.75)
+      };
+    }
+    if (n === 'outer-wilds-maples') {
+      return {
+        geometry: createFarMapleGeometry(mesh),
+        distance: 106,
+        hysteresis: 12,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 1.75)
+      };
+    }
+    if (n === 'outer-wilds-crags' || n === 'valley-borderlands-crags') {
+      return {
+        geometry: createFarCragGeometry(mesh),
+        distance: 112,
+        hysteresis: 12,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 0.25)
+      };
+    }
+    if (n === 'outer-wilds-tea-shrubs') {
+      return {
+        geometry: createFarShrubGeometry(mesh),
+        distance: 92,
+        hysteresis: 10,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 0.05)
+      };
+    }
+    if (n.startsWith('tree-far-')) {
+      return {
+        geometry: createFarPeachTreeGeometry(mesh),
+        distance: 128,
+        hysteresis: 14,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, lodGeo.userData.splitY ?? 2.2)
+      };
+    }
+    if (n === 'grass-near') {
+      return {
+        geometry: createFarGrassGeometry(mesh, 4),
+        distance: 52,
+        hysteresis: 8,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 0.18)
+      };
+    }
+    if (n === 'grass') {
+      return {
+        geometry: createFarGrassGeometry(mesh, 3),
+        distance: 84,
+        hysteresis: 10,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 0.18)
+      };
+    }
+    if (n === 'qin-han-millet-crops') {
+      return {
+        geometry: createFarMilletGeometry(mesh),
+        distance: 78,
+        hysteresis: 10,
+        syncGeometry: (src, lodGeo) => syncLodVertexColors(src, lodGeo, 0.30)
       };
     }
     return null;
@@ -1905,6 +1998,7 @@ renderer.setAnimationLoop(function () {
   sound.setLostMood?.(Boolean(act3Finale?.isLost));
   if (rawHinterlandPaths) rawHinterlandPaths.visible = false;
   portalVisibility?.update(camera, Boolean(godFlight?.active || travelerGuide?.cruiseActive));
+  interiorCommunityRig.flush(camera, scene.fog?.far ? scene.fog.far + 6 : 326);
   inkAtmosphere.update(r6Dt, elapsed, sky, player.state, camera);
   architecturalCraft?.update(r6Dt, elapsed, sky, phenology, camera);
   poeticWayfinder?.update(r6Dt, elapsed, sky, player.state, camera);
@@ -2038,6 +2132,7 @@ renderer.setAnimationLoop(function () {
 
 // 调试入口：控制台可直接查看渲染统计 / 传送
 window.__APP__ = {
+  meta: PROJECT_META,
   renderer: renderer,
   staticVisibility: staticVisibility,
   twilightWater: twilightWater,

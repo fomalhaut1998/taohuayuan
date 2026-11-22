@@ -2,6 +2,12 @@
   "name": "taohuayuan",
   "private": true,
   "version": "1.0.0",
+  "license": "MIT",
+  "homepage": "https://github.com/fomalhaut1998/taohuayuan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fomalhaut1998/taohuayuan"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

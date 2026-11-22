@@ -142,7 +142,7 @@ export function createNeighborTheaters(options = {}) {
   const actorGroup = new THREE.Group();
   actorGroup.name = 'neighbor-theater-actors';
   group.add(actorGroup);
-  const rig = createCommunityActors(actorGroup, 2);
+  const rig = options.actorRig ? options.actorRig.createChannel(actorGroup, 2) : createCommunityActors(actorGroup, 2);
 
   // Single 6-slot InstancedMesh for wooden well bucket + hoop + water glint + rope + resting pail + herding bamboo switch
   const PROP_COUNT = 6;
