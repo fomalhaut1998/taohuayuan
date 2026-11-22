@@ -4,7 +4,7 @@
 
 浏览器里的《桃花源记》水墨青绿 3D 活态世界：可漫步、可泛舟、可驻足，桌面键鼠与移动端触屏皆宜。纯静态构建、无后端、无运行时外部请求——构建后发链接即可直接点开玩。
 
-**在线体验**：<https://fomalhaut1998.github.io/taohuayuan/>（GitHub Pages 自动部署：推送 main 即更新）
+**在线体验**：<https://github.fomal.cc/taohuayuan/>（GitHub Pages 自动部署：推送 main 即更新；<https://fomalhaut1998.github.io/taohuayuan/> 同址跳转）
 
 ![桃花林 · 春深 · 晴昼](docs/images/peach-grove-spring.webp)
 
