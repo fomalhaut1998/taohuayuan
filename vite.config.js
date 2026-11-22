@@ -1,4 +1,6 @@
-export default {
+export default ({ command }) => ({
+  // GitHub Pages 部署于 /taohuayuan/ 子路径；开发服务器保持根路径
+  base: command === 'build' ? '/taohuayuan/' : '/',
   build: {
     chunkSizeWarningLimit: 550,
     rollupOptions: {
@@ -121,4 +123,4 @@ export default {
       }
     }
   }
-};
+});
